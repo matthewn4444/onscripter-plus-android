@@ -3,7 +3,7 @@ Onscripter Plus For Android
 ===========================
 December 27, 2013
 
-Port of Onscripter for Android (http://onscripter.sourceforge.jp/android/android.html)
+Fork of Onscripter for Android (http://onscripter.sourceforge.jp/android/android.html)
 that is compiled on Windows including full source (with dependencies).
 
 This Android application allows you to play visual novel games using the NScripter engine
