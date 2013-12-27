@@ -55,6 +55,6 @@ Play Visual Novel
 1. Download a visual novel game that uses NScripter
 2. Plug Android device in computer and navigate to the internal memory of the Android device
 3. Make a new folder "ons"
-4. Place a font (Japanese preferably) into the "ons" folder and name it "default.ttf"
 4. Place the game folder into "ons" folder
+4. Place a font (Japanese preferably) into the game folder and name it "default.ttf"
 5. You can delete the dll files
