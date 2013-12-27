@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="button_rclick">右クリック</string>
+    <string name="button_lclick">左クリック</string>
+    <string name="button_left">上ホイール</string>
+    <string name="button_right">下ホイール</string>
+    <string name="button_up">次のボタン</string>
+    <string name="button_down">前のボタン</string>
+    <string name="menu_automode">オートモード</string>
+    <string name="menu_skip">スキップ</string>
+    <string name="menu_speed">速度切替</string>
+    <string name="menu_settings">設定</string>
+    <string name="menu_show_buttons">ボタンを表示</string>
+    <string name="menu_hide_buttons">ボタンを非表示</string>
+    <string name="menu_version">バージョン</string>
+    <string name="menu_quit">終了</string>
+</resources>

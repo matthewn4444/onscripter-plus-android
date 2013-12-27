@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ONScripter</string>
+    <string name="version">ONScripter 20130202\nStudio O.G.A. Ogapee</string>
+    <bool name="use_launcher">true</bool>
+    <bool name="button_visible">true</bool>
+    <bool name="render_font_outline">true</bool>
+    <string name="download_version">.20130202</string>
+    <string name="public_key"></string>
+
+    <string name="button_rclick">Right Click</string>
+    <string name="button_lclick">Left Click</string>
+    <string name="button_left">Wheel Up</string>
+    <string name="button_right">Wheel Down</string>
+    <string name="button_up">Next Button</string>
+    <string name="button_down">Prev Button</string>
+    <string name="menu_automode">Automode</string>
+    <string name="menu_skip">Skip</string>
+    <string name="menu_speed">Change Speed</string>
+    <string name="menu_settings">Settings</string>
+    <string name="menu_show_buttons">Show Buttons</string>
+    <string name="menu_hide_buttons">Hide Buttons</string>
+    <string name="menu_version">Version</string>
+    <string name="menu_quit">Quit</string>
+</resources>
