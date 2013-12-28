@@ -671,20 +671,6 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
     col = 240;
     SDL_FillRect(s, &rect, SDL_MapRGBA(s->format, col, col, col, 0xff));
 
-    uchar3 col3={0, 0, 0};
-    dialog_font.top_xy[0] = 7;
-    dialog_font.top_xy[1] = DIALOG_HEADER+5;
-    dialog_font.num_xy[0] = (DIALOG_W-7*2)/dialog_font.pitch_xy[0];
-    dialog_font.num_xy[1] = 3;
-    dialog_font.clear();
-    drawString( mes1, col3, &dialog_font, false, s, NULL, NULL );
-
-    dialog_font.top_xy[0] = 5;
-    dialog_font.top_xy[1] = (DIALOG_HEADER-dialog_font.font_size_xy[1])/2;
-    dialog_font.setLineArea( strlen(mes2)/2+1 );
-    dialog_font.clear();
-    drawString( mes2, col3, &dialog_font, false, s, NULL, NULL );
-
     SDL_Surface *s2 = s;
     if (screen_ratio2 != screen_ratio1){
         s2 = SDL_CreateRGBSurface( SDL_SWSURFACE, DIALOG_W*screen_ratio1/screen_ratio2, DIALOG_H*screen_ratio1/screen_ratio2,
@@ -692,6 +678,20 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
         resizeSurface(s, s2);
         SDL_FreeSurface(s);
     }
+
+    uchar3 col3={0, 0, 0};
+    dialog_font.top_xy[0] = 7;
+    dialog_font.top_xy[1] = DIALOG_HEADER+5;
+    dialog_font.num_xy[0] = (DIALOG_W-7*2)/dialog_font.pitch_xy[0];
+    dialog_font.num_xy[1] = 3;
+    dialog_font.clear();
+    drawString( mes1, col3, &dialog_font, false, s2, NULL, NULL );
+
+    dialog_font.top_xy[0] = 5;
+    dialog_font.top_xy[1] = (DIALOG_HEADER-dialog_font.font_size_xy[1])/2;
+    dialog_font.setLineArea( strlen(mes2)/2+1 );
+    dialog_font.clear();
+    drawString( mes2, col3, &dialog_font, false, s2, NULL, NULL );
 
     dialog_info.deleteSurface();
     dialog_info.num_of_cells = 1;
@@ -735,12 +735,6 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
             col = 240;
             if (j==1) col = 214;
             SDL_FillRect(bs, &rect, SDL_MapRGBA(bs->format, col, col, col, 0xff));
-
-            dialog_font.top_xy[0] = rect.x+(rect.w-dialog_font.pitch_xy[0]*strlen(mes[i])/2)/2;
-            dialog_font.top_xy[1] = rect.y+(rect.h-dialog_font.font_size_xy[1])/2;
-            dialog_font.setLineArea( strlen(mes[i])/2+1 );
-            dialog_font.clear();
-            drawString( mes[i], col3, &dialog_font, false, bs, NULL, NULL );
         }
 
         SDL_Surface *bs2 = bs;
@@ -751,6 +745,18 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
             SDL_FreeSurface(bs);
         }
 
+        for (int j=0 ; j<2 ; j++){
+            rect.x = DIALOG_BUTTON_W*j+2;
+            rect.y = 2;
+            rect.w = DIALOG_BUTTON_W-4; rect.h = DIALOG_BUTTON_H-4;
+
+            dialog_font.top_xy[0] = rect.x+(rect.w-dialog_font.pitch_xy[0]*strlen(mes[i])/2)/2;
+            dialog_font.top_xy[1] = rect.y+(rect.h-dialog_font.font_size_xy[1])/2;
+            dialog_font.setLineArea( strlen(mes[i])/2+1 );
+            dialog_font.clear();
+            drawString( mes[i], col3, &dialog_font, false, bs2, NULL, NULL );
+        }
+
         ButtonLink *btn = new ButtonLink();
         btn->no = i+1;
         btn->button_type = ButtonLink::TMP_SPRITE_BUTTON;
@@ -758,8 +764,10 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
         btn->anim[0]->num_of_cells = 2;
         btn->anim[0]->setImage(bs2, texture_format);
         btn->show_flag = 1;
-        btn->anim[0]->pos.x = dialog_info.pos.x + DIALOG_W-3-(DIALOG_BUTTON_W+8)*(2-i);
-        btn->anim[0]->pos.y = dialog_info.pos.y + DIALOG_H-3-(DIALOG_FOOTER+DIALOG_BUTTON_H)/2;
+
+        btn->anim[0]->pos.x = dialog_info.pos.x + (DIALOG_W-3-(DIALOG_BUTTON_W+8)*(2-i))*screen_ratio1/screen_ratio2;
+        btn->anim[0]->pos.y = dialog_info.pos.y + (DIALOG_H-3-(DIALOG_FOOTER+DIALOG_BUTTON_H)/2)*screen_ratio1/screen_ratio2;
+
         btn->anim[0]->visible = true;
         btn->select_rect = btn->image_rect = btn->anim[0]->pos;
 

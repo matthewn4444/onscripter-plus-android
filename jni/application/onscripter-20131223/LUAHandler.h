@@ -2,7 +2,7 @@
  *
  *  LUAHandler.h - LUA handler for ONScripter
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -50,7 +50,6 @@ public:
     void init(ONScripter *ons, ScriptHandler *sh);
     void addCallback(const char *label);
 
-    void callback(int name);
     int  callFunction(bool is_callback, const char *cmd);
 
     bool isCallbackEnabled(int val);

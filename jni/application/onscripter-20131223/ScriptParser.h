@@ -2,7 +2,7 @@
  * 
  *  ScriptParser.h - Define block parser of ONScripter
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -67,7 +67,7 @@ public:
     void setCurrentLabel( const char *label );
     void gosubReal( const char *label, char *next_script, bool textgosub_flag=false );
 
-    FILE *fopen(const char *path, const char *mode);
+    FILE *fopen(const char *path, const char *mode, bool use_save_dir=false);
     void saveGlovalData();
 
     /* Command */
@@ -93,6 +93,7 @@ public:
     int selectcolorCommand();
     int savenumberCommand();
     int savenameCommand();
+    int savedirCommand();
     int rubyonCommand();
     int rubyoffCommand();
     int roffCommand();
@@ -227,6 +228,7 @@ protected:
     int debug_level;
 
     char *archive_path;
+    char *save_dir;
     char *nsa_path;
     int nsa_offset;
     bool globalon_flag;
@@ -266,7 +268,7 @@ protected:
     int screen_bpp;
     char *version_str;
     int underline_value;
-    char *savedir;
+    char *save_dir_envdata;
 
     void deleteNestInfo();
     void setStr( char **dst, const char *src, int num=-1 );
@@ -356,10 +358,16 @@ protected:
             if (text) delete[] text;
             if (tag)  delete[] tag;
         }
-        int add(char ch){
-            if (text_count >= max_text) return -1;
+        char add(char ch){
+            if (text_count >= max_text){
+                char *text2 = new char[max_text*2];
+                memcpy(text2, text, max_text);
+                delete[] text;
+                text = text2;
+                max_text *= 2;
+            }
             text[text_count++] = ch;
-            return 0;
+            return ch;
         };
     } *page_list, *start_page, *current_page; // ring buffer
     int  max_page_list;

@@ -32,6 +32,7 @@ ONScripter ons;
 #import "DataCopier.h"
 #import "DataDownloader.h"
 #import "ScriptSelector.h"
+#import "MoviePlayer.h"
 #endif
 
 #if defined(PSP)
@@ -132,6 +133,16 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 }
 #endif
 
+#if defined(IOS)
+extern "C" void playVideoIOS(const char *filename, bool click_flag, bool loop_flag)
+{
+    NSString *str = [[NSString alloc] initWithUTF8String:filename];
+    id obj = [MoviePlayer alloc];
+    [[obj init] play:str click:click_flag loop:loop_flag];
+    [obj release];
+}
+#endif
+
 #if defined(QWS) || defined(ANDROID)
 int SDL_main( int argc, char **argv )
 #elif defined(PSP)
@@ -168,20 +179,35 @@ int main( int argc, char **argv )
     if ([[[DataCopier alloc] init] copy]) exit(-1);
 #endif
 
-    NSArray* paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
-    NSString* path = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
+    // scripts and archives are stored under /Library/Caches
+    NSArray* cpaths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES);
+    NSString* cpath = [[cpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
     char filename[256];
-    strcpy(filename, [path UTF8String]);
+    strcpy(filename, [cpath UTF8String]);
     ons.setArchivePath(filename);
+
+    // output files are stored under /Documents
+    NSArray* dpaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString* dpath = [[dpaths objectAtIndex:0] stringByAppendingPathComponent:@"ONS"];
+    strcpy(filename, [dpath UTF8String]);
+    ons.setSaveDir(filename);
 
 #if defined(ZIP_URL)
     if ([[[DataDownloader alloc] init] download]) exit(-1);
 #endif
 
 #if defined(USE_SELECTOR)
-    strcpy(filename, [[[[ScriptSelector alloc] initWithStyle:UITableViewStylePlain] select] UTF8String]);
+    // scripts and archives are stored under /Library/Caches
+    cpath = [[[ScriptSelector alloc] initWithStyle:UITableViewStylePlain] select];
+    strcpy(filename, [cpath UTF8String]);
     ons.setArchivePath(filename);
+
+    // output files are stored under /Documents
+    dpath = [[dpaths objectAtIndex:0] stringByAppendingPathComponent:[cpath lastPathComponent]];
+    strcpy(filename, [dpath UTF8String]);
+    ons.setSaveDir(filename);
 #endif
+
 #if defined(RENDER_FONT_OUTLINE)
     ons.renderFontOutline();
 #endif

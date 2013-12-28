@@ -2,7 +2,7 @@
  *
  *  ONScripter_file.cpp - FILE I/O of ONScripter
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -50,7 +50,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 
     script_h.getStringFromInteger( save_file_info.sjis_no, no, (num_save_file >= 10)?2:1 );
 #if defined(LINUX) || defined(MACOSX) || defined(IOS)
-    sprintf( file_name, "%ssave%d.dat", archive_path, no );
+    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     struct stat buf;
     struct tm *tm;
     if ( stat( file_name, &buf ) != 0 ){
@@ -65,7 +65,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     save_file_info.hour   = tm->tm_hour;
     save_file_info.minute = tm->tm_min;
 #elif defined(WIN32)
-    sprintf( file_name, "%ssave%d.dat", archive_path, no );
+    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     HANDLE  handle;
     FILETIME    tm, ltm;
     SYSTEMTIME  stm;
@@ -94,31 +94,31 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
     save_file_info.hour   = stm.wHour;
     save_file_info.minute = stm.wMinute;
 #elif defined(MACOS9)
-	sprintf( file_name, "%ssave%d.dat", archive_path, no );
-	CInfoPBRec  pb;
-	Str255      p_file_name;
-	FSSpec      file_spec;
-	DateTimeRec tm;
-	c2pstrcpy( p_file_name, file_name );
-	if ( FSMakeFSSpec(0, 0, p_file_name, &file_spec) != noErr ){
-		save_file_info.valid = false;
-		return;
-	}
-	pb.hFileInfo.ioNamePtr = file_spec.name;
-	pb.hFileInfo.ioVRefNum = file_spec.vRefNum;
-	pb.hFileInfo.ioFDirIndex = 0;
-	pb.hFileInfo.ioDirID = file_spec.parID;
-	if (PBGetCatInfoSync(&pb) != noErr) {
-		save_file_info.valid = false;
-		return;
-	}
-	SecondsToDate( pb.hFileInfo.ioFlMdDat, &tm );
-	save_file_info.month  = tm.month;
-	save_file_info.day    = tm.day;
-	save_file_info.hour   = tm.hour;
-	save_file_info.minute = tm.minute;
+    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
+    CInfoPBRec  pb;
+    Str255      p_file_name;
+    FSSpec      file_spec;
+    DateTimeRec tm;
+    c2pstrcpy( p_file_name, file_name );
+    if ( FSMakeFSSpec(0, 0, p_file_name, &file_spec) != noErr ){
+        save_file_info.valid = false;
+        return;
+    }
+    pb.hFileInfo.ioNamePtr = file_spec.name;
+    pb.hFileInfo.ioVRefNum = file_spec.vRefNum;
+    pb.hFileInfo.ioFDirIndex = 0;
+    pb.hFileInfo.ioDirID = file_spec.parID;
+    if (PBGetCatInfoSync(&pb) != noErr) {
+        save_file_info.valid = false;
+        return;
+    }
+    SecondsToDate( pb.hFileInfo.ioFlMdDat, &tm );
+    save_file_info.month  = tm.month;
+    save_file_info.day    = tm.day;
+    save_file_info.hour   = tm.hour;
+    save_file_info.minute = tm.minute;
 #elif defined(PSP)
-    sprintf( file_name, "%ssave%d.dat", archive_path, no );
+    sprintf( file_name, "%ssave%d.dat", save_dir?save_dir:archive_path, no );
     SceIoStat buf;
     if ( sceIoGetstat(file_name, &buf)<0 ){
         save_file_info.valid = false;
@@ -132,7 +132,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 #else
     sprintf( file_name, "save%d.dat", no );
     FILE *fp;
-    if ( (fp = fopen( file_name, "rb" )) == NULL ){
+    if ( (fp = fopen( file_name, "rb", true )) == NULL ){
         save_file_info.valid = false;
         return;
     }

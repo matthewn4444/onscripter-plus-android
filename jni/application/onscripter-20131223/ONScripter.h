@@ -69,6 +69,7 @@ public:
     void setRegistryFile(const char *filename);
     void setDLLFile(const char *filename);
     void setArchivePath(const char *path);
+    void setSaveDir(const char *path);
     void setFullscreenMode();
     void setWindowMode();
     void enableButtonShortCut();

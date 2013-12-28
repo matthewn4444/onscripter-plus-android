@@ -2,7 +2,7 @@
  *
  *  ScriptHandler.cpp - Script manipulation class
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -30,6 +30,7 @@
 
 ScriptHandler::ScriptHandler()
 {
+    save_dir = NULL;
     num_of_labels = 0;
     script_buffer = NULL;
     kidoku_buffer = NULL;
@@ -124,13 +125,27 @@ void ScriptHandler::reset()
     internal_current_script = NULL;
 }
 
-FILE *ScriptHandler::fopen( const char *path, const char *mode )
+void ScriptHandler::setSaveDir(const char *path)
 {
-    char * file_name = new char[strlen(archive_path)+strlen(path)+1];
-    sprintf( file_name, "%s%s", archive_path, path );
+    if (save_dir) delete[] save_dir;
+    save_dir = new char[ strlen(path) ];
+    strcpy(save_dir, path);
+}
 
-    FILE *fp = ::fopen( file_name, mode );
-    delete[] file_name;
+FILE *ScriptHandler::fopen( const char *path, const char *mode, bool use_save_dir )
+{
+    char *filename;
+    if (use_save_dir && save_dir){
+        filename = new char[strlen(save_dir)+strlen(path)+1];
+        sprintf( filename, "%s%s", save_dir, path );
+    }
+    else{
+        filename = new char[strlen(archive_path)+strlen(path)+1];
+        sprintf( filename, "%s%s", archive_path, path );
+    }
+
+    FILE *fp = ::fopen( filename, mode );
+    delete[] filename;
 
     return fp;
 }
@@ -367,7 +382,7 @@ void ScriptHandler::skipToken()
     bool quat_flag = false;
     bool text_flag = false;
     while(1){
-        if ( *buf == 0x0a ||
+        if ( *buf == 0x0a || *buf == 0 ||
              (!quat_flag && !text_flag && (*buf == ':' || *buf == ';') ) ) break;
         if ( *buf == '"' ) quat_flag = !quat_flag;
         if ( IS_TWO_BYTE(*buf) ){
@@ -560,7 +575,7 @@ void ScriptHandler::saveKidokuData()
 {
     FILE *fp;
 
-    if ( ( fp = fopen( "kidoku.dat", "wb" ) ) == NULL ){
+    if ( ( fp = fopen( "kidoku.dat", "wb", true ) ) == NULL ){
         fprintf( stderr, "can't write kidoku.dat\n" );
         return;
     }
@@ -577,7 +592,7 @@ void ScriptHandler::loadKidokuData()
     kidoku_buffer = new char[ script_buffer_length/8 + 1 ];
     memset( kidoku_buffer, 0, script_buffer_length/8 + 1 );
 
-    if ( ( fp = fopen( "kidoku.dat", "rb" ) ) != NULL ){
+    if ( ( fp = fopen( "kidoku.dat", "rb", true ) ) != NULL ){
         fread( kidoku_buffer, 1, script_buffer_length/8, fp );
         fclose( fp );
     }

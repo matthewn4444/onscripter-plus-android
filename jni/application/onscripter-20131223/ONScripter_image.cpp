@@ -89,8 +89,8 @@ SDL_Surface *ONScripter::createRectangleSurface(char *filename, bool *has_alpha)
     }
 
     SDL_PixelFormat *fmt = image_surface->format;
-	SDL_Surface *tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, w * screen_ratio1 / screen_ratio2, h * screen_ratio1 / screen_ratio2,
-											fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_Surface *tmp = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h,
+                                            fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
 
     c = c2;
     for (int i=0 ; i<n ; i++){
@@ -314,8 +314,7 @@ void ONScripter::alphaBlend( SDL_Surface *mask_surface,
     SDL_UnlockSurface( effect_src_surface );
 }
 
-#if defined(BPP16)
-#define BLEND_PIXEL_TEXT()\
+#define BLEND_PIXEL_TEXT_BPP16()\
 {\
     Uint32 mask2 = *src_buffer >> 3;                                    \
     if (mask2 != 0){                                                    \
@@ -324,7 +323,7 @@ void ONScripter::alphaBlend( SDL_Surface *mask_surface,
         *dst_buffer = mask | mask >> 16;                                \
     }                                                                   \
 }
-#else
+
 #define BLEND_PIXEL_TEXT()\
 {\
     Uint32 mask2 = *src_buffer;                                     \
@@ -340,7 +339,6 @@ void ONScripter::alphaBlend( SDL_Surface *mask_surface,
         *dst_buffer    = 0xff000000 | mask_rb | mask_g;             \
     }                                                               \
 }
-#endif        
 
 // alphaBlendText
 // dst: ONSBuf surface (accumulation_surface)
@@ -373,41 +371,69 @@ void ONScripter::alphaBlendText( SDL_Surface *dst_surface, SDL_Rect dst_rect,
     SDL_LockSurface( dst_surface );
     SDL_LockSurface( src_surface );
 
-    SDL_PixelFormat *fmt = accumulation_surface->format;
-#if defined(BPP16)    
-    Uint32 src_color = (((color.r >> fmt->Rloss) << fmt->Rshift) |
-                        ((color.g >> fmt->Gloss) << fmt->Gshift) |
-                        ((color.b >> fmt->Bloss) << fmt->Bshift));
-    src_color = (src_color | src_color << 16) & 0x07e0f81f;
-#else
-    Uint32 src_color1 = (color.r << fmt->Rshift) | (color.b << fmt->Bshift);
-    Uint32 src_color2 = (color.g << fmt->Gshift);
-    Uint32 src_color3 = (0xff << fmt->Ashift) | src_color1 | src_color2;
-#endif    
+    SDL_PixelFormat *fmt = dst_surface->format;
 
-    ONSBuf *dst_buffer = (AnimationInfo::ONSBuf *)dst_surface->pixels + dst_surface->w * dst_rect.y + dst_rect.x;
+    if (fmt->BitsPerPixel == 16){
+        Uint32 src_color = (((color.r >> fmt->Rloss) << fmt->Rshift) |
+                            ((color.g >> fmt->Gloss) << fmt->Gshift) |
+                            ((color.b >> fmt->Bloss) << fmt->Bshift));
+        src_color = (src_color | src_color << 16) & 0x07e0f81f;
 
-    if (!rotate_flag){
-        unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch * y2 + x2;
-        for ( int i=0 ; i<dst_rect.h ; i++ ){
-            for ( int j=dst_rect.w ; j!=0 ; j-- ){
-                BLEND_PIXEL_TEXT();
-                src_buffer++;
-                dst_buffer++;
+        Uint16 *dst_buffer = (Uint16*)dst_surface->pixels + dst_surface->w * dst_rect.y + dst_rect.x;
+
+        if (!rotate_flag){
+            unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch * y2 + x2;
+            for ( int i=0 ; i<dst_rect.h ; i++ ){
+                for ( int j=dst_rect.w ; j!=0 ; j-- ){
+                    BLEND_PIXEL_TEXT_BPP16();
+                    src_buffer++;
+                    dst_buffer++;
+                }
+                src_buffer += src_surface->pitch - dst_rect.w;
+                dst_buffer += dst_surface->w - dst_rect.w;
             }
-            src_buffer += src_surface->pitch - dst_rect.w;
-            dst_buffer += dst_surface->w - dst_rect.w;
+        }
+        else{
+            for ( int i=0 ; i<dst_rect.h ; i++ ){
+                unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch*(src_surface->h - x2 - 1) + y2 + i;
+                for ( int j=dst_rect.w ; j!=0 ; j-- ){
+                    BLEND_PIXEL_TEXT_BPP16();
+                    src_buffer -= src_surface->pitch;
+                    dst_buffer++;
+                }
+                dst_buffer += dst_surface->w - dst_rect.w;
+            }
         }
     }
     else{
-        for ( int i=0 ; i<dst_rect.h ; i++ ){
-            unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch*(src_surface->h - x2 - 1) + y2 + i;
-            for ( int j=dst_rect.w ; j!=0 ; j-- ){
-                BLEND_PIXEL_TEXT();
-                src_buffer -= src_surface->pitch;
-                dst_buffer++;
+        Uint32 src_color1 = (color.r << fmt->Rshift) | (color.b << fmt->Bshift);
+        Uint32 src_color2 = (color.g << fmt->Gshift);
+        Uint32 src_color3 = (0xff << fmt->Ashift) | src_color1 | src_color2;
+
+        Uint32 *dst_buffer = (Uint32*)dst_surface->pixels + dst_surface->w * dst_rect.y + dst_rect.x;
+
+        if (!rotate_flag){
+            unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch * y2 + x2;
+            for ( int i=0 ; i<dst_rect.h ; i++ ){
+                for ( int j=dst_rect.w ; j!=0 ; j-- ){
+                    BLEND_PIXEL_TEXT();
+                    src_buffer++;
+                    dst_buffer++;
+                }
+                src_buffer += src_surface->pitch - dst_rect.w;
+                dst_buffer += dst_surface->w - dst_rect.w;
             }
-            dst_buffer += dst_surface->w - dst_rect.w;
+        }
+        else{
+            for ( int i=0 ; i<dst_rect.h ; i++ ){
+                unsigned char *src_buffer = (unsigned char*)src_surface->pixels + src_surface->pitch*(src_surface->h - x2 - 1) + y2 + i;
+                for ( int j=dst_rect.w ; j!=0 ; j-- ){
+                    BLEND_PIXEL_TEXT();
+                    src_buffer -= src_surface->pitch;
+                    dst_buffer++;
+                }
+                dst_buffer += dst_surface->w - dst_rect.w;
+            }
         }
     }
     
@@ -558,9 +584,9 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
 }
 
 void ONScripter::refreshSprite( int sprite_no, bool active_flag, int cell_no,
-                                     SDL_Rect *check_src_rect, SDL_Rect *check_dst_rect )
+                                SDL_Rect *check_src_rect, SDL_Rect *check_dst_rect )
 {
-    if ( sprite_info[sprite_no].image_name && 
+    if ( sprite_info[sprite_no].image_surface && 
          ( sprite_info[ sprite_no ].visible != active_flag ||
            (cell_no >= 0 && sprite_info[ sprite_no ].current_cell != cell_no ) ||
            AnimationInfo::doClipping(check_src_rect, &sprite_info[ sprite_no ].pos) == 0 ||

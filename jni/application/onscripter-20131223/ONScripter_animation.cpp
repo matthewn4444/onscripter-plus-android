@@ -113,7 +113,9 @@ void ONScripter::proceedAnimation()
             int tmp_string_buffer_offset = string_buffer_offset;
 
             char *current = script_h.getCurrent();
-            lua_handler.callback(LUAHandler::LUA_ANIMATION);
+            if (lua_handler.isCallbackEnabled(LUAHandler::LUA_ANIMATION))
+                if (lua_handler.callFunction(true, "animation"))
+                    errorAndExit( lua_handler.error_str );
             script_h.setCurrent(current);
             readToken();
 
@@ -233,7 +235,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info )
             surface_m = loadImage( anim->mask_file_name );
         
         surface = anim->setupImageAlpha(surface, surface_m, has_alpha);
-/*
+
         if (surface &&
             screen_ratio2 != screen_ratio1 &&
             (!disable_rescale_flag || location == BaseReader::ARCHIVE_TYPE_NONE))
@@ -250,7 +252,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info )
             resizeSurface(src_s, surface);
             SDL_FreeSurface(src_s);
         }
-*/
+
         anim->setImage( surface, texture_format );
 
         if ( surface_m ) SDL_FreeSurface(surface_m);
@@ -403,11 +405,9 @@ void ONScripter::drawTaggedSurface( SDL_Surface *dst_surface, AnimationInfo *ani
     }
 
     if (!anim->affine_flag)
-        anim->blendOnSurface( dst_surface, poly_rect.x, poly_rect.y,
-                              clip, anim->trans );
+        anim->blendOnSurface( dst_surface, poly_rect.x, poly_rect.y, clip, anim->trans );
     else
-        anim->blendOnSurface2( dst_surface, poly_rect.x, poly_rect.y,
-                               clip, anim->trans );
+        anim->blendOnSurface2( dst_surface, poly_rect.x, poly_rect.y, clip, anim->trans );
 }
 
 void ONScripter::stopAnimation( int click )

@@ -113,31 +113,6 @@ void ONScripter::initSDL()
 
     screen_height = screen_width*script_h.screen_height/script_h.screen_width;
 
-	FILE *fpo;
-	char buff[256];
-	char VALUE[20];
-	int SDL_SURFACE = SDL_SWSURFACE;
-	if(fpo = fopen("ons.ini", "r")){
-		int n = strlen(buff);
-		for(int i=0; i<n; i++) buff[i] = toupper(buff[i]);
-		while(fgets(buff, sizeof(buff), fpo) != NULL){
-			if(sscanf(buff, "SURFACE=%s", VALUE)){
-				if(!strcmp(VALUE, "SOFTWARE")) SDL_SURFACE = SDL_SWSURFACE;
-				if(!strcmp(VALUE, "HARDWARE")) SDL_SURFACE = SDL_HWSURFACE;
-			}
-			else if(sscanf(buff, "WIDTH=%s", VALUE)){
-				screen_width = atoi(VALUE);
-				screen_ratio1 = screen_width;
-				screen_ratio2 = script_h.screen_width;
-				printf("%d, %d\n", screen_ratio1, screen_ratio2);
-			}
-			else if(sscanf(buff, "HEIGHT=%s", VALUE)){
-				screen_height = atoi(VALUE);
-			}
-		}
-		fclose(fpo);
-	}
-
     screen_device_width  = screen_width;
     screen_device_height = screen_height;
 #if defined(USE_SDL_RENDERER)
@@ -220,7 +195,7 @@ void ONScripter::initSDL()
 
 void ONScripter::openAudio()
 {
-#if (defined(PDA_WIDTH) || defined(PDA_AUTOSIZE)) && !defined(PSP) && !defined(IPHONE) && !defined(IOS)
+#if (defined(PDA_WIDTH) || defined(PDA_AUTOSIZE)) && !defined(PSP) && !defined(IPHONE) && !defined(IOS) && !defined(PANDORA)
     if ( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
 #else        
     if ( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
@@ -322,6 +297,14 @@ void ONScripter::setArchivePath(const char *path)
     if (archive_path) delete[] archive_path;
     archive_path = new char[ RELATIVEPATHLENGTH + strlen(path) + 2 ];
     sprintf( archive_path, RELATIVEPATH "%s%c", path, DELIMITER );
+}
+
+void ONScripter::setSaveDir(const char *path)
+{
+    if (save_dir) delete[] save_dir;
+    save_dir = new char[ RELATIVEPATHLENGTH + strlen(path) + 2 ];
+    sprintf( save_dir, RELATIVEPATH "%s%c", path, DELIMITER );
+    script_h.setSaveDir(save_dir);
 }
 
 void ONScripter::setFullscreenMode()
@@ -502,21 +485,15 @@ int ONScripter::init()
 
     for (i=0 ; i<MAX_PARAM_NUM ; i++) bar_info[i] = prnum_info[i] = NULL;
 
+    loadEnvData();
     defineresetCommand();
-    if ( loadFileIOBuf( "gloval.sav" ) > 0 )
-        readVariables( script_h.global_variable_border, script_h.variable_range );
 
-#ifdef USE_LUA
-    lua_handler.init(this, &script_h);
-#endif    
     readToken();
 
     if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
         fprintf( stderr, "can't open font file: %s\n", font_file );
         return -1;
     }
-
-    loadEnvData();
     
     return 0;
 }
@@ -1192,7 +1169,7 @@ void ONScripter::loadEnvData()
     cdaudio_on_flag = true;
     default_cdrom_drive = NULL;
     kidokumode_flag = true;
-    setStr( &savedir, NULL );
+    setStr( &save_dir_envdata, NULL );
     automode_time = DEFAULT_AUTOMODE_TIME;
     
     if (loadFileIOBuf( "envdata" ) > 0){
@@ -1210,7 +1187,13 @@ void ONScripter::loadEnvData()
         music_volume = DEFAULT_VOLUME - readInt();
         if (readInt() == 0) kidokumode_flag = false;
         readInt();
-        readStr( &savedir );
+        readStr( &save_dir_envdata ); // save_dir_envdata is not used directly
+        if (!save_dir && save_dir_envdata){
+            // a workaround not to overwrite save_dir given in command line options
+            save_dir = new char[ strlen(archive_path) + strlen(save_dir_envdata) + 2 ];
+            sprintf( save_dir, "%s%s%c", archive_path, save_dir_envdata, DELIMITER );
+            script_h.setSaveDir(save_dir);
+        }
         automode_time = readInt();
     }
     else{
@@ -1236,7 +1219,7 @@ void ONScripter::saveEnvData()
         writeInt( DEFAULT_VOLUME - music_volume, output_flag );
         writeInt( kidokumode_flag?1:0, output_flag );
         writeInt( 0, output_flag ); // ?
-        writeStr( savedir, output_flag );
+        writeStr( save_dir_envdata, output_flag );
         writeInt( automode_time, output_flag );
 
         if (i==1) break;

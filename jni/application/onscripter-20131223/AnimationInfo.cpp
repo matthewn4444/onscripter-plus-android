@@ -100,7 +100,7 @@ void AnimationInfo::reset()
 {
     remove();
 
-    trans = 256;
+    trans = -1;
     orig_pos.x = orig_pos.y = 0;
     pos.x = pos.y = 0;
     visible = false;
@@ -265,7 +265,7 @@ int AnimationInfo::doClipping( SDL_Rect *dst, SDL_Rect *clip, SDL_Rect *clipped 
 
 #if defined(BPP16)
 #define BLEND_PIXEL(){\
-    if ((*alphap == 255) && (alpha == 256)){\
+    if ((*alphap == 255) && (alpha == 255)){\
         *dst_buffer = *src_buffer;\
     }\
     else if (*alphap != 0){\
@@ -279,7 +279,7 @@ int AnimationInfo::doClipping( SDL_Rect *dst, SDL_Rect *clip, SDL_Rect *clipped 
 }
 #else
 #define BLEND_PIXEL(){\
-    if ((*alphap == 255) && (alpha == 256)){\
+    if ((*alphap == 255) && (alpha == 255)){\
         *dst_buffer = *src_buffer;\
     }\
     else if (*alphap != 0){\
@@ -373,6 +373,7 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
     SDL_LockSurface( dst_surface );
     SDL_LockSurface( image_surface );
     
+    alpha &= 0xff;
     int pitch = image_surface->pitch / sizeof(ONSBuf);
     ONSBuf *src_buffer = (ONSBuf *)image_surface->pixels + pitch * src_rect.y + image_surface->w*current_cell/num_of_cells + src_rect.x;
     ONSBuf *dst_buffer = (ONSBuf *)dst_surface->pixels   + dst_surface->w * dst_rect.y + dst_rect.x;
@@ -436,6 +437,7 @@ void AnimationInfo::blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int ds
     
     Uint32 mask2;
     
+    alpha &= 0xff;
     int pitch = image_surface->pitch / sizeof(ONSBuf);
     // set pixel by inverse-projection with raster scan
     for (y=min_xy[1] ; y<= max_xy[1] ; y++){

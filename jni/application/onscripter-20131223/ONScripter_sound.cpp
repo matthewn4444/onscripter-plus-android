@@ -2,7 +2,7 @@
  * 
  *  ONScripter_sound.cpp - Methods for playing sound
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -82,6 +82,10 @@ void playVideoAndroid(const char *filename)
 }
 #endif
 
+#if defined(IOS)
+extern "C" void playVideoIOS(const char *filename, bool click_flag, bool loop_flag);
+#endif
+
 #if defined(USE_AVIFILE)
 #include "AVIWrapper.h"
 #endif
@@ -159,7 +163,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag, int 
 
     if (format & SOUND_MIDI){
         FILE *fp;
-        if ( (fp = fopen(TMP_MUSIC_FILE, "wb")) == NULL){
+        if ( (fp = fopen(TMP_MUSIC_FILE, "wb", true)) == NULL){
             fprintf(stderr, "can't open temporaly MIDI file %s\n", TMP_MUSIC_FILE);
         }
         else{
@@ -227,7 +231,7 @@ int ONScripter::playMIDI(bool loop_flag)
     Mix_SetMusicCMD(midi_cmd);
     
     char midi_filename[256];
-    sprintf(midi_filename, "%s%s", archive_path, TMP_MUSIC_FILE);
+    sprintf(midi_filename, "%s%s", save_dir?save_dir:archive_path, TMP_MUSIC_FILE);
     if ((midi_info = Mix_LoadMUS(midi_filename)) == NULL) return -1;
 
     int midi_looping = loop_flag ? -1 : 0;
@@ -254,6 +258,14 @@ int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
 
 #ifdef ANDROID
     playVideoAndroid(filename);
+    return 0;
+#endif
+
+#ifdef IOS
+    char *absolute_filename = new char[ strlen(archive_path) + strlen(filename) + 1 ];
+    sprintf( absolute_filename, "%s%s", archive_path, filename );
+    playVideoIOS(absolute_filename, click_flag, loop_flag);
+    delete[] absolute_filename;
     return 0;
 #endif
 

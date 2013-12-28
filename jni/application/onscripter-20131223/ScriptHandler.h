@@ -2,7 +2,7 @@
  * 
  *  ScriptHandler.h - Script manipulation class
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -101,7 +101,8 @@ public:
     ~ScriptHandler();
 
     void reset();
-    FILE *fopen( const char *path, const char *mode );
+    void setSaveDir(const char *path);
+    FILE *fopen( const char *path, const char *mode, bool use_save_dir=false );
     void setKeyTable( const unsigned char *key_table );
 
     // basic parser function
@@ -120,7 +121,7 @@ public:
     void addStringBuffer( char ch );
     
     // function for direct manipulation of script address 
-    inline char *getCurrent(){ return current_script; };
+    inline char *getCurrent(bool use_script=false){ return (use_script && internal_current_script)?internal_current_script:current_script; };
     inline char *getNext(){ return next_script; };
     inline char *getWait(){ return wait_script; };
     void setCurrent(char *pos);
@@ -309,6 +310,7 @@ private:
     ArrayVariable *root_array_variable, *current_array_variable;
 
     char *archive_path;
+    char *save_dir;
     int  script_buffer_length;
     char *script_buffer;
     char *tmp_script_buf;

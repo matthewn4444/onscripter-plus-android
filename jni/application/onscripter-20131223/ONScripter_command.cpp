@@ -302,11 +302,8 @@ int ONScripter::talCommand()
     else if ( loc == 'c' ) no = 1;
     else if ( loc == 'r' ) no = 2;
 
-    if (no >= 0){
+    if (no >= 0)
         trans = script_h.readInt();
-        if      (trans > 256) trans = 256;
-        else if (trans < 0  ) trans = 0;
-    }
 
     if (no >= 0){
         tachi_info[ no ].trans = trans;
@@ -394,7 +391,7 @@ int ONScripter::strspCommand()
     }
 
     ai->trans_mode = AnimationInfo::TRANS_STRING;
-    ai->trans = 256;
+    ai->trans = -1;
     ai->visible = v;
     ai->is_single_line = false;
     ai->is_tight_region = false;
@@ -938,22 +935,16 @@ int ONScripter::savescreenshotCommand()
     }
 
     const char *buf = script_h.readStr();
-    const char *ext = NULL;
-    if (buf) ext = strrchr( buf, '.' );
-    if ( ext && (!strcmp( ext+1, "BMP" ) || !strcmp( ext+1, "bmp" ) ) ){
-        char filename[256];
-        sprintf( filename, "%s%s", archive_path, buf );
-        for ( unsigned int i=0 ; i<strlen( filename ) ; i++ )
-            if ( filename[i] == '/' || filename[i] == '\\' )
-                filename[i] = DELIMITER;
+    char filename[256];
+    sprintf( filename, "%s%s", archive_path, buf );
+    for ( unsigned int i=0 ; i<strlen( filename ) ; i++ )
+        if ( filename[i] == '/' || filename[i] == '\\' )
+            filename[i] = DELIMITER;
 
-        SDL_Surface *surface = AnimationInfo::alloc32bitSurface( screenshot_w, screenshot_h, texture_format );
-        resizeSurface( screenshot_surface, surface );
-        SDL_SaveBMP( surface, filename );
-        SDL_FreeSurface( surface );
-    }
-    else
-        printf("savescreenshot: file %s is not supported.\n", buf );
+    SDL_Surface *surface = AnimationInfo::alloc32bitSurface( screenshot_w, screenshot_h, texture_format );
+    resizeSurface( screenshot_surface, surface );
+    SDL_SaveBMP( surface, filename );
+    SDL_FreeSurface( surface );
 
     return RET_CONTINUE;
 }
@@ -1060,6 +1051,10 @@ int ONScripter::resetCommand()
     clearCurrentPage();
     flush( refreshMode(), &sentence_font_info.pos );
     
+    /* Initialize local variables */
+    for (int i=0 ; i<script_h.global_variable_border ; i++)
+        script_h.getVariableData(i).reset(false);
+
     setCurrentLabel( "start" );
     saveSaveFile(-1);
     
@@ -1289,10 +1284,14 @@ int ONScripter::mspCommand()
         dirty_rect.add( ai->pos );
     }
     
-    if ( script_h.getEndStatus() & ScriptHandler::END_COMMA )
-        ai->trans += script_h.readInt();
-    if      ( ai->trans > 256 ) ai->trans = 256;
-    else if ( ai->trans <   0 ) ai->trans = 0;
+    if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
+        if (ai->trans == -1)
+            ai->trans = 255 + script_h.readInt();
+        else
+            ai->trans += script_h.readInt();
+        if      (ai->trans <   0) ai->trans = 0;
+        else if (ai->trans > 255) ai->trans = 255;
+    }
 
     return RET_CONTINUE;
 }
@@ -1588,7 +1587,7 @@ int ONScripter::lsp2Command()
     if ( script_h.getEndStatus() & ScriptHandler::END_COMMA )
         ai->trans = script_h.readInt();
     else
-        ai->trans = 256;
+        ai->trans = -1;
 
     parseTaggedString( ai );
     setupAnimationInfo( ai );
@@ -1624,7 +1623,7 @@ int ONScripter::lspCommand()
     if ( script_h.getEndStatus() & ScriptHandler::END_COMMA )
         ai->trans = script_h.readInt();
     else
-        ai->trans = 256;
+        ai->trans = -1;
 
     parseTaggedString( ai );
     setupAnimationInfo( ai );
@@ -2138,9 +2137,9 @@ int ONScripter::getspsizeCommand()
     int no = script_h.readInt();
 
     script_h.readVariable();
-	script_h.setInt( &script_h.current_variable, sprite_info[no].trans_mode==AnimationInfo::TRANS_STRING ? sprite_info[no].orig_pos.w : sprite_info[no].orig_pos.w * screen_ratio2 / screen_ratio1 );
+    script_h.setInt( &script_h.current_variable, sprite_info[no].orig_pos.w );
     script_h.readVariable();
-	script_h.setInt( &script_h.current_variable, sprite_info[no].trans_mode==AnimationInfo::TRANS_STRING ? sprite_info[no].orig_pos.h : sprite_info[no].orig_pos.h * screen_ratio2 / screen_ratio1 );
+    script_h.setInt( &script_h.current_variable, sprite_info[no].orig_pos.h );
     if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
         script_h.readVariable();
         script_h.setInt( &script_h.current_variable, sprite_info[no].num_of_cells );
@@ -2462,6 +2461,9 @@ int ONScripter::getcselnumCommand()
 
 int ONScripter::gameCommand()
 {
+    if ( current_mode != DEFINE_MODE )
+        errorAndExit( "game: not in the define section" );
+
     int i;
     current_mode = NORMAL_MODE;
 
@@ -2488,11 +2490,6 @@ int ONScripter::gameCommand()
     }
     
     /* ---------------------------------------- */
-    /* Load default cursor */
-    loadCursor( 0, NULL, 0, 0 );
-    loadCursor( 1, NULL, 0, 0 );
-
-    /* ---------------------------------------- */
     /* Initialize text buffer */
     page_list = new Page[max_page_list];
     for ( i=0 ; i<max_page_list-1 ; i++ ){
@@ -2501,17 +2498,18 @@ int ONScripter::gameCommand()
     }
     page_list[0].previous = &page_list[max_page_list-1];
     page_list[max_page_list-1].next = &page_list[0];
-    start_page = current_page = &page_list[0];
 
-    clearCurrentPage();
+    resetCommand();
 
-    /* ---------------------------------------- */
-    /* Initialize local variables */
-    for ( i=0 ; i<script_h.global_variable_border ; i++ )
-        script_h.getVariableData(i).reset(false);
+    loadCursor( 0, NULL, 0, 0 );
+    loadCursor( 1, NULL, 0, 0 );
 
-    setCurrentLabel( "start" );
-    saveSaveFile(-1);
+#ifdef USE_LUA
+    if (lua_handler.isCallbackEnabled(LUAHandler::LUA_RESET)){
+        if (lua_handler.callFunction(true, "reset"))
+            errorAndExit( lua_handler.error_str );
+    }
+#endif
 
     return RET_CONTINUE;
 }
@@ -2836,7 +2834,7 @@ int ONScripter::drawbg2Command()
 
     SDL_Rect clip = {0, 0, screen_width, screen_height};
     bi.blendOnSurface2( accumulation_surface, bi.pos.x, bi.pos.y,
-                        clip, 256 );
+                        clip, 255 );
 
     return RET_CONTINUE;
 }
@@ -2860,11 +2858,22 @@ int ONScripter::delayCommand()
 
 int ONScripter::defineresetCommand()
 {
+    saveGlovalData();
+
     script_h.reset();
     ScriptParser::reset();
     reset();
 
     setCurrentLabel( "define" );
+
+    if ( loadFileIOBuf( "gloval.sav" ) > 0 )
+        readVariables( script_h.global_variable_border, script_h.variable_range );
+
+#ifdef USE_LUA
+    lua_handler.init(this, &script_h);
+#endif    
+
+    current_mode = DEFINE_MODE;
 
     return RET_CONTINUE;
 }
@@ -3168,10 +3177,16 @@ int ONScripter::btnwaitCommand()
         if (is_exbtn_enabled) decodeExbtnControl( exbtn_d_button_link.exbtn_ctl[1], &check_src_rect );
     }
 
-    if (textbtn_flag && (skip_mode & SKIP_NORMAL || 
-                         (skip_mode & SKIP_TO_EOP && (textgosub_clickstr_state & 0x03) == CLICK_WAIT) || 
-                         ctrl_pressed_status) ){
+    if ((textbtn_flag || bexec_flag) && 
+        (skip_mode & SKIP_NORMAL || 
+         (skip_mode & SKIP_TO_EOP && (textgosub_clickstr_state & 0x03) == CLICK_WAIT) || 
+         ctrl_pressed_status) ){
         current_button_state.button = 0;
+        if (skip_mode & SKIP_NORMAL || 
+            (skip_mode & SKIP_TO_EOP && (textgosub_clickstr_state & 0x03) == CLICK_WAIT))
+            sprintf(current_button_state.str, "SKIP");
+        else
+            sprintf(current_button_state.str, "CTRL");
     }
     else{
         shortcut_mouse_line = 0;
@@ -3632,11 +3647,11 @@ int ONScripter::amspCommand()
         dirty_rect.add( ai->pos );
     }
     
-    if ( script_h.getEndStatus() & ScriptHandler::END_COMMA )
+    if ( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
         ai->trans = script_h.readInt();
-
-    if      ( ai->trans > 256 ) ai->trans = 256;
-    else if ( ai->trans <   0 ) ai->trans = 0;
+        if      (ai->trans <   0) ai->trans = 0;
+        else if (ai->trans > 255) ai->trans = 255;
+    }
 
     return RET_CONTINUE;
 }

@@ -2,7 +2,7 @@
  *
  *  ScriptParser.cpp - Define block parser of ONScripter
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -24,7 +24,7 @@
 #include "ScriptParser.h"
 
 #define VERSION_STR1 "ONScripter"
-#define VERSION_STR2 "Copyright (C) 2001-2012 Studio O.G.A. All Rights Reserved."
+#define VERSION_STR2 "Copyright (C) 2001-2013 Studio O.G.A. All Rights Reserved."
 
 #define DEFAULT_SAVE_MENU_NAME "＜セーブ＞"
 #define DEFAULT_LOAD_MENU_NAME "＜ロード＞"
@@ -46,8 +46,9 @@ ScriptParser::ScriptParser()
     screen_ratio2 = 1;
 
     archive_path = NULL;
+    save_dir = NULL;
     version_str = NULL;
-    savedir = NULL;
+    save_dir_envdata = NULL;
     nsa_path = NULL;
     nsa_offset = 0;
     key_table = NULL;
@@ -93,7 +94,7 @@ ScriptParser::~ScriptParser()
     if (file_io_buf) delete[] file_io_buf;
     if (save_data_buf) delete[] save_data_buf;
 
-    if (savedir) delete[] savedir;
+    if (save_dir_envdata) delete[] save_dir_envdata;
 }
 
 void ScriptParser::reset()
@@ -144,8 +145,6 @@ void ScriptParser::reset()
                            strlen("\n")+
                            +1];
     sprintf( version_str, "%s\n%s\n", VERSION_STR1, VERSION_STR2 );
-    if (savedir) delete[] savedir;
-    savedir = NULL;
     z_order = 499;
 
     textgosub_label = NULL;
@@ -246,8 +245,6 @@ void ScriptParser::reset()
     last_effect_link = &root_effect_link;
     last_effect_link->next = NULL;
 
-    readLog( script_h.log_info[ScriptHandler::LABEL_LOG] );
-    
     current_mode = DEFINE_MODE;
 }
 
@@ -350,8 +347,11 @@ void ScriptParser::allocFileIOBuf()
 
 int ScriptParser::saveFileIOBuf( const char *filename, int offset, const char *savestr )
 {
+    bool use_save_dir = false;
+    if (strcmp(filename, "envdata") != 0) use_save_dir = true;
+    
     FILE *fp;
-    if ( (fp = fopen( filename, "wb" )) == NULL ) return -1;
+    if ( (fp = fopen( filename, "wb", use_save_dir )) == NULL ) return -1;
     
     size_t ret = fwrite(file_io_buf+offset, 1, file_io_buf_ptr-offset, fp);
 
@@ -371,8 +371,11 @@ int ScriptParser::saveFileIOBuf( const char *filename, int offset, const char *s
 
 size_t ScriptParser::loadFileIOBuf( const char *filename )
 {
+    bool use_save_dir = false;
+    if (strcmp(filename, "envdata") != 0) use_save_dir = true;
+
     FILE *fp;
-    if ( (fp = fopen( filename, "rb" )) == NULL )
+    if ( (fp = fopen( filename, "rb", use_save_dir )) == NULL )
         return 0;
     
     fseek(fp, 0, SEEK_END);
@@ -694,10 +697,13 @@ ScriptParser::EffectLink *ScriptParser::parseEffect(bool init_flag)
     return NULL;
 }
 
-FILE *ScriptParser::fopen(const char *path, const char *mode)
+FILE *ScriptParser::fopen(const char *path, const char *mode, bool use_save_dir)
 {
     char filename[256];
-    sprintf( filename, "%s%s", archive_path, path );
+    if (use_save_dir && save_dir)
+        sprintf( filename, "%s%s", save_dir, path );
+    else
+        sprintf( filename, "%s%s", archive_path, path );
 
     return ::fopen( filename, mode );
 }

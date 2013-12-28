@@ -559,11 +559,16 @@ void LUAHandler::init(ONScripter *ons, ScriptHandler *sh)
     this->ons = ons;
     this->sh = sh;
     
-    state = lua_open();
+    state = luaL_newstate();
     luaL_openlibs(state);
 
+#if LUA_VERSION_NUM >= 502
+    lua_pushglobaltable(state);
+    luaL_setfuncs(state, lua_lut, 0);
+#else
     lua_pushvalue(state, LUA_GLOBALSINDEX);
     luaL_register(state, NULL, lua_lut);
+#endif
     
     lua_pushlightuserdata(state, this);
     lua_setglobal(state, ONS_LUA_HANDLER_PTR);
@@ -606,12 +611,6 @@ void LUAHandler::addCallback(const char *label)
         callback_state[LUA_LOAD] = true;
     if (strcmp(label, "reset") == 0)
         callback_state[LUA_RESET] = true;
-}
-
-void LUAHandler::callback(int name)
-{
-    if (name == LUA_ANIMATION)
-        callFunction(true, "animation");
 }
 
 int LUAHandler::callFunction(bool is_callback, const char *cmd)

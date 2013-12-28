@@ -136,9 +136,9 @@ public:
     void setCell(int cell);
     static int doClipping( SDL_Rect *dst, SDL_Rect *clip, SDL_Rect *clipped=NULL );
     void blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst_y,
-                         SDL_Rect &clip, int alpha=256 );
+                         SDL_Rect &clip, int alpha=255 );
     void blendOnSurface2( SDL_Surface *dst_surface, int dst_x, int dst_y,
-                          SDL_Rect &clip, int alpha=256 );
+                          SDL_Rect &clip, int alpha=255 );
     void blendText( SDL_Surface *surface, int dst_x, int dst_y, 
                     SDL_Color &color, SDL_Rect *clip, bool rotate_flag );
     void calcAffineMatrix();
