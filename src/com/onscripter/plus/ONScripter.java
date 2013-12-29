@@ -1,32 +1,15 @@
 package com.onscripter.plus;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Comparator;
-
-import jp.ogapee.onscripter.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
@@ -36,286 +19,46 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 
-public class ONScripter extends Activity implements AdapterView.OnItemClickListener, Runnable
+public class ONScripter extends Activity
 {
-	public static final byte[] SALT = new byte[] { 2, 42, -12, -1, 54, 98,
-		-100, -12, 43, 1, -8, -4, 9, 5, -106, -107, -33, 45, -2, 84
-	};
+    private final int num_file = 0;
+    private final byte[] buf = null;
+    private int screen_w, screen_h;
+    private int button_w, button_h;
+    private Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
+    private LinearLayout layout  = null;
+    private LinearLayout layout1 = null;
+    private LinearLayout layout2 = null;
+    private LinearLayout layout3 = null;
+    private boolean mIsLandscape = true;
+    private boolean mButtonVisible = true;
 
-	// Launcher contributed by katane-san
 
-	private File mCurrentDirectory = null;
-	private File mOldCurrentDirectory = null;
-	private File [] mDirectoryFiles = null;
-	private ListView listView = null;
-	private int num_file = 0;
-	private byte[] buf = null;
-	private int screen_w, screen_h;
-	private int button_w, button_h;
-	private Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
-	private LinearLayout layout  = null;
-	private LinearLayout layout1 = null;
-	private LinearLayout layout2 = null;
-	private LinearLayout layout3 = null;
-	private boolean mIsLandscape = true;
-	private boolean mButtonVisible = true;
+    private DemoGLSurfaceView mGLView = null;
+    private AudioThread mAudioThread = null;
+    private PowerManager.WakeLock wakeLock = null;
+    private native int nativeInitJavaCallbacks();
+    private native int nativeGetWidth();
+    private native int nativeGetHeight();
+    private final DataDownloader downloader = null;
+    private AlertDialog.Builder alertDialogBuilder = null;
+    private final ProgressDialog progDialog = null;
 
-    static class FileSort implements Comparator<File>{
-        @Override
-        public int compare(File src, File target){
-            return src.getName().compareTo(target.getName());
-        }
+    /** Called when the activity is first created. */
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
+        mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
+        alertDialogBuilder = new AlertDialog.Builder(this);
+
+        runSDLApp();
     }
-
-    private void setupDirectorySelector() {
-        mDirectoryFiles = mCurrentDirectory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return (!file.isHidden() && file.isDirectory());
-                }
-            });
-
-        Arrays.sort(mDirectoryFiles, new FileSort());
-
-        int length = mDirectoryFiles.length;
-        if (mCurrentDirectory.getParent() != null) {
-            length++;
-        }
-        String [] names = new String[length];
-
-        int j=0;
-        if (mCurrentDirectory.getParent() != null) {
-            names[j++] = "..";
-        }
-        for (int i=0 ; i<mDirectoryFiles.length ; i++){
-            names[j++] = mDirectoryFiles[i].getName();
-        }
-
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
-
-        listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(this);
-    }
-
-	private void runLauncher() {
-        mCurrentDirectory = new File(gCurrentDirectoryPath);
-        if (mCurrentDirectory.exists() == false){
-            gCurrentDirectoryPath = Environment.getExternalStorageDirectory().getPath();
-            mCurrentDirectory = new File(gCurrentDirectoryPath);
-
-            if (mCurrentDirectory.exists() == false) {
-                showErrorDialog("Could not find SD card.");
-            }
-        }
-
-        listView = new ListView(this);
-
-        LinearLayout layoutH = new LinearLayout(this);
-
-        checkRFO = new CheckBox(this);
-        checkRFO.setText("Render Font Outline");
-        checkRFO.setBackgroundColor(Color.rgb(244,244,255));
-        checkRFO.setTextColor(Color.BLACK);
-        checkRFO.setChecked(gRenderFontOutline);
-        checkRFO.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-                    Editor e = getSharedPreferences("pref", MODE_PRIVATE).edit();
-                    e.putBoolean("render_font_outline", isChecked);
-                    e.commit();
-                }
-            });
-
-        layoutH.addView(checkRFO, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1.0f));
-
-        listView.addHeaderView(layoutH, null, false);
-
-        setupDirectorySelector();
-
-        setContentView(listView);
-    }
-
-	@Override
-    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        position--; // for header
-
-        TextView textView = (TextView)v;
-        mOldCurrentDirectory = mCurrentDirectory;
-
-        if (textView.getText().equals("..")){
-            mCurrentDirectory = new File(mCurrentDirectory.getParent());
-            gCurrentDirectoryPath = mCurrentDirectory.getPath();
-        } else {
-            if (mCurrentDirectory.getParent() != null) {
-                position--;
-            }
-            gCurrentDirectoryPath = mDirectoryFiles[position].getPath();
-            mCurrentDirectory = new File(gCurrentDirectoryPath);
-        }
-
-        mDirectoryFiles = mCurrentDirectory.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return (file.isFile() &&
-                            (file.getName().equals("0.txt") ||
-                             file.getName().equals("00.txt") ||
-                             file.getName().equals("nscr_sec.dat") ||
-                             file.getName().equals("nscript.___") ||
-                             file.getName().equals("nscript.dat")));
-                }
-            });
-
-        if (mDirectoryFiles.length == 0){
-            setupDirectorySelector();
-        }
-        else{
-            mDirectoryFiles = mCurrentDirectory.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File file) {
-                        return (file.isFile() &&
-                                (file.getName().equals("default.ttf")));
-                    }
-                });
-
-            if (mDirectoryFiles.length == 0){
-                alertDialogBuilder.setTitle(getString(R.string.app_name));
-                alertDialogBuilder.setMessage("default.ttf is missing.");
-                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            setResult(RESULT_OK);
-                        }
-                    });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
-                mCurrentDirectory = mOldCurrentDirectory;
-                setupDirectorySelector();
-            }
-            else{
-                gRenderFontOutline = checkRFO.isChecked();
-                runSDLApp();
-            }
-        }
-    }
-
-	private void runCopier()
-	{
-		File file = new File(gCurrentDirectoryPath + "/" + getResources().getString(R.string.download_version));
-		if (file.exists() == false){
-			progDialog = new ProgressDialog(this);
-			progDialog.setCanceledOnTouchOutside(false);
-			progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-			progDialog.setMessage("Copying archives: ");
-			progDialog.setOnKeyListener(new OnKeyListener(){
-				@Override
-                public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event){
-						if (KeyEvent.KEYCODE_SEARCH == keyCode || KeyEvent.KEYCODE_BACK == keyCode) {
-                            return true;
-                        }
-						return false;
-				}
-			});
-			progDialog.show();
-
-			PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-			wakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "ONScripter");
-			wakeLock.acquire();
-
-			new Thread(this).start();
-		}
-		else{
-			runSDLApp();
-		}
-	}
-
-	@Override
-	public void run()
-	{
-		num_file = 0;
-		buf = new byte[8192*2];
-
-		copyRecursive("");
-
-		File file = new File(gCurrentDirectoryPath + "/" + getResources().getString(R.string.download_version));
-		try {
-			file.createNewFile();
-		} catch( Exception e ) {
-			sendMessage(-2, 0, "Failed to create version file: " + e.toString());
-		};
-
-		sendMessage(-1, 0, null);
-	}
-
-	private void copyRecursive(String path)
-	{
-		AssetManager as = getResources().getAssets();
-		try{
-			File file = new File(gCurrentDirectoryPath + "/" + path);
-			if (!file.exists()) { file.mkdir(); }
-
-			String [] file_list = as.list(path);
-			for (String str : file_list){
-				InputStream is = null;
-				String path2 = path;
-				if (!path.equals("")) {
-                    path2 += "/";
-                }
-				path2 += str;
-
-				int total_size = 0;
-				try{
-					is = as.open(path2);
-					AssetFileDescriptor afd = as.openFd(path2);
-					total_size = (int)afd.getLength();
-					afd.close();
-				} catch (Exception e){
-					copyRecursive(path2);
-					is = null;
-				}
-				if (is == null) {
-                    continue;
-                }
-
-				File dst_file = new File(gCurrentDirectoryPath + "/" + path2);
-				BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(dst_file));
-
-				num_file++;
-				int len = is.read(buf);
-				int total_read = 0;
-				while (len >= 0){
-					if (len > 0) {
-                        os.write(buf, 0, len);
-                    }
-					total_read += len;
-					sendMessage(total_read, total_size, "Copying archives: " + num_file);
-
-					len = is.read(buf);
-					try{
-						Thread.sleep(1);
-					} catch (InterruptedException e){
-					}
-				}
-				os.flush();
-				os.close();
-				is.close();
-			}
-		} catch( Exception e ) {
-			progDialog.dismiss();
-			sendMessage(-2, 0, "Failed to write: " + e.toString());
-		}
-	}
 
 	private void runSDLApp() {
 		nativeInitJavaCallbacks();
@@ -525,7 +268,7 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 
 	public void playVideo(char[] filename){
 		try{
-			String filename2 = "file:/" + gCurrentDirectoryPath + "/" + new String(filename);
+			String filename2 = "file:/" + LauncherActivity.gCurrentDirectoryPath + "/" + new String(filename);
 			filename2 = filename2.replace('\\', '/');
 			Log.v("ONS", "playVideo: " + filename2);
 			Uri uri = Uri.parse(filename2);
@@ -536,32 +279,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
 		catch(Exception e){
 			Log.e("ONS", "playVideo error:  " + e.getClass().getName());
 		}
-	}
-
-    /** Called when the activity is first created. */
-    @Override
-	public void onCreate(Bundle savedInstanceState)
-	{
-		super.onCreate(savedInstanceState);
-
-		// fullscreen mode
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                             WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-		gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/Android/data/" + getApplicationContext().getPackageName();
-		alertDialogBuilder = new AlertDialog.Builder(this);
-
-		SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
-		mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
-		gRenderFontOutline = sp.getBoolean("render_font_outline", getResources().getBoolean(R.bool.render_font_outline));
-
-		if (getResources().getBoolean(R.bool.use_launcher)){
-			gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
-			runLauncher();
-		} else {
-            runCopier();
-        }
 	}
 
     @Override
@@ -679,67 +396,6 @@ public class ONScripter extends Activity implements AdapterView.OnItemClickListe
         }
 		super.onDestroy();
 	}
-
-	final Handler handler = new Handler(){
-		@Override
-        public void handleMessage(Message msg){
-			int current = msg.getData().getInt("current");
-			if (current == -1){
-				progDialog.dismiss();
-				runSDLApp();
-			}
-			else if (current == -2){
-				progDialog.dismiss();
-				showErrorDialog(msg.getData().getString("message"));
-			}
-			else{
-				progDialog.setMessage(msg.getData().getString("message"));
-				int total = msg.getData().getInt("total");
-				if (total != progDialog.getMax()) {
-                    progDialog.setMax(total);
-                }
-				progDialog.setProgress(current);
-			}
-		}
-	};
-
-	private void showErrorDialog(String mes)
-	{
-		alertDialogBuilder.setTitle("Error");
-		alertDialogBuilder.setMessage(mes);
-		alertDialogBuilder.setPositiveButton("Quit", new DialogInterface.OnClickListener(){
-			@Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-				finish();
-			}
-		});
-		AlertDialog alertDialog = alertDialogBuilder.create();
-		alertDialog.show();
-	}
-
-	public void sendMessage(int current, int total, String str)
-	{
-		Message msg = handler.obtainMessage();
-		Bundle b = new Bundle();
-		b.putInt("total", total);
-		b.putInt("current", current);
-		b.putString("message", str);
-		msg.setData(b);
-		handler.sendMessage(msg);
-	}
-
-	private DemoGLSurfaceView mGLView = null;
-	private AudioThread mAudioThread = null;
-	private PowerManager.WakeLock wakeLock = null;
-	public static String gCurrentDirectoryPath;
-	public static boolean gRenderFontOutline;
-	public static CheckBox checkRFO = null;
-	private native int nativeInitJavaCallbacks();
-	private native int nativeGetWidth();
-	private native int nativeGetHeight();
-	private final DataDownloader downloader = null;
-	private AlertDialog.Builder alertDialogBuilder = null;
-	private ProgressDialog progDialog = null;
 
 	static {
 		System.loadLibrary("mad");

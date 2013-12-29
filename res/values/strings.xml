@@ -2,10 +2,8 @@
 <resources>
     <string name="app_name">ONScripter</string>
     <string name="version">ONScripter 20130202\nStudio O.G.A. Ogapee</string>
-    <bool name="use_launcher">true</bool>
     <bool name="button_visible">true</bool>
     <bool name="render_font_outline">true</bool>
-    <string name="download_version">.20130202</string>
     <string name="public_key"></string>
 
     <string name="button_rclick">Right Click</string>

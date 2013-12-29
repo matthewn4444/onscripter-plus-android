@@ -1,23 +1,17 @@
 package com.onscripter.plus;
 
-import javax.microedition.khronos.opengles.GL10;
 import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGL11;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
+import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.KeyEvent;
-import android.view.Window;
-import android.view.WindowManager;
 import android.media.AudioManager;
-
-import android.widget.TextView;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 
 
 class DemoRenderer extends GLSurfaceView_SDL.Renderer {
@@ -26,40 +20,51 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 	{
 		context = _context;
 		int n = 1;
-		if (ONScripter.gRenderFontOutline) n++;
+		if (LauncherActivity.gRenderFontOutline) {
+            n++;
+        }
 		String[] arg = new String[n];
 		n = 0;
 		arg[n++] = "--open-only";
-		if (ONScripter.gRenderFontOutline) arg[n++] = "--render-font-outline";
-		nativeInit(ONScripter.gCurrentDirectoryPath, arg);
+		if (LauncherActivity.gRenderFontOutline) {
+            arg[n++] = "--render-font-outline";
+        }
+		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);
 	}
-	
-	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+
+	@Override
+    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		// nativeInit();
 	}
 
-	public void onSurfaceChanged(GL10 gl, int w, int h) {
+	@Override
+    public void onSurfaceChanged(GL10 gl, int w, int h) {
 		//gl.glViewport(0, 0, w, h);
 		gl.glMatrixMode(GL10.GL_PROJECTION);
 		gl.glLoadIdentity();
 		gl.glMatrixMode(GL10.GL_MODELVIEW);
 		gl.glLoadIdentity();
 		gl.glViewport(0, 0, w, h);
-		gl.glOrthof(0.0f, (float) w, (float) h, 0.0f, 0.0f, 1.0f);
+		gl.glOrthof(0.0f, w, h, 0.0f, 0.0f, 1.0f);
 		nativeResize(w, h);
 	}
 
-	public void onDrawFrame(GL10 gl) {
+	@Override
+    public void onDrawFrame(GL10 gl) {
 
 		nativeInitJavaCallbacks();
 
         // Calls main() and never returns, hehe - we'll call eglSwapBuffers() from native code
 		int n = 0;
-		if (ONScripter.gRenderFontOutline) n++;
+		if (LauncherActivity.gRenderFontOutline) {
+            n++;
+        }
 		String[] arg = new String[n];
 		n = 0;
-		if (ONScripter.gRenderFontOutline) arg[n++] = "--render-font-outline";
-		nativeInit(ONScripter.gCurrentDirectoryPath, arg);
+		if (LauncherActivity.gRenderFontOutline) {
+            arg[n++] = "--render-font-outline";
+        }
+		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);
 
 	}
 
@@ -78,12 +83,12 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 	private native void nativeDone();
 
 	private Activity context = null;
-	
-	private EGL10 mEgl = null;
-	private EGLDisplay mEglDisplay = null;
-	private EGLSurface mEglSurface = null;
-	private EGLContext mEglContext = null;
-	private int skipFrames = 0;
+
+	private final EGL10 mEgl = null;
+	private final EGLDisplay mEglDisplay = null;
+	private final EGLSurface mEglSurface = null;
+	private final EGLContext mEglContext = null;
+	private final int skipFrames = 0;
 }
 
 class DemoGLSurfaceView extends GLSurfaceView_SDL {
@@ -94,18 +99,22 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
 	}
 
 	@Override
-	public boolean onTouchEvent(final MotionEvent event) 
+	public boolean onTouchEvent(final MotionEvent event)
 	{
 		// TODO: add multitouch support (added in Android 2.0 SDK)
 		int action = -1;
-		if( event.getAction() == MotionEvent.ACTION_DOWN )
-			action = 0;
-		if( event.getAction() == MotionEvent.ACTION_UP )
-			action = 1;
-		if( event.getAction() == MotionEvent.ACTION_MOVE )
-			action = 2;
-		if ( action >= 0 )
-			nativeMouse( (int)event.getX(), (int)event.getY(), action );
+		if( event.getAction() == MotionEvent.ACTION_DOWN ) {
+            action = 0;
+        }
+		if( event.getAction() == MotionEvent.ACTION_UP ) {
+            action = 1;
+        }
+		if( event.getAction() == MotionEvent.ACTION_MOVE ) {
+            action = 2;
+        }
+		if ( action >= 0 ) {
+            nativeMouse( (int)event.getX(), (int)event.getY(), action );
+        }
 
 		return true;
 	}
@@ -135,7 +144,7 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
 
 		return true;
 	 }
-	
+
 	@Override
 	public boolean onKeyUp(int keyCode, final KeyEvent event)
 	{

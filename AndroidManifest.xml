@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="jp.ogapee.onscripter"
+      package="com.onscripter.plus"
       android:versionCode="20130202"
-      android:versionName="20130202"
-      android:installLocation="preferExternal">
+      android:versionName="20130202">
     <application android:label="@string/app_name" android:icon="@drawable/icon">
-        <activity android:name="com.onscripter.plus.ONScripter"
+        <activity android:name="com.onscripter.plus.LauncherActivity"
                   android:label="@string/app_name"
-                  android:screenOrientation="landscape"
-                  android:configChanges="orientation|keyboardHidden"
-                  android:launchMode="singleInstance">
+                  android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name="com.onscripter.plus.ONScripter"
+                  android:label="@string/app_name"
+                  android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                  android:screenOrientation="landscape"
+                  android:configChanges="orientation|keyboardHidden">
         </activity>
     </application>
     <uses-sdk android:minSdkVersion="4" />
