@@ -13,6 +13,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +24,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener
 {
@@ -57,6 +61,44 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         LauncherActivity.gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
 
         runLauncher();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+       MenuInflater inflater = getSupportMenuInflater();
+       inflater.inflate(R.menu.menu_launcher, menu);
+       return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+        case R.id.action_settings:
+            goToActivity(Settings.class);
+            break;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    protected void goToActivity(Class<?> cls) {
+        Intent i = new Intent(this, cls);
+        startActivity(i);
+    }
+
+    protected void log(Object... txt) {
+        String returnStr = "";
+        int i = 1;
+        int size = txt.length;
+        if (size != 0) {
+            returnStr = txt[0] == null ? "null" : txt[0].toString();
+            for (; i < size; i++) {
+                returnStr += ", "
+                        + (txt[i] == null ? "null" : txt[i].toString());
+            }
+        }
+        Log.i("lunch", returnStr);
     }
 
     private void setupDirectorySelector() {
