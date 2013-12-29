@@ -9,27 +9,34 @@ import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 
 class DemoRenderer extends GLSurfaceView_SDL.Renderer {
-
 	public DemoRenderer(Activity _context)
 	{
 		context = _context;
 		int n = 1;
-		if (LauncherActivity.gRenderFontOutline) {
+		if (shouldRenderFontOutline()) {
             n++;
         }
 		String[] arg = new String[n];
 		n = 0;
 		arg[n++] = "--open-only";
-		if (LauncherActivity.gRenderFontOutline) {
+		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
 		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);
+	}
+
+	private boolean shouldRenderFontOutline() {
+	    SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+	    return sharedPref.getBoolean(context.getString(R.string.settings_render_font_outline_key),
+	            context.getResources().getBoolean(R.bool.render_font_outline));
 	}
 
 	@Override
@@ -56,12 +63,12 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 
         // Calls main() and never returns, hehe - we'll call eglSwapBuffers() from native code
 		int n = 0;
-		if (LauncherActivity.gRenderFontOutline) {
+		if (shouldRenderFontOutline()) {
             n++;
         }
 		String[] arg = new String[n];
 		n = 0;
-		if (LauncherActivity.gRenderFontOutline) {
+		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
 		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);

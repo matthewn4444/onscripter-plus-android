@@ -28,5 +28,6 @@
     <!-- Settings -->
     <string name="settings_render_cate">Render</string>
     <string name="settings_render_font_outline_key">settings.render.font.outline.key</string>
+    <string name="settings_render_font_outline_summary">Displays an outline for each character for easier reading.</string>
     <string name="settings_render_font_outline_title">Render Font Outline</string>
 </resources>

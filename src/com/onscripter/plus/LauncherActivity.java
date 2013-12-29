@@ -8,18 +8,12 @@ import java.util.Comparator;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -32,8 +26,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 {
 
     public static String gCurrentDirectoryPath;
-    public static boolean gRenderFontOutline;
-    public static CheckBox checkRFO = null;
 
  // Launcher contributed by katane-san
     private File mCurrentDirectory = null;
@@ -55,8 +47,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         LauncherActivity.gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/Android/data/" + getApplicationContext().getPackageName();
         alertDialogBuilder = new AlertDialog.Builder(this);
-        SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
-        LauncherActivity.gRenderFontOutline = sp.getBoolean("render_font_outline", getResources().getBoolean(R.bool.render_font_outline));
 
         LauncherActivity.gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
 
@@ -87,7 +77,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         startActivity(i);
     }
 
-    protected void log(Object... txt) {
+    protected static void log(Object... txt) {
         String returnStr = "";
         int i = 1;
         int size = txt.length;
@@ -158,26 +148,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         listView = new ListView(this);
 
-        LinearLayout layoutH = new LinearLayout(this);
-
-        checkRFO = new CheckBox(this);
-        checkRFO.setText("Render Font Outline");
-        checkRFO.setBackgroundColor(Color.rgb(244,244,255));
-        checkRFO.setTextColor(Color.BLACK);
-        checkRFO.setChecked(gRenderFontOutline);
-        checkRFO.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked){
-                    Editor e = getSharedPreferences("pref", MODE_PRIVATE).edit();
-                    e.putBoolean("render_font_outline", isChecked);
-                    e.commit();
-                }
-            });
-
-        layoutH.addView(checkRFO, new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 1.0f));
-
-        listView.addHeaderView(layoutH, null, false);
-
         setupDirectorySelector();
 
         setContentView(listView);
@@ -185,8 +155,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        position--; // for header
-
         TextView textView = (TextView)v;
         mOldCurrentDirectory = mCurrentDirectory;
 
@@ -241,10 +209,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                 setupDirectorySelector();
             }
             else{
-                gRenderFontOutline = checkRFO.isChecked();
-//                runSDLApp();
-                Intent i = new Intent(this, ONScripter.class);
-                startActivity(i);
+                goToActivity(ONScripter.class);
             }
         }
     }

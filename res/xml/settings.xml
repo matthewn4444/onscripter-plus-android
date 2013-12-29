@@ -2,7 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory android:title="@string/settings_render_cate">
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="@bool/render_font_outline"
+            android:summary="@string/settings_render_font_outline_summary"
             android:key="@string/settings_render_font_outline_key"
             android:title="@string/settings_render_font_outline_title">
         </CheckBoxPreference>
