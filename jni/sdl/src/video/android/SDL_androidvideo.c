@@ -246,9 +246,9 @@ JNIEXPORT void JNICALL
 JAVA_EXPORT_NAME(DemoRenderer_nativeInitJavaCallbacks) ( JNIEnv*  env, jobject thiz )
 {
 	JavaEnv = env;
-	JavaRenderer = thiz;
 	
-	JavaRendererClass = (*JavaEnv)->GetObjectClass(JavaEnv, thiz);
+	JavaRenderer = (*JavaEnv)->NewGlobalRef(JavaEnv,thiz);
+	JavaRendererClass = (*JavaEnv)->GetObjectClass(JavaEnv, JavaRenderer);
 	JavaSwapBuffers = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "swapBuffers", "()I");
 	
 	ANDROID_InitOSKeymap();
