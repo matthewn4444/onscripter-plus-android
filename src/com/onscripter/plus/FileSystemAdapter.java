@@ -13,6 +13,7 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
 
     private File mCurrentDirectory;
     private boolean mShowHidden;
+    private boolean onlyShowFolders;
     private File[] mFileList;
     private final FileSort fileSorter = new FileSort();
 
@@ -37,8 +38,22 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         return mCurrentDirectory;
     }
 
+    public void onlyShowFolders(boolean flag) {
+        if (onlyShowFolders != flag) {
+            onlyShowFolders = flag;
+            refresh();
+        }
+    }
+
+    public boolean isOnlyShowingFolders() {
+        return onlyShowFolders;
+    }
+
     public void showHiddenFiles(boolean flag) {
-        mShowHidden = flag;
+        if (mShowHidden != flag) {
+            mShowHidden = flag;
+            refresh();
+        }
     }
 
     public boolean isShowingHiddenFiles() {
@@ -54,8 +69,8 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         mFileList = mCurrentDirectory.listFiles(new FileFilter() {      // TODO split this into file and folder
             @Override
             public boolean accept(File file) {
-                return !file.isHidden() && file.isHidden()
-                        && mShowHidden || file.isDirectory();
+                return (!onlyShowFolders && (!file.isHidden() || file.isHidden()
+                        && mShowHidden)) || file.isDirectory();
             }
         });
         Arrays.sort(mFileList, fileSorter);

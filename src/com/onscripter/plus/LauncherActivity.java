@@ -113,6 +113,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        mAdapter.onlyShowFolders(true);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
 
