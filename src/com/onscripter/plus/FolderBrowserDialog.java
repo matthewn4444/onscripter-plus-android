@@ -78,7 +78,7 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
             openDir = Environment.getExternalStorageDirectory();
         }
         try {
-            mAdapter = new FileSystemAdapter(mCtx, openDir, true, true);
+            mAdapter = new FileSystemAdapter(mCtx, openDir, !openDir.equals(Environment.getExternalStorageDirectory()), true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             dialog.dismiss();
@@ -100,14 +100,24 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         mAdapter.setChildAsCurrent(position);
+        if (position == 0 && mAdapter.getCurrentDirectory()
+                .equals(Environment.getExternalStorageDirectory())) {
+            mAdapter.showBackListItem(false);
+        } else {
+            mAdapter.showBackListItem(true);
+        }
     }
 
     @Override
     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+        File internalStorage = Environment.getExternalStorageDirectory();
         if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mAdapter.getCurrentDirectory().equals(Environment.getExternalStorageDirectory())) {
+            if (mAdapter.getCurrentDirectory().equals(internalStorage)) {
                 getDialog().dismiss();
             } else {
+                if (mAdapter.getCurrentDirectory().getParentFile().equals(internalStorage)) {
+                    mAdapter.showBackListItem(false);
+                }
                 mAdapter.moveUp();
             }
         }

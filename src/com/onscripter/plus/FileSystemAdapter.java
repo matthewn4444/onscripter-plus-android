@@ -20,6 +20,7 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
     private File[] mFileList;
     private final FileSort mFileSorter = new FileSort();
     private TextView mBindedPath;
+    private static String BackString;
 
     static class FileSort implements Comparator<File>{
         @Override
@@ -49,6 +50,9 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         mOnlyShowFolders = onlyShowFolders;
         mShowBackItem = showBackButton;
         mCurrentDirectory = startDirectory;
+        if (BackString == null) {
+            BackString = getContext().getString(R.string.directory_back);
+        }
         refresh();
     }
 
@@ -88,7 +92,11 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
     public void showBackListItem(boolean flag) {
         if (mShowBackItem != flag) {
             mShowBackItem = flag;
-            refresh();
+            if (mShowBackItem) {
+                insert(BackString, 0);
+            } else {
+                remove(BackString);
+            }
         }
     }
 
@@ -121,8 +129,7 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         clear();
         mFileList = files;
         if (mShowBackItem) {
-            LauncherActivity.log("dsdsds");
-            add(getContext().getString(R.string.directory_back));
+            add(BackString);
         }
         Arrays.sort(mFileList, mFileSorter);
         for (int i = 0; i < mFileList.length; i++) {
