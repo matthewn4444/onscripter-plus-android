@@ -23,6 +23,9 @@
     <string name="menu_version">Version</string>
     <string name="menu_quit">Quit</string>
 
+    <!-- Messages -->
+    <string name="message_cannot_find_internal_storage">Cannot find internal memory, something went wrong!</string>
+
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
 

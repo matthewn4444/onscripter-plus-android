@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 public class FileSystemAdapter extends ArrayAdapter<String> {
 
@@ -16,6 +17,7 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
     private boolean onlyShowFolders;
     private File[] mFileList;
     private final FileSort fileSorter = new FileSort();
+    private TextView mBindedPath;
 
     static class FileSort implements Comparator<File>{
         @Override
@@ -31,6 +33,10 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         }
         mCurrentDirectory = startDirectory;
         refresh();
+    }
+
+    public void bindPathToTextView(TextView textView) {
+        mBindedPath = textView;
     }
 
     public File getCurrentDirectory() {
@@ -75,6 +81,9 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         Arrays.sort(mFileList, fileSorter);
         for (int i = 0; i < mFileList.length; i++) {
             add(mFileList[i].getName());
+        }
+        if (mBindedPath != null) {
+            mBindedPath.setText(mCurrentDirectory.getPath());
         }
         notifyDataSetChanged();
     }
