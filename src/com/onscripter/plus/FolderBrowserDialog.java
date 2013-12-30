@@ -78,7 +78,7 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
             openDir = Environment.getExternalStorageDirectory();
         }
         try {
-            mAdapter = new FileSystemAdapter(mCtx, openDir);
+            mAdapter = new FileSystemAdapter(mCtx, openDir, true, true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             dialog.dismiss();
@@ -86,7 +86,6 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
             return;
         }
         mAdapter.bindPathToTextView(mPathText);
-        mAdapter.onlyShowFolders(true);
         mListView.setAdapter(mAdapter);
     }
 

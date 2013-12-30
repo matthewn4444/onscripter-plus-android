@@ -6,6 +6,7 @@
     <bool name="render_font_outline">true</bool>
     <string name="public_key"></string>
     <integer name="gingerbread_version">10</integer>
+    <string name="directory_back">(Back)</string>
 
     <!-- Playback Buttons -->
     <string name="button_rclick">Right Click</string>
