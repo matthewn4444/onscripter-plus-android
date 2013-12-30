@@ -26,7 +26,6 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
 
     public FileSystemAdapter(Context context, File startDirectory) throws FileNotFoundException {
         super(context, android.R.layout.simple_list_item_1);
-        LauncherActivity.log(startDirectory);
         if (!startDirectory.exists() || !startDirectory.isDirectory()) {
             throw new FileNotFoundException("Cannot find directory.");
         }
