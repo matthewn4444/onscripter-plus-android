@@ -7,8 +7,11 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.Display;
@@ -89,8 +92,11 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
         dialog.setCancelable(false);
         dialog.setOnKeyListener(this);
 
+        setupDirectories(getPersistedString(null));
+    }
+
+    private void setupDirectories(String path) {
         // Detect if External sdcard is available, if not then remove the sdcard button and adjust the layout
-        mCurrentExternalPath = ExternalStorage;
         final LinearLayout.LayoutParams textLayout = (LinearLayout.LayoutParams) mPathText.getLayoutParams();
         if (ExternalStorage != null) {
             ((View)mTogglePath.getParent()).setVisibility(View.VISIBLE);
@@ -102,20 +108,31 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
         mPathText.setLayoutParams(textLayout);
 
         // Open default location from preference, if cannot find, then open storage
-        File openDir = new File(Environment.getExternalStorageDirectory() + "/dssdds");
-        if (!openDir.exists()) {
+        File openDir;
+        if (path != null) {
+            openDir = new File(path);
+            if (!openDir.exists()) {
+                openDir = InternalStorage;
+            }
+        } else {
             openDir = InternalStorage;
         }
 
         // Detect where the current directory is either from internal or external storage
-        LauncherActivity.log(openDir.getPath().contains(InternalStorage.getPath()));
-        mUpperBoundFile = openDir.getPath().contains(InternalStorage.getPath()) ? InternalStorage : ExternalStorage;
+        if (openDir.getPath().contains(InternalStorage.getPath())) {
+            mUpperBoundFile = InternalStorage;
+            mCurrentExternalPath = ExternalStorage;
+        } else {
+            mUpperBoundFile = ExternalStorage;
+            mCurrentInternalPath = InternalStorage;
+            mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
+        }
 
         try {
             mAdapter = new FileSystemAdapter(mCtx, openDir, !openDir.equals(mUpperBoundFile), true);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            dialog.dismiss();
+            getDialog().dismiss();
             Toast.makeText(mCtx, R.string.message_cannot_find_internal_storage, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -130,6 +147,23 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
             ((ViewGroup)mLayout.getParent()).removeView(mLayout);
         }
         super.onDismiss(dialog);
+    }
+
+    @Override
+    protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
+
+        if (positiveResult) {
+            String value = mAdapter.getCurrentDirectory().getPath();
+            if (callChangeListener(value)) {
+                persistString(value);
+            }
+        }
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getString(index);
     }
 
     @Override
@@ -155,9 +189,8 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
         return false;
     }
 
-    @Override
-    public void onClick(View v) {
-        // Toggle between the internal and external storage
+    private void toggleGotoButton() {
+     // Toggle between the internal and external storage
         if (mUpperBoundFile.equals(InternalStorage)) {
             mCurrentInternalPath = mAdapter.getCurrentDirectory();
             mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
@@ -172,5 +205,71 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
 
         // Remove the back list item if we are at upperbound
         mAdapter.showBackListItem(!mUpperBoundFile.equals(mAdapter.getCurrentDirectory()));
+    }
+
+    @Override
+    public void onClick(View v) {
+        toggleGotoButton();
+    }
+
+    // Code below is from EditTextPreference class
+    @Override
+    protected Parcelable onSaveInstanceState() {
+        final Parcelable superState = super.onSaveInstanceState();
+        if (isPersistent()) {
+            // No need to save instance state since it's persistent
+            return superState;
+        }
+
+        final SavedState myState = new SavedState(superState);
+        myState.text = mAdapter.getCurrentDirectory().getPath();
+        return myState;
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Parcelable state) {
+        if (state == null || !state.getClass().equals(SavedState.class)) {
+            // Didn't save state for us in onSaveInstanceState
+            super.onRestoreInstanceState(state);
+            return;
+        }
+
+        SavedState myState = (SavedState) state;
+        super.onRestoreInstanceState(myState.getSuperState());
+
+        InternalStorage = Environment.getExternalStorageDirectory();
+        ExternalStorage = Environment2.getExternalSDCardDirectory();
+        setupDirectories(myState.text);
+    }
+
+    private static class SavedState extends BaseSavedState {
+        String text;
+
+        public SavedState(Parcel source) {
+            super(source);
+            text = source.readString();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeString(text);
+        }
+
+        public SavedState(Parcelable superState) {
+            super(superState);
+        }
+
+        public static final Parcelable.Creator<SavedState> CREATOR = new Parcelable.Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
     }
 }

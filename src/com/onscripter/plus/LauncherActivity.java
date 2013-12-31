@@ -7,8 +7,10 @@ import java.io.FileNotFoundException;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +31,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private ListView listView = null;
     private AlertDialog.Builder alertDialogBuilder = null;      // TODO make this smarter
     private FileSystemAdapter mAdapter = null;
+    private static final int REQUEST_CODE_SETTINGS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +56,24 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
         case R.id.action_settings:
-            goToActivity(Settings.class);
+            Intent i = new Intent(this, Settings.class);
+            startActivityForResult(i, REQUEST_CODE_SETTINGS);
             break;
         default:
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+        case REQUEST_CODE_SETTINGS:
+            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+            log(sp.getString(getString(R.string.settings_folder_default_key), null));
+            break;
+        }
     }
 
     protected void goToActivity(Class<?> cls) {
