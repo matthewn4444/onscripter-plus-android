@@ -36,11 +36,28 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/Android/data/" + getApplicationContext().getPackageName();
         alertDialogBuilder = new AlertDialog.Builder(this);
 
-        gCurrentDirectoryPath = Environment.getExternalStorageDirectory() + "/ons";
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultDirPref = getString(R.string.settings_folder_default_key);
+        gCurrentDirectoryPath = sp.getString(defaultDirPref, null);
+
+        // Setup default directory location when null
+        if (gCurrentDirectoryPath == null) {
+            // Check to see if there is a <internal storage>/ons
+            File onsDefaultDir = new File(Environment.getExternalStorageDirectory() + "/ons");
+            if (onsDefaultDir.exists()) {
+                gCurrentDirectoryPath = onsDefaultDir.getPath();
+                sp.edit().putString(defaultDirPref, gCurrentDirectoryPath).commit();
+            } else if (Environment2.hasExternalSDCard()) {
+                // Check to see if there is a <extSdCard storage>/ons
+                onsDefaultDir = new File(Environment2.getExternalSDCardDirectory() + "/ons");
+                if (onsDefaultDir.exists()) {
+                    gCurrentDirectoryPath = onsDefaultDir.getPath();
+                    sp.edit().putString(defaultDirPref, gCurrentDirectoryPath).commit();
+                }
+            }
+        }
 
         runLauncher();
     }
@@ -71,7 +88,12 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         switch (requestCode) {
         case REQUEST_CODE_SETTINGS:
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            log(sp.getString(getString(R.string.settings_folder_default_key), null));
+            String path = sp.getString(getString(R.string.settings_folder_default_key), null);
+            if (path != null && path != gCurrentDirectoryPath) {
+                File dir = new File(path);
+                mAdapter.setCurrentDirectory(dir);
+                gCurrentDirectoryPath = path;
+            }
             break;
         }
     }
