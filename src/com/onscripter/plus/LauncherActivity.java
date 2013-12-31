@@ -160,7 +160,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public void onBackPressed() {
         if (mAdapter != null) {
             // Back button will exit
-            if (mAdapter.getCurrentDirectory().equals(Environment.getExternalStorageDirectory())) {     // TODO change this to the "home folder"
+            if (mAdapter.getCurrentDirectory().equals(Environment.getExternalStorageDirectory())
+                    || mAdapter.getCurrentDirectory().equals(Environment2.getExternalSDCardDirectory())) {
                 super.onBackPressed();
             } else {
                 mAdapter.moveUp();
