@@ -63,6 +63,10 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         }
     }
 
+    public String getCurrentDirectoryPath() {
+        return mCurrentDirectory.getPath();
+    }
+
     public File getCurrentDirectory() {
         return mCurrentDirectory;
     }

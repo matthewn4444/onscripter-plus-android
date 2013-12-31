@@ -1,5 +1,7 @@
 package com.onscripter.plus;
 
+import java.io.File;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -25,6 +27,8 @@ import android.widget.LinearLayout;
 
 public class ONScripter extends Activity
 {
+    public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
+
     private final int num_file = 0;
     private final byte[] buf = null;
     private int screen_w, screen_h;
@@ -36,6 +40,8 @@ public class ONScripter extends Activity
     private LinearLayout layout3 = null;
     private boolean mIsLandscape = true;
     private boolean mButtonVisible = true;
+
+    private File mCurrentDirectory;
 
 
     private DemoGLSurfaceView mGLView = null;
@@ -57,6 +63,9 @@ public class ONScripter extends Activity
         mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
         alertDialogBuilder = new AlertDialog.Builder(this);
 
+        mCurrentDirectory = new File(getIntent().getStringExtra(CURRENT_DIRECTORY_EXTRA));
+        LauncherActivity.log(mCurrentDirectory.getPath());
+
         runSDLApp();
     }
 
@@ -64,7 +73,7 @@ public class ONScripter extends Activity
 		nativeInitJavaCallbacks();
 
 		mAudioThread = new AudioThread(this);
-		mGLView = new DemoGLSurfaceView(this);
+		mGLView = new DemoGLSurfaceView(this, mCurrentDirectory);
 		mGLView.setFocusableInTouchMode(true);
 		mGLView.setFocusable(true);
 		mGLView.requestFocus();
@@ -268,7 +277,7 @@ public class ONScripter extends Activity
 
 	public void playVideo(char[] filename){
 		try{
-			String filename2 = "file:/" + LauncherActivity.gCurrentDirectoryPath + "/" + new String(filename);
+			String filename2 = "file:/" + mCurrentDirectory + "/" + new String(filename);
 			filename2 = filename2.replace('\\', '/');
 			Log.v("ONS", "playVideo: " + filename2);
 			Uri uri = Uri.parse(filename2);

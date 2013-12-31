@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,42 +25,56 @@ import com.actionbarsherlock.view.MenuItem;
 
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener
 {
-
-    public static String gCurrentDirectoryPath;
-
-    private File mCurrentDirectory = null;      // TODO this is not needed
-    private ListView listView = null;
-    private AlertDialog.Builder alertDialogBuilder = null;      // TODO make this smarter
-    private FileSystemAdapter mAdapter = null;
     private static final int REQUEST_CODE_SETTINGS = 1;
+
+    private AlertDialog.Builder mDialog = null;
+    private FileSystemAdapter mAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        alertDialogBuilder = new AlertDialog.Builder(this);
-
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String defaultDirPref = getString(R.string.settings_folder_default_key);
-        gCurrentDirectoryPath = sp.getString(defaultDirPref, null);
+        mDialog = new AlertDialog.Builder(this);
 
         // Setup default directory location when null
-        if (gCurrentDirectoryPath == null) {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String defaultDirPref = getString(R.string.settings_folder_default_key);
+        String path = sp.getString(defaultDirPref, null);
+        if (path == null) {
             // Check to see if there is a <internal storage>/ons
             File onsDefaultDir = new File(Environment.getExternalStorageDirectory() + "/ons");
             if (onsDefaultDir.exists()) {
-                gCurrentDirectoryPath = onsDefaultDir.getPath();
-                sp.edit().putString(defaultDirPref, gCurrentDirectoryPath).commit();
+                path = onsDefaultDir.getPath();
+                sp.edit().putString(defaultDirPref, path).commit();
             } else if (Environment2.hasExternalSDCard()) {
                 // Check to see if there is a <extSdCard storage>/ons
                 onsDefaultDir = new File(Environment2.getExternalSDCardDirectory() + "/ons");
                 if (onsDefaultDir.exists()) {
-                    gCurrentDirectoryPath = onsDefaultDir.getPath();
-                    sp.edit().putString(defaultDirPref, gCurrentDirectoryPath).commit();
+                    path = onsDefaultDir.getPath();
+                    sp.edit().putString(defaultDirPref, path).commit();
                 }
             }
         }
+        File directory = new File(path);
+        if (!directory.exists()){
+            directory = new File(Environment.getExternalStorageDirectory().getPath());
 
-        runLauncher();
+            if (!directory.exists()) {
+                showError(getString(R.string.message_cannot_find_internal_storage));
+                return;
+            }
+        }
+
+        // Set up the listView and the adapter
+        try {
+            mAdapter = new FileSystemAdapter(this, directory);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        final ListView listView = new ListView(this);
+        mAdapter.onlyShowFolders(true);
+        listView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(this);
+        setContentView(listView);
     }
 
     @Override
@@ -89,17 +104,25 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         case REQUEST_CODE_SETTINGS:
             SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
             String path = sp.getString(getString(R.string.settings_folder_default_key), null);
-            if (path != null && path != gCurrentDirectoryPath) {
+            String currentPath = mAdapter.getCurrentDirectoryPath();
+            if (path != null && path != currentPath) {
                 File dir = new File(path);
                 mAdapter.setCurrentDirectory(dir);
-                gCurrentDirectoryPath = path;
+                currentPath = path;
             }
             break;
         }
     }
 
     protected void goToActivity(Class<?> cls) {
+        goToActivity(cls, null);
+    }
+
+    protected void goToActivity(Class<?> cls, Bundle bundle) {
         Intent i = new Intent(this, cls);
+        if (bundle != null) {
+            i.putExtras(bundle);
+        }
         startActivity(i);
     }
 
@@ -117,45 +140,23 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         Log.i("lunch", returnStr);
     }
 
-    private void showErrorDialog(String mes)
-    {
-        alertDialogBuilder.setTitle("Error");
-        alertDialogBuilder.setMessage(mes);
-        alertDialogBuilder.setPositiveButton("Quit", new DialogInterface.OnClickListener(){
+    private void alert(String message) {
+        mDialog.setTitle(getString(R.string.app_name));
+        mDialog.setMessage(message);
+        mDialog.setPositiveButton(android.R.string.ok, null);
+        mDialog.create().show();
+    }
+
+    private void showError(String message) {
+        mDialog.setTitle("Error");
+        mDialog.setMessage(message);
+        mDialog.setPositiveButton(R.string.dialog_quit_button, new OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
+            public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
         });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
-
-    private void runLauncher() {
-        mCurrentDirectory = new File(gCurrentDirectoryPath);
-        if (mCurrentDirectory.exists() == false){
-            gCurrentDirectoryPath = Environment.getExternalStorageDirectory().getPath();
-            mCurrentDirectory = new File(gCurrentDirectoryPath);
-
-            if (mCurrentDirectory.exists() == false) {
-                showErrorDialog("Could not find SD card.");
-            }
-        }
-
-        listView = new ListView(this);
-
-        // Set up the adapter
-        try {
-            mAdapter = new FileSystemAdapter(this, mCurrentDirectory);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        mAdapter.onlyShowFolders(true);
-        listView.setAdapter(mAdapter);
-        listView.setOnItemClickListener(this);
-
-
-        setContentView(listView);
+        mDialog.create().show();
     }
 
     @Override
@@ -172,15 +173,13 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        // TODO simplify this function
-        File oldCurrentDir = mCurrentDirectory;
+        File currentDir = mAdapter.getFile(position);
 
         // Set new path for the file
-        mCurrentDirectory = mAdapter.getFile(position);
-        gCurrentDirectoryPath = mCurrentDirectory.getPath();
+        currentDir = mAdapter.getFile(position);
 
         // Check to see if this folder contains a visual novel
-        File[] mDirectoryFiles = mCurrentDirectory.listFiles(new FileFilter() {
+        File[] mDirectoryFiles = currentDir.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
                 return (file.isFile() &&
@@ -195,7 +194,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         // Unable to read the folder
         if (mDirectoryFiles == null) {
             Toast.makeText(LauncherActivity.this, "Unable to open folder because of permissions", Toast.LENGTH_SHORT).show();
-            mCurrentDirectory = oldCurrentDir;
             return;
         }
 
@@ -203,7 +201,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             mAdapter.setChildAsCurrent(position);
         } else {
             // Check to see if it has a font file inside
-            mDirectoryFiles = mCurrentDirectory.listFiles(new FileFilter() {
+            mDirectoryFiles = currentDir.listFiles(new FileFilter() {
                 @Override
                 public boolean accept(File file) {
                     return (file.isFile() &&
@@ -213,21 +211,11 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
             // Missing font
             if (mDirectoryFiles.length == 0){
-                alertDialogBuilder.setTitle(getString(R.string.app_name));
-                alertDialogBuilder.setMessage("default.ttf is missing.");
-                alertDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                        @Override
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            setResult(RESULT_OK);
-                        }
-                    });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-
-                mCurrentDirectory = oldCurrentDir;
-            }
-            else{
-                goToActivity(ONScripter.class);     // TODO change this to setActivityForResult and return the current directory
+                alert("default.ttf is missing.");
+            } else{
+                Bundle b = new Bundle();
+                b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, currentDir.getPath());
+                goToActivity(ONScripter.class, b);
             }
         }
     }

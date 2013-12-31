@@ -1,5 +1,7 @@
 package com.onscripter.plus;
 
+import java.io.File;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -17,9 +19,10 @@ import android.view.MotionEvent;
 
 
 class DemoRenderer extends GLSurfaceView_SDL.Renderer {
-	public DemoRenderer(Activity _context)
+	public DemoRenderer(Activity _context, File currentDirectory)
 	{
 		context = _context;
+		mCurrentDirectory = currentDirectory.getPath();
 		int n = 1;
 		if (shouldRenderFontOutline()) {
             n++;
@@ -30,7 +33,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
-		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);
+		nativeInit(mCurrentDirectory, arg);
 	}
 
 	private boolean shouldRenderFontOutline() {
@@ -71,7 +74,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
-		nativeInit(LauncherActivity.gCurrentDirectoryPath, arg);
+		nativeInit(mCurrentDirectory, arg);
 
 	}
 
@@ -90,6 +93,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 	private native void nativeDone();
 
 	private Activity context = null;
+	private final String mCurrentDirectory;
 
 	private final EGL10 mEgl = null;
 	private final EGLDisplay mEglDisplay = null;
@@ -99,9 +103,9 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 }
 
 class DemoGLSurfaceView extends GLSurfaceView_SDL {
-	public DemoGLSurfaceView(Activity context) {
+	public DemoGLSurfaceView(Activity context, File currentDirectory) {
 		super(context);
-		mRenderer = new DemoRenderer(context);
+		mRenderer = new DemoRenderer(context, currentDirectory);
 		setRenderer(mRenderer);
 	}
 
