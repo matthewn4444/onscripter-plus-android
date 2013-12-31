@@ -26,6 +26,7 @@ import com.actionbarsherlock.view.MenuItem;
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
+    private static final File DEFAULT_LOCATION = Environment.getExternalStorageDirectory();
 
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
@@ -35,7 +36,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         mDialog = new AlertDialog.Builder(this);
 
-        // Setup default directory location when null
+        // Detect folder location if none is provided
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String defaultDirPref = getString(R.string.settings_folder_default_key);
         String path = sp.getString(defaultDirPref, null);
@@ -54,14 +55,10 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                 }
             }
         }
-        File directory = new File(path);
+        File directory = path != null && new File(path).exists() ? new File(path) : DEFAULT_LOCATION;
         if (!directory.exists()){
-            directory = new File(Environment.getExternalStorageDirectory().getPath());
-
-            if (!directory.exists()) {
-                showError(getString(R.string.message_cannot_find_internal_storage));
-                return;
-            }
+            showError(getString(R.string.message_cannot_find_internal_storage));
+            return;
         }
 
         // Set up the listView and the adapter
