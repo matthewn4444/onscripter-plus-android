@@ -56,5 +56,6 @@ Play Visual Novel
 2. Plug Android device in computer and navigate to the internal memory of the Android device
 3. Make a new folder "ons"
 4. Place the game folder into "ons" folder
-4. Place a font (Japanese preferably) into the game folder and name it "default.ttf"
-5. You can delete the dll files
+5. [OPTIONAL] Place a font (Japanese preferably) into the game folder and name it "default.ttf"
+    - if no font is provided, it will use a default font
+6. You can delete the dll files
