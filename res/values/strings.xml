@@ -9,6 +9,9 @@
     <string name="directory_back">(Back)</string>
     <string name="dialog_quit_button">Quit</string>
 
+    <!-- Files -->
+    <string name="default_font_file">default.ttf</string>
+
     <!-- Playback Buttons -->
     <string name="button_rclick">Right Click</string>
     <string name="button_lclick">Left Click</string>
@@ -27,6 +30,10 @@
 
     <!-- Messages -->
     <string name="message_cannot_find_internal_storage">Cannot find internal memory, something went wrong!</string>
+    <string name="message_loading_fonts">Loading fonts&#8230;</string>
+    <string name="message_asset_not_found">Could not find default font file in assets!</string>
+    <string name="message_private_dir_not_found">Could not find private directory!</string>
+    <string name="message_internal_write_error">Could not write font file to internal storage!</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>

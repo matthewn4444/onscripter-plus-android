@@ -1,7 +1,5 @@
 package com.onscripter.plus;
 
-import java.io.File;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -28,6 +26,7 @@ import android.widget.LinearLayout;
 public class ONScripter extends Activity
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
+    public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
 
     private final int num_file = 0;
     private final byte[] buf = null;
@@ -41,8 +40,8 @@ public class ONScripter extends Activity
     private boolean mIsLandscape = true;
     private boolean mButtonVisible = true;
 
-    private File mCurrentDirectory;
-
+    private String mCurrentDirectory;
+    private boolean mUseDefaultFont;
 
     private DemoGLSurfaceView mGLView = null;
     private AudioThread mAudioThread = null;
@@ -59,12 +58,13 @@ public class ONScripter extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         SharedPreferences sp = getSharedPreferences("pref", MODE_PRIVATE);
         mButtonVisible = sp.getBoolean("button_visible", getResources().getBoolean(R.bool.button_visible));
         alertDialogBuilder = new AlertDialog.Builder(this);
 
-        mCurrentDirectory = new File(getIntent().getStringExtra(CURRENT_DIRECTORY_EXTRA));
-        LauncherActivity.log(mCurrentDirectory.getPath());
+        mCurrentDirectory = getIntent().getStringExtra(CURRENT_DIRECTORY_EXTRA);
+        mUseDefaultFont = getIntent().getBooleanExtra(USE_DEFAULT_FONT_EXTRA, false);
 
         runSDLApp();
     }
@@ -73,7 +73,11 @@ public class ONScripter extends Activity
 		nativeInitJavaCallbacks();
 
 		mAudioThread = new AudioThread(this);
-		mGLView = new DemoGLSurfaceView(this, mCurrentDirectory);
+		if (mUseDefaultFont) {
+		    mGLView = new DemoGLSurfaceView(this, mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH);
+		} else {
+		    mGLView = new DemoGLSurfaceView(this, mCurrentDirectory);
+		}
 		mGLView.setFocusableInTouchMode(true);
 		mGLView.setFocusable(true);
 		mGLView.requestFocus();

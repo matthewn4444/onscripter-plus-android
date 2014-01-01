@@ -3,8 +3,12 @@ package com.onscripter.plus;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -27,9 +31,12 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
     private static final File DEFAULT_LOCATION = Environment.getExternalStorageDirectory();
+    public static String DEFAULT_FONT_PATH = null;
+    public static String DEFAULT_FONT_FILE = null;
 
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
+    private FontFileCopyTask mCopyTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +79,18 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         setContentView(listView);
+
+        if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
+            DEFAULT_FONT_FILE = getString(R.string.default_font_file);
+            DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
+        }
+
+        // Copy the font file if it does not exist yet
+        if (!new File(DEFAULT_FONT_PATH).exists()) {
+            mCopyTask = new FontFileCopyTask(this, R.string.message_loading_fonts, false);
+            mCopyTask.setCancelable(false);
+            mCopyTask.execute();
+        }
     }
 
     @Override
@@ -144,6 +163,9 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mDialog.create().show();
     }
 
+    private void showError(int stringResource) {
+        showError(getString(stringResource));
+    }
     private void showError(String message) {
         mDialog.setTitle("Error");
         mDialog.setMessage(message);
@@ -173,9 +195,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         File currentDir = mAdapter.getFile(position);
 
-        // Set new path for the file
-        currentDir = mAdapter.getFile(position);
-
         // Check to see if this folder contains a visual novel
         File[] mDirectoryFiles = currentDir.listFiles(new FileFilter() {
             @Override
@@ -198,23 +217,110 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         if (mDirectoryFiles.length == 0){       // It is a regular folder, so open it
             mAdapter.setChildAsCurrent(position);
         } else {
-            // Check to see if it has a font file inside
-            mDirectoryFiles = currentDir.listFiles(new FileFilter() {
-                @Override
-                public boolean accept(File file) {
-                    return (file.isFile() &&
-                            (file.getName().equals("default.ttf")));
+            // Use default font if there is none in the game folder
+            if (new File(currentDir + "/" + DEFAULT_FONT_FILE).exists()) {
+                startONScripter(currentDir.getPath());
+            } else {
+                if (mCopyTask != null) {    // Still copying, so wait till finished then run
+                    mCopyTask.runNovelWhenFinished(currentDir.getPath());
+                } else {
+                    startONScripter(currentDir.getPath(), true);
                 }
-            });
-
-            // Missing font
-            if (mDirectoryFiles.length == 0){
-                alert("default.ttf is missing.");
-            } else{
-                Bundle b = new Bundle();
-                b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, currentDir.getPath());
-                goToActivity(ONScripter.class, b);
             }
+        }
+    }
+
+    private void startONScripter(String path) {
+        startONScripter(path, false);
+    }
+
+    private void startONScripter(String path, boolean useDefaultFont) {
+        Bundle b = new Bundle();
+        if (useDefaultFont) {
+            b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
+        }
+        b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
+        goToActivity(ONScripter.class, b);
+    }
+
+    class FontFileCopyTask extends ProgressDialogAsyncTask<Void, Void, Integer> {
+        public FontFileCopyTask(Context ctx, String message, boolean showDialog) {
+            super(ctx, message, showDialog);
+        }
+        public FontFileCopyTask(Context ctx, int stringResource, boolean showDialog) {
+            super(ctx, ctx.getString(stringResource), showDialog);
+        }
+
+        private final int NO_PROBLEM = 0;
+        private final int ASSET_NOT_FOUND = 1;
+        private final int PRIVATE_PATH_NOT_FOUND = 2;
+        private final int WRITING_ERROR = 3;
+
+        private String mRunNovelWhenFinishedPath = null;
+
+        public void runNovelWhenFinished(String path) {
+            mRunNovelWhenFinishedPath = path;
+            show();
+        }
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            InputStream is = null;
+            OutputStream os = null;
+            try {
+                 is = getAssets().open(DEFAULT_FONT_FILE);
+                 os = openFileOutput(DEFAULT_FONT_FILE, Context.MODE_PRIVATE);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                try {
+                    is.close();
+                } catch (IOException e1) {}
+                return PRIVATE_PATH_NOT_FOUND;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ASSET_NOT_FOUND;
+            }
+
+            // Copy file
+            byte[] buffer = new byte[1024];
+            int read;
+            try {
+                while((read = is.read(buffer)) != -1){
+                  os.write(buffer, 0, read);
+                }
+                os.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return WRITING_ERROR;
+            } finally {
+                try {
+                    is.close();
+                    os.close();
+                } catch (IOException e) {}
+            }
+            return NO_PROBLEM;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            switch (result) {
+            case NO_PROBLEM:
+                if (mRunNovelWhenFinishedPath != null) {
+                    startONScripter(mRunNovelWhenFinishedPath, true);
+                }
+                break;
+            case ASSET_NOT_FOUND:
+                showError(R.string.message_asset_not_found);
+                break;
+            case PRIVATE_PATH_NOT_FOUND:
+                showError(R.string.message_private_dir_not_found);
+                break;
+            case WRITING_ERROR:
+                showError(R.string.message_internal_write_error);
+                break;
+            }
+            mCopyTask = null;
         }
     }
 }

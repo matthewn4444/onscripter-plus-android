@@ -1,7 +1,5 @@
 package com.onscripter.plus;
 
-import java.io.File;
-
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -19,20 +17,33 @@ import android.view.MotionEvent;
 
 
 class DemoRenderer extends GLSurfaceView_SDL.Renderer {
-	public DemoRenderer(Activity _context, File currentDirectory)
+    public DemoRenderer(Activity _context, String currentDirectory)
+    {
+        this(_context, currentDirectory, null);
+    }
+
+	public DemoRenderer(Activity _context, String currentDirectory, String fontPath)
 	{
 		context = _context;
-		mCurrentDirectory = currentDirectory.getPath();
+		mCurrentDirectory = currentDirectory;
+		mFontPath = fontPath;
 		int n = 1;
 		if (shouldRenderFontOutline()) {
             n++;
         }
+		if (fontPath != null) {
+		    n += 2;
+		}
 		String[] arg = new String[n];
 		n = 0;
 		arg[n++] = "--open-only";
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
+		if (fontPath != null) {
+		    arg[n++] = "-f";
+		    arg[n++] = fontPath;
+		}
 		nativeInit(mCurrentDirectory, arg);
 	}
 
@@ -69,11 +80,18 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		if (shouldRenderFontOutline()) {
             n++;
         }
+		if (mFontPath != null) {
+		    n += 2;
+		}
 		String[] arg = new String[n];
 		n = 0;
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }
+		if (mFontPath != null) {
+		    arg[n++] = "-f";
+            arg[n++] = mFontPath;
+		}
 		nativeInit(mCurrentDirectory, arg);
 
 	}
@@ -94,6 +112,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 
 	private Activity context = null;
 	private final String mCurrentDirectory;
+	private final String mFontPath;
 
 	private final EGL10 mEgl = null;
 	private final EGLDisplay mEglDisplay = null;
@@ -103,11 +122,15 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 }
 
 class DemoGLSurfaceView extends GLSurfaceView_SDL {
-	public DemoGLSurfaceView(Activity context, File currentDirectory) {
-		super(context);
-		mRenderer = new DemoRenderer(context, currentDirectory);
-		setRenderer(mRenderer);
+	public DemoGLSurfaceView(Activity context, String currentDirectory) {
+	    this(context, currentDirectory, null);
 	}
+
+	public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath) {
+        super(context);
+        mRenderer = new DemoRenderer(context, currentDirectory, fontPath);
+        setRenderer(mRenderer);
+    }
 
 	@Override
 	public boolean onTouchEvent(final MotionEvent event)
