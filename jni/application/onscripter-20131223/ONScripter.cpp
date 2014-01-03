@@ -629,6 +629,11 @@ void ONScripter::resetSentenceFont()
     sentence_font.og_font_size_xy[1] = DEFAULT_FONT_SIZE;
     sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
     sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+    int line_width = sentence_font.num_xy[0] * sentence_font.og_font_size_xy[0];
+    sentence_font.og_num_xy[0] = sentence_font.num_xy[0];
+    sentence_font.og_num_xy[1] = sentence_font.num_xy[1];
+    sentence_font.num_xy[0] = floor(line_width / sentence_font.font_size_xy[0]);
+    sentence_font.num_xy[1]++;
 #else
     sentence_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
     sentence_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
@@ -1014,6 +1019,9 @@ void ONScripter::clearCurrentPage()
         sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
         sentence_font.pitch_xy[0] = sentence_font.font_size_xy[0];
         sentence_font.pitch_xy[1] = sentence_font.font_size_xy[1];
+        int line_width = sentence_font.og_num_xy[0] * sentence_font.og_font_size_xy[0];
+        sentence_font.num_xy[0] = floor(line_width / sentence_font.font_size_xy[0]);
+        sentence_font.num_xy[1] = sentence_font.og_num_xy[1] + 1;
 
         if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
             fprintf( stderr, "can't open font file: %s\n", font_file );

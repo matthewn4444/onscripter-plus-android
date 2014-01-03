@@ -50,6 +50,7 @@ public:
     uchar3  window_color;
 #ifdef ANDROID
     int og_font_size_xy[2];
+    int og_num_xy[2];
     bool size_invalidated;
 #endif
 

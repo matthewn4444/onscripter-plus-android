@@ -633,6 +633,11 @@ void ONScripter::setwindowCore()
     sentence_font.og_font_size_xy[1] = script_h.readInt();
     sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
     sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+    int line_width = sentence_font.num_xy[0] * sentence_font.og_font_size_xy[0];
+    sentence_font.og_num_xy[0] = sentence_font.num_xy[0];
+    sentence_font.og_num_xy[1] = sentence_font.num_xy[1];
+    sentence_font.num_xy[0] = floor(line_width / sentence_font.font_size_xy[0]);
+    sentence_font.num_xy[1]++;
 #else
     sentence_font.font_size_xy[0] = script_h.readInt();
     sentence_font.font_size_xy[1] = script_h.readInt();
