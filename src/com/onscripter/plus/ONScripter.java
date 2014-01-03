@@ -19,11 +19,16 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.VerticalSeekBar;
 
-public class ONScripter extends Activity
+public class ONScripter extends Activity implements OnSeekBarChangeListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
@@ -32,11 +37,12 @@ public class ONScripter extends Activity
     private final byte[] buf = null;
     private int screen_w, screen_h;
     private int button_w, button_h;
-    private Button btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8;
+    private Button btn1, btn2, btn3, btn4, btn5, btn6, btn7;
     private LinearLayout layout  = null;
     private LinearLayout layout1 = null;
     private LinearLayout layout2 = null;
     private LinearLayout layout3 = null;
+    private SeekBar seekbar = null;
     private boolean mIsLandscape = true;
     private boolean mButtonVisible = true;
 
@@ -49,6 +55,7 @@ public class ONScripter extends Activity
     private native int nativeInitJavaCallbacks();
     private native int nativeGetWidth();
     private native int nativeGetHeight();
+    private native int nativeSetSentenceFontScale(double scale);
     private final DataDownloader downloader = null;
     private AlertDialog.Builder alertDialogBuilder = null;
     private final ProgressDialog progDialog = null;
@@ -66,10 +73,13 @@ public class ONScripter extends Activity
         mCurrentDirectory = getIntent().getStringExtra(CURRENT_DIRECTORY_EXTRA);
         mUseDefaultFont = getIntent().getBooleanExtra(USE_DEFAULT_FONT_EXTRA, false);
 
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         runSDLApp();
     }
 
-	private void runSDLApp() {
+    private void runSDLApp() {
 		nativeInitJavaCallbacks();
 
 		mAudioThread = new AudioThread(this);
@@ -166,13 +176,16 @@ public class ONScripter extends Activity
 
 		btn7 = new Button(this); // dummy button for Android 1.6
 		btn7.setVisibility(View.INVISIBLE);
-		btn8 = new Button(this); // dummy button for Android 1.6
-		btn8.setVisibility(View.INVISIBLE);
+		seekbar = new VerticalSeekBar(this);
+		seekbar.setOnSeekBarChangeListener(this);
 
 		layout  = new LinearLayout(this);
 		layout1 = new LinearLayout(this);
 		layout2 = new LinearLayout(this);
 		layout3 = new LinearLayout(this);
+
+		seekbar.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+		layout3.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 		if (mIsLandscape) {
             layout2.setOrientation(LinearLayout.VERTICAL);
@@ -192,7 +205,7 @@ public class ONScripter extends Activity
 		layout2.addView(btn6, 5);
 		layout.addView(layout2, 2);
 
-		layout3.addView(btn8);
+		layout3.addView(seekbar);
 		layout.addView(layout3, 3);
 
 		resetLayout();
@@ -276,7 +289,7 @@ public class ONScripter extends Activity
 
 		layout.updateViewLayout(layout1, new LinearLayout.LayoutParams(w1, h1));
 		layout.updateViewLayout(layout2, new LinearLayout.LayoutParams(w2, h2));
-		layout.updateViewLayout(layout3, new LinearLayout.LayoutParams(dw-screen_w-w1-w2, dh-screen_h-h1-h2));
+//		layout.updateViewLayout(layout3, new LinearLayout.LayoutParams(dw-screen_w-w1-w2, dh-screen_h-h1-h2));
 	}
 
 	public void playVideo(char[] filename){
@@ -422,4 +435,16 @@ public class ONScripter extends Activity
 		System.loadLibrary("application");
 		System.loadLibrary("sdl_main");
 	}
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress,
+            boolean fromUser) {
+        nativeSetSentenceFontScale(Math.floor(progress /10)/10.0 + 1);
+    }
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
 }

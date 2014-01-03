@@ -274,7 +274,14 @@ public:
     int allsp2hideCommand();
     int allsphideCommand();
     int amspCommand();
-    
+
+#ifdef ANDROID
+    static double Sentence_font_scale;
+    void invalidateSentenceFontSize() {
+        sentence_font.size_invalidated = true;
+    }
+#endif
+
 private:
     // ----------------------------------------
     // global variables and methods

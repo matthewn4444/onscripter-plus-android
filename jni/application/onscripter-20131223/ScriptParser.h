@@ -44,6 +44,7 @@
 #endif
 
 #define DEFAULT_FONT_SIZE 26
+#define DEFAULT_SENTENCE_SCALE 1
 #define DEFAULT_DIALOG_FONT_SIZE 18
 
 #define DEFAULT_LOOKBACK_NAME0 "uoncur.bmp"

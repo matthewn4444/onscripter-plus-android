@@ -48,6 +48,10 @@ public:
     bool is_transparent;
     bool is_newline_accepted;
     uchar3  window_color;
+#ifdef ANDROID
+    int og_font_size_xy[2];
+    bool size_invalidated;
+#endif
 
     int line_offset_xy[2]; // ruby offset for each line
     bool rubyon_flag;

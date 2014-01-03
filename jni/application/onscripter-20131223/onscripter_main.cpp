@@ -130,6 +130,15 @@ JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 {
 	return ons.getHeight();
 }
+
+JNIEXPORT jint JNICALL
+JAVA_EXPORT_NAME(ONScripter_nativeSetSentenceFontScale) ( JNIEnv*  env, jobject thiz, double scale )
+{
+	if (ONScripter::Sentence_font_scale != scale) {
+		ONScripter::Sentence_font_scale = scale;
+		ons.invalidateSentenceFontSize();
+	}
+}
 }
 #endif
 

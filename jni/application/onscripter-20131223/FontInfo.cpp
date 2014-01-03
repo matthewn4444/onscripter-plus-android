@@ -76,6 +76,9 @@ void FontInfo::reset()
     is_shadow = true;
     is_transparent = true;
     is_newline_accepted = false;
+#ifdef ANDROID
+    size_invalidated = false;
+#endif
 }
 
 void *FontInfo::openFont( char *font_file, int ratio1, int ratio2 )

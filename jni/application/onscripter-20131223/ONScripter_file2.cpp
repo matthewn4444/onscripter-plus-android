@@ -60,8 +60,15 @@ int ONScripter::loadSaveFile2( int file_version )
     sentence_font.top_xy[1] = readInt();
     sentence_font.num_xy[0] = readInt();
     sentence_font.num_xy[1] = readInt();
+#if ANDROID
+    sentence_font.og_font_size_xy[0] = readInt();
+    sentence_font.og_font_size_xy[1] = readInt();
+    sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
+    sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+#else
     sentence_font.font_size_xy[0] = readInt();
     sentence_font.font_size_xy[1] = readInt();
+#endif
     sentence_font.pitch_xy[0] = readInt();
     sentence_font.pitch_xy[1] = readInt();
     for ( i=0 ; i<3 ; i++ )

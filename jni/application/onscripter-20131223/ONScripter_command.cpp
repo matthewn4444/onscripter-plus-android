@@ -628,8 +628,15 @@ void ONScripter::setwindowCore()
     sentence_font.top_xy[1] = script_h.readInt();
     sentence_font.num_xy[0] = script_h.readInt();
     sentence_font.num_xy[1] = script_h.readInt();
+#if ANDROID
+    sentence_font.og_font_size_xy[0] = script_h.readInt();
+    sentence_font.og_font_size_xy[1] = script_h.readInt();
+    sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
+    sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+#else
     sentence_font.font_size_xy[0] = script_h.readInt();
     sentence_font.font_size_xy[1] = script_h.readInt();
+#endif
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
     sentence_font.pitch_xy[1] = script_h.readInt() + sentence_font.font_size_xy[1];
     sentence_font.wait_time = script_h.readInt();

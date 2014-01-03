@@ -37,6 +37,10 @@ extern "C" void waveCallback( int channel );
 #define DEFAULT_ENV_FONT "‚l‚r ƒSƒVƒbƒN"
 #define DEFAULT_AUTOMODE_TIME 1000
 
+#ifdef ANDROID
+double ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
+#endif
+
 static void SDL_Quit_Wrapper()
 {
     SDL_Quit();
@@ -620,8 +624,15 @@ void ONScripter::resetSub()
 void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
+#if ANDROID
+    sentence_font.og_font_size_xy[0] = DEFAULT_FONT_SIZE;
+    sentence_font.og_font_size_xy[1] = DEFAULT_FONT_SIZE;
+    sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
+    sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+#else
     sentence_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
     sentence_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
+#endif
     sentence_font.top_xy[0] = 21;
     sentence_font.top_xy[1] = 16;// + sentence_font.font_size;
     sentence_font.num_xy[0] = 23;
@@ -994,6 +1005,23 @@ void ONScripter::clearCurrentPage()
 
     text_info.fill( 0, 0, 0, 0 );
     cached_page = current_page;
+
+#ifdef ANDROID
+    // If sentence font size is invalidated, then update the scaling here
+    if (sentence_font.size_invalidated) {
+        sentence_font.size_invalidated = true;
+        sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
+        sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
+        sentence_font.pitch_xy[0] = sentence_font.font_size_xy[0];
+        sentence_font.pitch_xy[1] = sentence_font.font_size_xy[1];
+
+        if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
+            fprintf( stderr, "can't open font file: %s\n", font_file );
+            quit();
+            exit(-1);
+        }
+    }
+#endif
 }
 
 void ONScripter::shadowTextDisplay( SDL_Surface *surface, SDL_Rect &clip )
@@ -1042,7 +1070,6 @@ void ONScripter::newPage()
             start_page = start_page->next;
         clearCurrentPage();
     }
-
     page_enter_status = 0;
 
     flush( refreshMode(), &sentence_font_info.pos );
