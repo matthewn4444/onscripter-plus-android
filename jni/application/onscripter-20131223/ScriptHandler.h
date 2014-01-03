@@ -29,6 +29,11 @@
 #include <string.h>
 #include "BaseReader.h"
 
+#ifdef ENABLE_ENGLISH
+#define ENABLE_1BYTE_CHAR
+#define FORCE_1BYTE_CHAR
+#endif
+
 #define IS_TWO_BYTE(x) \
         ( ((x) & 0xe0) == 0xe0 || ((x) & 0xe0) == 0x80 )
 
