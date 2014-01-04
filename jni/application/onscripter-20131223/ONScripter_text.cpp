@@ -781,6 +781,34 @@ bool ONScripter::processText()
            script_h.getStringBuffer()[ string_buffer_offset ] == '\t' ) string_buffer_offset ++;
 
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
+#ifdef ENABLE_ENGLISH
+        // Check next line for English text and see if it is lowercase then skip new line
+        char* next = script_h.getNext() + 1;
+        if (next[0] == '`') {       // Using 1 Byte English text
+            if (next[1] == ' ') {
+                // See if the first non-spaced character is lowercase, if it is then skip new line
+                int i = 1;
+                while(next[i] == ' ') i++;
+                if (islower(next[i])) {
+                    // Check for the next space in new line after text and see if it fits in previous line
+                    while(next[i] != ' ') i++;
+                    if (!sentence_font.willBeEndOfLine(i)) {
+                        new_line_skip_flag = true;
+                    }
+                }
+            } else if (islower(next[1])) {
+                // Check for the next space in new line and see if it fits in previous line
+                int i = 0;
+                while(next[i + 1] != ' ') i++;
+                if (!sentence_font.willBeEndOfLine(i)) {
+                    // Add a space because there will not be one later
+                    out_text[0] = ' ';
+                    drawChar( out_text, &sentence_font, true, true, accumulation_surface, &text_info );
+                    new_line_skip_flag = true;
+                }
+            }
+        }
+#endif
         processEOT();
         return false;
     }
@@ -1011,6 +1039,30 @@ bool ONScripter::processText()
             num_chars_in_sentence++;
         }
         else if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
+#ifdef ENABLE_ENGLISH
+            // Scan text for next whitespace to break on if at the end
+            bool newLineEarly = false;
+            if (ch == ' ') {
+                char* script = script_h.getStringBuffer();
+                int index = string_buffer_offset + 1;
+                while(script[index] != '\0') {
+                    if (script[index] == ' ') break;
+                    index++;
+                }
+
+                // If we draw the next word it will be split to the next line, so make new line before adding word
+                newLineEarly = sentence_font.willBeEndOfLine(index - string_buffer_offset);
+                if (newLineEarly) {
+                    sentence_font.newLine();
+                    for (int i=0 ; i<indent_offset ; i++){
+                        current_page->add(0x81);
+                        current_page->add(0x40);
+                        sentence_font.advanceCharInHankaku(2);
+                    }
+                }
+            }
+            if (!newLineEarly)
+#endif
             drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
             num_chars_in_sentence++;
         }

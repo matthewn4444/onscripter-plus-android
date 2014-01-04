@@ -200,6 +200,12 @@ void FontInfo::setLineArea(int num)
     num_xy[1-tateyoko_mode] = 1;
 }
 
+bool FontInfo::willBeEndOfLine(int lookAhead, int margin) {
+    if (xy[tateyoko_mode] + lookAhead + margin >= num_xy[tateyoko_mode]*2) return true;
+
+    return false;
+}
+
 bool FontInfo::isEndOfLine(int margin)
 {
     if (xy[tateyoko_mode] + margin >= num_xy[tateyoko_mode]*2) return true;

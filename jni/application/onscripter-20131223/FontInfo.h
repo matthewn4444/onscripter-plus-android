@@ -73,6 +73,7 @@ public:
     void setLineArea(int num);
 
     bool isEndOfLine(int margin=0);
+    bool willBeEndOfLine(int lookAhead, int margin=0);
     bool isLineEmpty();
     void advanceCharInHankaku(int offest);
     void addLineOffset(int margin);
