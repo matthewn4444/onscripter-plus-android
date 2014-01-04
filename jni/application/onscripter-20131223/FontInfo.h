@@ -43,6 +43,7 @@ public:
     int old_xy[2];
     int pitch_xy[2]; // Width and height of a character
     int wait_time;
+    int display_width;
 #ifdef ENABLE_ENGLISH
     int advance_position;
 #endif
@@ -80,7 +81,9 @@ public:
     void setLineArea(int num);
 
     bool isEndOfLine(int margin=0);
-    bool willBeEndOfLine(int lookAhead, int margin=0);
+#ifdef ENABLE_ENGLISH
+    bool willBeEndOfLine(int lookAheadAdvance, int margin=0);
+#endif
     bool isLineEmpty();
     void advanceCharInHankaku(int offest);
     void addLineOffset(int margin);

@@ -220,15 +220,21 @@ void FontInfo::setLineArea(int num)
     num_xy[1-tateyoko_mode] = 1;
 }
 
-bool FontInfo::willBeEndOfLine(int lookAhead, int margin) {
-    if (xy[tateyoko_mode] + lookAhead + margin >= num_xy[tateyoko_mode]*2) return true;
+#ifdef ENABLE_ENGLISH
+bool FontInfo::willBeEndOfLine(int lookAheadAdvance, int margin) {
+    if (advance_position + lookAheadAdvance + margin * pitch_xy[0] >= display_width) return true;
 
     return false;
 }
+#endif
 
 bool FontInfo::isEndOfLine(int margin)
 {
+#ifdef ENABLE_ENGLISH
+    if (advance_position + margin * pitch_xy[0] >= display_width) return true;
+#else
     if (xy[tateyoko_mode] + margin >= num_xy[tateyoko_mode]*2) return true;
+#endif
 
     return false;
 }

@@ -800,16 +800,25 @@ bool ONScripter::processText()
                 while(next[i] == ' ') i++;
                 if (islower(next[i])) {
                     // Check for the next space in new line after text and see if it fits in previous line
-                    while(next[i] != ' ') i++;
-                    if (!sentence_font.willBeEndOfLine(i)) {
+                    int advanced, accum_advance = 0;
+                    while(next[i] != ' ') {
+                        TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i], NULL, NULL, NULL, NULL, &advanced );
+                        accum_advance += advanced;
+                        i++;
+                    }
+                    if (!sentence_font.willBeEndOfLine(accum_advance)) {
                         new_line_skip_flag = true;
                     }
                 }
             } else if (islower(next[1])) {
                 // Check for the next space in new line and see if it fits in previous line
-                int i = 0;
-                while(next[i + 1] != ' ') i++;
-                if (!sentence_font.willBeEndOfLine(i)) {
+                int i = 0, accum_advance = 0, advanced;
+                while(next[i + 1] != ' ') {
+                    TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i + 1], NULL, NULL, NULL, NULL, &advanced );
+                    accum_advance += advanced;
+                    i++;
+                }
+                if (!sentence_font.willBeEndOfLine(accum_advance)) {
                     // Add a space because there will not be one later
                     out_text[0] = ' ';
                     drawChar( out_text, &sentence_font, true, true, accumulation_surface, &text_info );
@@ -1054,13 +1063,18 @@ bool ONScripter::processText()
             if (ch == ' ') {
                 char* script = script_h.getStringBuffer();
                 int index = string_buffer_offset + 1;
+                int advanced, accum_advance = 0;
+
+                // Scan the next characters till the next space and get the accumulated character advance (word width)
                 while(script[index] != '\0') {
+                    TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    accum_advance += advanced;
                     if (script[index] == ' ') break;
                     index++;
                 }
 
                 // If we draw the next word it will be split to the next line, so make new line before adding word
-                newLineEarly = sentence_font.willBeEndOfLine(index - string_buffer_offset);
+                newLineEarly = sentence_font.willBeEndOfLine(accum_advance);
                 if (newLineEarly) {
                     sentence_font.newLine();
                     for (int i=0 ; i<indent_offset ; i++){
