@@ -92,6 +92,15 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
                       &minx, &maxx, &miny, &maxy, &advanced );
     //printf("min %d %d %d %d %d %d\n", minx, maxx, miny, maxy, advanced,TTF_FontAscent((TTF_Font*)info->ttf_font[0])  );
 
+#ifdef ENABLE_ENGLISH
+    // Use the glyth's advance for non-Japanese characters
+    if (IS_TWO_BYTE(text[0])) {
+        info->addMonospacedCharacterAdvance();
+    } else {
+        info->addProportionalCharacterAdvance(advanced);
+    }
+#endif
+
     static SDL_Color fcol={0xff, 0xff, 0xff}, bcol={0, 0, 0};
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[0], unicode, fcol, bcol);
     

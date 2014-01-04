@@ -152,7 +152,11 @@ int FontInfo::getRemainingLine()
 
 int FontInfo::x(bool use_ruby_offset)
 {
+#ifdef ENABLE_ENGLISH
+    int x = advance_position + top_xy[0] + line_offset_xy[0];
+#else
     int x = xy[0]*pitch_xy[0]/2 + top_xy[0] + line_offset_xy[0];
+#endif
     if (use_ruby_offset && rubyon_flag && tateyoko_mode == TATE_MODE) 
         x += font_size_xy[0] - pitch_xy[0];
     return x;
@@ -172,6 +176,16 @@ void FontInfo::setXY( int x, int y )
     if ( y != -1 ) xy[1] = y*2;
 }
 
+#ifdef ENABLE_ENGLISH
+void FontInfo::addProportionalCharacterAdvance(int advance) {
+    advance_position += advance;
+}
+
+void FontInfo::addMonospacedCharacterAdvance() {
+    advance_position += pitch_xy[0];
+}
+#endif
+
 void FontInfo::clear()
 {
     if (tateyoko_mode == YOKO_MODE)
@@ -179,6 +193,9 @@ void FontInfo::clear()
     else
         setXY(num_xy[0]-1, 0);
     line_offset_xy[0] = line_offset_xy[1] = 0;
+#ifdef ENABLE_ENGLISH
+    advance_position = 0;
+#endif
 }
 
 void FontInfo::newLine()
@@ -192,6 +209,9 @@ void FontInfo::newLine()
         xy[1] = 0;
     }
     line_offset_xy[0] = line_offset_xy[1] = 0;
+#ifdef ENABLE_ENGLISH
+    advance_position = 0;
+#endif
 }
 
 void FontInfo::setLineArea(int num)

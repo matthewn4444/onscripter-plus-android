@@ -43,6 +43,9 @@ public:
     int old_xy[2];
     int pitch_xy[2]; // Width and height of a character
     int wait_time;
+#ifdef ENABLE_ENGLISH
+    int advance_position;
+#endif
     bool is_bold;
     bool is_shadow;
     bool is_transparent;
@@ -68,6 +71,10 @@ public:
     int x(bool use_ruby_offset=true);
     int y(bool use_ruby_offset=true);
     void setXY( int x=-1, int y=-1 );
+#ifdef ENABLE_ENGLISH
+    void addProportionalCharacterAdvance(int advance);
+    void addMonospacedCharacterAdvance();
+#endif
     void clear();
     void newLine();
     void setLineArea(int num);
