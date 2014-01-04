@@ -466,12 +466,21 @@ void ONScripter::saveSaveFile2( bool output_flag )
     
     writeInt( sentence_font.top_xy[0], output_flag );
     writeInt( sentence_font.top_xy[1], output_flag );
+#ifdef ANDROID
+    writeInt( sentence_font.og_num_xy[0], output_flag );
+    writeInt( sentence_font.og_num_xy[1], output_flag );
+    writeInt( sentence_font.og_font_size_xy[0], output_flag );
+    writeInt( sentence_font.og_font_size_xy[1], output_flag );
+    writeInt( sentence_font.og_font_size_xy[0], output_flag );      // pitch_xy[0]
+    writeInt( sentence_font.og_font_size_xy[1], output_flag );      // pitch_xy[1]
+#else
     writeInt( sentence_font.num_xy[0], output_flag );
     writeInt( sentence_font.num_xy[1], output_flag );
     writeInt( sentence_font.font_size_xy[0], output_flag );
     writeInt( sentence_font.font_size_xy[1], output_flag );
     writeInt( sentence_font.pitch_xy[0], output_flag );
     writeInt( sentence_font.pitch_xy[1], output_flag );
+#endif
     for ( i=0 ; i<3 ; i++ )
         writeChar( sentence_font.window_color[2-i], output_flag );
     writeChar( ( sentence_font.is_transparent )?0x00:0xff, output_flag ); 
