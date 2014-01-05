@@ -406,20 +406,39 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 
             if (IS_TWO_BYTE(out_text[0])){
                 out_text[1] = current_page->text[i+1];
-                
+
                 if ( checkLineBreak( current_page->text+i, &f_info ) )
                     f_info.newLine();
                 i++;
             }
             else{
                 out_text[1] = 0;
-                
-                if (i+1 != current_page->text_count &&
-                    current_page->text[i+1] != 0x0a){
-                    out_text[1] = current_page->text[i+1];
-                    i++;
+            }
+
+#ifdef ENABLE_ENGLISH
+            // Scan text for next whitespace to break on if at the end
+            bool newLineEarly = false;
+            if (out_text[0] == ' ') {
+                char* script = current_page->text;
+                int index = i + 1;
+                int advanced, accum_advance = 0;
+
+                // Scan the next characters till the next space and get the accumulated character advance (word width)
+                while(index < current_page->text_count) {
+                    TTF_GlyphMetrics( (TTF_Font*)f_info.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    accum_advance += advanced;
+                    if (script[index] == ' ') break;
+                    index++;
+                }
+
+                // If we draw the next word it will be split to the next line, so make new line before adding word
+                newLineEarly = f_info.willBeEndOfLine(accum_advance);
+                if (newLineEarly) {
+                    f_info.newLine();
                 }
             }
+            if (!newLineEarly)
+#endif
             drawChar( out_text, &f_info, false, false, surface, &text_info );
         }
     }
@@ -1082,6 +1101,7 @@ bool ONScripter::processText()
                         current_page->add(0x40);
                         sentence_font.advanceCharInHankaku(2);
                     }
+                    current_page->add(' ');
                 }
             }
             if (!newLineEarly)
