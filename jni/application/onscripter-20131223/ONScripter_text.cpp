@@ -948,7 +948,7 @@ bool ONScripter::processText()
         string_buffer_offset += 7;
         return true;
     }
-    else if ( ch == '(' && 
+    else if ( ch == '(' && script_h.getCurrent()[0] != '`' &&
               (!english_mode ||
                !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
         current_page->add('(');
