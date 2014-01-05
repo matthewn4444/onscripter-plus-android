@@ -1004,17 +1004,7 @@ void ONScripter::clearCurrentPage()
     cached_page = current_page;
 
 #ifdef ANDROID
-    // If sentence font size is invalidated, then update the scaling here
-    if (sentence_font.size_invalidated) {
-        sentence_font.size_invalidated = true;
-        updateSentenceFontSizes();
-
-        if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
-            fprintf( stderr, "can't open font file: %s\n", font_file );
-            quit();
-            exit(-1);
-        }
-    }
+    reassureSentenceFontSize();
 #endif
 }
 

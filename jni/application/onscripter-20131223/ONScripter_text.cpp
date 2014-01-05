@@ -364,6 +364,10 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 {
     text_info.fill( 0, 0, 0, 0 );
 
+#ifdef ANDROID
+    reassureSentenceFontSize();
+#endif
+
     char out_text[3] = { '\0','\0','\0' };
     FontInfo f_info = sentence_font;
     f_info.clear();

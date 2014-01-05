@@ -421,6 +421,20 @@ private:
         sentence_font.num_xy[0] = floor(sentence_font.display_width / sentence_font.font_size_xy[0]);
         sentence_font.num_xy[1] = ceil(1.0 * sentence_font.og_num_xy[0] * sentence_font.og_num_xy[1] / sentence_font.num_xy[0]);
     }
+
+    void reassureSentenceFontSize() {
+        // If sentence font size is invalidated, then update the scaling here
+        if (sentence_font.size_invalidated) {
+            sentence_font.size_invalidated = true;
+            updateSentenceFontSizes();
+
+            if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
+                fprintf( stderr, "can't open font file: %s\n", font_file );
+                quit();
+                exit(-1);
+            }
+        }
+    }
 #endif
 
     // ----------------------------------------
