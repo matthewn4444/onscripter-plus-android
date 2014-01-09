@@ -836,7 +836,7 @@ void ONScripter::executeLabel()
             continue;
         }
 
-        if ( kidokuskip_flag && skip_mode & SKIP_NORMAL && kidokumode_flag && !script_h.isKidoku() ) skip_mode &= ~SKIP_NORMAL;
+        if ( kidokuskip_flag && skip_mode & SKIP_NORMAL && kidokumode_flag && !script_h.isKidoku() ) setInternalSkipMode(false);
 
         int ret = parseLine();
         if ( ret & (RET_SKIP_LINE | RET_EOL) ){
@@ -1300,6 +1300,27 @@ int ONScripter::getNumberFromBuffer( const char **buf )
         ret = ret*10 + *(*buf)++ - '0';
 
     return ret;
+}
+
+void ONScripter::setInternalSkipMode(bool enabled) {
+    if (enabled) {
+        skip_mode |= SKIP_NORMAL;
+    } else {
+        skip_mode &= ~SKIP_NORMAL;
+    }
+#ifdef ANDROID
+    JNIEnv * jniEnv = NULL;
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
+
+    if (!jniEnv){
+        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::setInternalSkipMode: Java VM AttachCurrentThread() failed");
+        return;
+    }
+
+    jboolean jb = enabled ? JNI_TRUE : JNI_FALSE;
+    jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
+    jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, ANDROID_MSG_SKIP_MODE, jb);
+#endif
 }
 
 void ONScripter::setInternalAutoMode(bool enabled) {

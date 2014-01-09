@@ -117,6 +117,9 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         case MSG_AUTO_MODE:
             mAutoButton.setSelected(flag);
             break;
+        case MSG_SKIP_MODE:
+            mSkipButton.setSelected(flag);
+            break;
         }
     }
 

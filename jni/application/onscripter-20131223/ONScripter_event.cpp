@@ -449,7 +449,7 @@ bool ONScripter::mousePressEvent( SDL_MouseButtonEvent *event )
     current_button_state.x = event->x * screen_width / screen_device_width;
     current_button_state.y = event->y * screen_width / screen_device_width;
     current_button_state.down_flag = false;
-    skip_mode &= ~SKIP_NORMAL;
+    setInternalSkipMode(false);
 
     if ( event->button == SDL_BUTTON_RIGHT &&
          event->type == SDL_MOUSEBUTTONUP &&
@@ -760,7 +760,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
     }
     
     if (event->type == SDL_KEYUP)
-        skip_mode &= ~SKIP_NORMAL;
+        setInternalSkipMode(false);
     
     if ( shift_pressed_status && event->keysym.sym == SDLK_q && current_mode == NORMAL_MODE ){
         endCommand();
@@ -942,7 +942,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
     
     if ( event_mode & WAIT_INPUT_MODE ){
         if (event->keysym.sym == SDLK_s && !automode_flag ){
-            skip_mode |= SKIP_NORMAL;
+            setInternalSkipMode(true);
             printf("toggle skip to true\n");
             stopAnimation( clickstr_state );
 
@@ -962,7 +962,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
         }
         else if ( event->keysym.sym == SDLK_a && mode_ext_flag && !automode_flag ){
             setInternalAutoMode(true);
-            skip_mode &= ~SKIP_NORMAL;
+            setInternalSkipMode(false);
             printf("change to automode\n");
             stopAnimation( clickstr_state );
 

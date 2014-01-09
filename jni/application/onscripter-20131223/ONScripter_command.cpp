@@ -602,7 +602,7 @@ int ONScripter::spbtnCommand()
 
 int ONScripter::skipoffCommand() 
 { 
-    skip_mode &= ~SKIP_NORMAL;
+    setInternalSkipMode(false);
  
     return RET_CONTINUE; 
 } 
@@ -868,7 +868,7 @@ int ONScripter::selectCommand()
 
     event_mode = WAIT_TEXT_MODE | WAIT_BUTTON_MODE | WAIT_TIMER_MODE;
     do{
-        skip_mode &= ~SKIP_NORMAL;
+        setInternalSkipMode(false);
         if (waitEvent(-1)) return RET_CONTINUE;
     }
     while(current_button_state.button <= 0 || skip_mode & SKIP_NORMAL);
@@ -1548,7 +1548,7 @@ int ONScripter::menu_fullCommand()
 int ONScripter::menu_automodeCommand()
 {
     setInternalAutoMode(true);
-    skip_mode &= ~SKIP_NORMAL;
+    setInternalSkipMode(false);
     printf("menu_automode: change to automode\n");
     
     return RET_CONTINUE;
@@ -1786,7 +1786,7 @@ int ONScripter::loadgameCommand()
 
         saveon_flag = true;
         internal_saveon_flag = true;
-        skip_mode &= ~SKIP_NORMAL;
+        setInternalSkipMode(false);
         setInternalAutoMode(false);
         deleteButtonLink();
         deleteSelectLink();
@@ -2988,7 +2988,7 @@ int ONScripter::clickCommand()
     bool lrclick_flag = false;
     if ( script_h.isName( "lrclick" ) ) lrclick_flag = true;
 
-    skip_mode &= ~SKIP_NORMAL;
+    setInternalSkipMode(false);
 
     event_mode = WAIT_TIMER_MODE | WAIT_INPUT_MODE;
     if (lrclick_flag) event_mode |= WAIT_RCLICK_MODE;
@@ -3194,7 +3194,7 @@ int ONScripter::btnwaitCommand()
     }
     else{
         shortcut_mouse_line = 0;
-        skip_mode &= ~SKIP_NORMAL;
+        setInternalSkipMode(false);
 
         flush( refreshMode() );
 

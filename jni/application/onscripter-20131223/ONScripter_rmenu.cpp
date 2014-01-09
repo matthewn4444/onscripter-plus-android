@@ -207,14 +207,14 @@ void ONScripter::executeSystemMenu()
 
 void ONScripter::executeSystemSkip()
 {
-    skip_mode |= SKIP_NORMAL;
+    setInternalSkipMode(true);
     leaveSystemCall();
 }
 
 void ONScripter::executeSystemAutomode()
 {
     setInternalAutoMode(true);
-    skip_mode &= ~SKIP_NORMAL;
+    setInternalSkipMode(false);
     printf("systemcall_automode: change to automode\n");
     leaveSystemCall();
 }

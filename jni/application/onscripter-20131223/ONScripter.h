@@ -462,6 +462,7 @@ private:
     void playVideoAndroid(const char *filename);
 #endif
     void setInternalAutoMode(bool enabled);
+    void setInternalSkipMode(bool enabled);
 
     // ----------------------------------------
     // variables and methods relevant to animation
