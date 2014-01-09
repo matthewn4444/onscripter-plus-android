@@ -139,6 +139,21 @@ JAVA_EXPORT_NAME(ONScripter_nativeSetSentenceFontScale) ( JNIEnv*  env, jobject 
 		ons.invalidateSentenceFontSize();
 	}
 }
+
+JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
+{
+    ONScripter::setJavaEnv(jniEnv, thiz);
+}
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
+{
+    ONScripter::JNI_VM = vm;
+    return JNI_VERSION_1_2;
+};
+
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
+{
+    ONScripter::JNI_VM = vm;
+};
 }
 #endif
 

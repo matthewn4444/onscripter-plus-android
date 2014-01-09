@@ -28,44 +28,10 @@
 #endif
 
 #ifdef ANDROID
-extern "C"
-{
-#include <jni.h>
-#include <android/log.h>
-static JavaVM *jniVM = NULL;
-static jobject JavaONScripter = NULL;
-static jmethodID JavaPlayVideo = NULL;
-
-JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
-{
-    jniVM = vm;
-    return JNI_VERSION_1_2;
-};
-
-JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved)
-{
-    jniVM = vm;
-};
-
-#ifndef SDL_JAVA_PACKAGE_PATH
-#error You have to define SDL_JAVA_PACKAGE_PATH to your package path with dots replaced with underscores, for example "com_example_SanAngeles"
-#endif
-#define JAVA_EXPORT_NAME2(name,package) Java_##package##_##name
-#define JAVA_EXPORT_NAME1(name,package) JAVA_EXPORT_NAME2(name,package)
-#define JAVA_EXPORT_NAME(name) JAVA_EXPORT_NAME1(name,SDL_JAVA_PACKAGE_PATH)
-
-JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
-{
-    JavaONScripter = jniEnv->NewGlobalRef(thiz);
-    jclass JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
-    JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
-}
-}
-
-void playVideoAndroid(const char *filename)
+void ONScripter::playVideoAndroid(const char *filename)
 {
     JNIEnv * jniEnv = NULL;
-    jniVM->AttachCurrentThread(&jniEnv, NULL);
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
         __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::playVideoAndroid: Java VM AttachCurrentThread() failed");

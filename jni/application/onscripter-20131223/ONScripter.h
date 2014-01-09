@@ -32,6 +32,10 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
+#ifdef ANDROID
+#include <jni.h>
+#endif
+
 #define DEFAULT_VIDEO_SURFACE_FLAG (SDL_SWSURFACE)
 
 #define DEFAULT_BLIT_FLAG (0)
@@ -60,6 +64,24 @@ public:
     
     ONScripter();
     ~ONScripter();
+
+#ifdef ANDROID
+    // Static Java Environment
+    static JavaVM *JNI_VM;
+    static jobject JavaONScripter;
+    static jmethodID JavaPlayVideo;
+
+    static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
+        ONScripter::JavaONScripter = jniEnv->NewGlobalRef(thiz);
+        jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
+        ONScripter::JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
+    }
+
+    static double Sentence_font_scale;
+    void invalidateSentenceFontSize() {
+        sentence_font.size_invalidated = true;
+    }
+#endif
 
     // ----------------------------------------
     // start-up options
@@ -275,13 +297,6 @@ public:
     int allsphideCommand();
     int amspCommand();
 
-#ifdef ANDROID
-    static double Sentence_font_scale;
-    void invalidateSentenceFontSize() {
-        sentence_font.size_invalidated = true;
-    }
-#endif
-
 private:
     // ----------------------------------------
     // global variables and methods
@@ -435,6 +450,8 @@ private:
             }
         }
     }
+
+    void playVideoAndroid(const char *filename);
 #endif
 
     // ----------------------------------------

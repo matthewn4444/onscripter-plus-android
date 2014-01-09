@@ -38,7 +38,10 @@ extern "C" void waveCallback( int channel );
 #define DEFAULT_AUTOMODE_TIME 1000
 
 #ifdef ANDROID
-double ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
+double      ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
+JavaVM *    ONScripter::JNI_VM = NULL;
+jobject     ONScripter::JavaONScripter = NULL;
+jmethodID   ONScripter::JavaPlayVideo = NULL;
 #endif
 
 static void SDL_Quit_Wrapper()
