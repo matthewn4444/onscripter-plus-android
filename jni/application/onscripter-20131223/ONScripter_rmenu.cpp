@@ -213,7 +213,7 @@ void ONScripter::executeSystemSkip()
 
 void ONScripter::executeSystemAutomode()
 {
-    automode_flag = true;
+    setInternalAutoMode(true);
     skip_mode &= ~SKIP_NORMAL;
     printf("systemcall_automode: change to automode\n");
     leaveSystemCall();

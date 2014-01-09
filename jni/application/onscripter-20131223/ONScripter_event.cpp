@@ -437,7 +437,7 @@ bool ONScripter::mousePressEvent( SDL_MouseButtonEvent *event )
     if ( variable_edit_mode ) return false;
     
     if ( automode_flag ){
-        automode_flag = false;
+        setInternalAutoMode(false);
         return false;
     }
 
@@ -740,7 +740,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
     current_button_state.button = 0;
     current_button_state.down_flag = false;
     if ( automode_flag ){
-        automode_flag = false;
+        setInternalAutoMode(false);
         return false;
     }
     
@@ -961,7 +961,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
             }
         }
         else if ( event->keysym.sym == SDLK_a && mode_ext_flag && !automode_flag ){
-            automode_flag = true;
+            setInternalAutoMode(true);
             skip_mode &= ~SKIP_NORMAL;
             printf("change to automode\n");
             stopAnimation( clickstr_state );

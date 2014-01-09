@@ -858,7 +858,7 @@ int ONScripter::selectCommand()
         setCurrentLabel( "customsel" );
         return RET_CONTINUE;
     }
-    automode_flag = false;
+    setInternalAutoMode(false);
     sentence_font.xy[0] = xy[0];
     sentence_font.xy[1] = xy[1];
 
@@ -1547,7 +1547,7 @@ int ONScripter::menu_fullCommand()
 
 int ONScripter::menu_automodeCommand()
 {
-    automode_flag = true;
+    setInternalAutoMode(true);
     skip_mode &= ~SKIP_NORMAL;
     printf("menu_automode: change to automode\n");
     
@@ -1787,7 +1787,7 @@ int ONScripter::loadgameCommand()
         saveon_flag = true;
         internal_saveon_flag = true;
         skip_mode &= ~SKIP_NORMAL;
-        automode_flag = false;
+        setInternalAutoMode(false);
         deleteButtonLink();
         deleteSelectLink();
         text_on_flag = false;

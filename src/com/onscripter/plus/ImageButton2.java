@@ -63,11 +63,13 @@ public class ImageButton2 extends FrameLayout implements OnTouchListener, OnClic
 
     @Override
     public void setSelected(boolean selected) {
-        mSelected = selected;
-        if (mSrcImageSelected != null) {
-            mImageView.setImageDrawable(selected ? mSrcImageSelected : mSrcImage);
+        if (mSelected != selected) {
+            mSelected = selected;
+            if (mSrcImageSelected != null) {
+                mImageView.setImageDrawable(selected ? mSrcImageSelected : mSrcImage);
+            }
+            super.setSelected(selected);
         }
-        super.setSelected(selected);
     }
 
     public boolean getSelected() {

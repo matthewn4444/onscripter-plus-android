@@ -66,15 +66,23 @@ public:
     ~ONScripter();
 
 #ifdef ANDROID
+
+private:
+static const int ANDROID_MSG_AUTO_MODE = 1;
+static const int ANDROID_MSG_SKIP_MODE = 2;
+
+public:
     // Static Java Environment
     static JavaVM *JNI_VM;
     static jobject JavaONScripter;
     static jmethodID JavaPlayVideo;
+    static jmethodID JavaReceiveMessage;
 
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
         ONScripter::JavaONScripter = jniEnv->NewGlobalRef(thiz);
         jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
         ONScripter::JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
+        JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
     }
 
     static double Sentence_font_scale;
@@ -453,6 +461,7 @@ private:
 
     void playVideoAndroid(const char *filename);
 #endif
+    void setInternalAutoMode(bool enabled);
 
     // ----------------------------------------
     // variables and methods relevant to animation

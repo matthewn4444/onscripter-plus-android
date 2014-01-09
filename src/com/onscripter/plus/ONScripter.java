@@ -1,10 +1,14 @@
 package com.onscripter.plus;
 
+import java.lang.ref.WeakReference;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.Display;
@@ -22,6 +26,11 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
+
+    private static final int MSG_AUTO_MODE = 1;
+    private static final int MSG_SKIP_MODE = 2;
+
+    private static UpdateHandler sHandler;
 
     private FrameLayout mGameLayout;
     private LinearLayout mLeftLayout;
@@ -47,7 +56,22 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
     private native int nativeInitJavaCallbacks();
     private native int nativeGetWidth();
     private native int nativeGetHeight();
-    private native int nativeSetSentenceFontScale(double scale);
+    private native void nativeSetSentenceFontScale(double scale);
+
+    static class UpdateHandler extends Handler {
+        private final WeakReference<ONScripter> mActivity;
+        UpdateHandler(ONScripter activity) {
+            mActivity = new WeakReference<ONScripter>(activity);
+        }
+        @Override
+        public void handleMessage(Message msg)
+        {
+             ONScripter activity = mActivity.get();
+             if (activity != null) {
+                 activity.updateControls(msg.what, (Boolean)msg.obj);
+             }
+        }
+    }
 
     /** Called when the activity is first created. */
     @Override
@@ -83,7 +107,17 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         mMouseScrollUpButton.setOnClickListener(this);
         mMouseScrollDownButton.setOnClickListener(this);
 
+        sHandler = new UpdateHandler(this);
+
         runSDLApp();
+    }
+
+    private void updateControls(int mode, boolean flag) {
+        switch(mode) {
+        case MSG_AUTO_MODE:
+            mAutoButton.setSelected(flag);
+            break;
+        }
     }
 
     private void runSDLApp() {
@@ -176,6 +210,15 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
             mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 1 );
             mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 0 );
             break;
+        }
+    }
+
+    public static void receiveMessageFromNDK(int mode, boolean flag) {
+        if (sHandler != null) {
+            Message msg = new Message();
+            msg.obj = flag;
+            msg.what = mode;
+            sHandler.sendMessage(msg);
         }
     }
 

@@ -42,6 +42,7 @@ double      ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
 JavaVM *    ONScripter::JNI_VM = NULL;
 jobject     ONScripter::JavaONScripter = NULL;
 jmethodID   ONScripter::JavaPlayVideo = NULL;
+jmethodID   ONScripter::JavaReceiveMessage = NULL;
 #endif
 
 static void SDL_Quit_Wrapper()
@@ -507,7 +508,7 @@ int ONScripter::init()
 
 void ONScripter::reset()
 {
-    automode_flag = false;
+    setInternalAutoMode(false);
     automode_time = DEFAULT_AUTOMODE_TIME;
     autoclick_time = 0;
     btntime2_flag = false;
@@ -1299,4 +1300,21 @@ int ONScripter::getNumberFromBuffer( const char **buf )
         ret = ret*10 + *(*buf)++ - '0';
 
     return ret;
+}
+
+void ONScripter::setInternalAutoMode(bool enabled) {
+    automode_flag = enabled;
+#ifdef ANDROID
+    JNIEnv * jniEnv = NULL;
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
+
+    if (!jniEnv){
+        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::setInternalAutoMode: Java VM AttachCurrentThread() failed");
+        return;
+    }
+
+    jboolean jb = enabled ? JNI_TRUE : JNI_FALSE;
+    jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
+    jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, ANDROID_MSG_AUTO_MODE, jb);
+#endif
 }
