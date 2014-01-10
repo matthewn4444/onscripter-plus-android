@@ -18,8 +18,8 @@
             android:key="@string/settings_controls_swipe_key"
             android:title="@string/settings_controls_swipe_title"
             android:entries="@array/settings_controls_swipe_entries"
-            android:defaultValue="0"
-            android:entryValues="@array/settings_controls_swipe_values"/>
+            android:defaultValue="@string/settings_controls_swipe_default_entry"
+            android:entryValues="@array/settings_controls_swipe_entries"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_folder_cate">
         <com.onscripter.plus.FolderBrowserDialog

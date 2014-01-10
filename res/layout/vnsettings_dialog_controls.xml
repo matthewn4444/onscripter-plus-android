@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/vn_settings_controls"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="@string/dialog_settings_controls_global"/>
+        <LinearLayout
+            style="@style/dialog_settings_row_style">
+            <TextView
+                style="@style/dialog_settings_row_description_style"
+                android:text="@string/settings_controls_display_title"/>
+            <CheckBox
+                android:id="@+id/dialog_controls_display_checkbox"
+                style="@style/dialog_settings_row_view_style"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/dialog_settings_row_style">
+            <TextView
+                style="@style/dialog_settings_row_description_style"
+                android:text="@string/settings_controls_swipe_title"/>
+            <Spinner
+                android:id="@+id/dialog_controls_swipe_spinner"
+                android:entries="@array/settings_controls_swipe_entries"
+                style="@style/dialog_settings_row_view_style"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

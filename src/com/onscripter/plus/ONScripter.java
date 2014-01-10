@@ -32,6 +32,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 
     private static UpdateHandler sHandler;
 
+    private VNSettingsDialog mDialog;
     private FrameLayout mGameLayout;
     private LinearLayout mLeftLayout;
     private LinearLayout mRightLayout;
@@ -106,6 +107,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         mRightClickButton.setOnClickListener(this);
         mMouseScrollUpButton.setOnClickListener(this);
         mMouseScrollDownButton.setOnClickListener(this);
+        mDialog = new VNSettingsDialog(this);
 
         sHandler = new UpdateHandler(this);
 
@@ -199,7 +201,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
             mGLView.nativeKey( KeyEvent.KEYCODE_A, 0 );
             break;
         case R.id.controls_settings_button:
-            // TODO
+            mDialog.show();
             break;
         case R.id.controls_rclick_button:
             mGLView.nativeKey( KeyEvent.KEYCODE_BACK, 1 );
