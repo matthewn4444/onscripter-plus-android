@@ -40,8 +40,8 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
     private final Spinner mSwipeGesturesSpinner;
 
     // Settings view elements id
-    private static final int DISPLAY_CONTROLS_ID = R.id.dialog_controls_display_checkbox;
-    private static final int SWIPE_GESTURES_ID = R.id.dialog_controls_swipe_spinner;
+    public static final int DISPLAY_CONTROLS_ID = R.id.dialog_controls_display_checkbox;
+    public static final int SWIPE_GESTURES_ID = R.id.dialog_controls_swipe_spinner;
 
     public VNSettingsDialog(Activity activity) {
         mActivity = activity;

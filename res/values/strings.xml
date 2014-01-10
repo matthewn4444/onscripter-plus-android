@@ -9,6 +9,10 @@
     <string name="directory_back">(Back)</string>
     <string name="dialog_quit_button">Quit</string>
 
+    <!-- Control Configurations -->
+    <integer name="hide_controls_timeout_seconds">5</integer>
+    <integer name="bezel_swipe_distance">50</integer>
+
     <!-- Files -->
     <string name="default_font_file">default.ttf</string>
 
@@ -65,12 +69,10 @@
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_global">These control settings are set globally.</string>
-    <string name="settings_controls_swipe_default_entry">Swipe from all sides</string>
+    <string name="settings_controls_swipe_default_entry">Swipe from both sides</string>
     <string-array name="settings_controls_swipe_entries">
         <item>@string/settings_controls_swipe_default_entry</item>
         <item>Swipe from left</item>
         <item>Swipe from right</item>
-        <item>Swipe from either left or right</item>
-        <item>Swipe from bottom</item>
     </string-array>
 </resources>
