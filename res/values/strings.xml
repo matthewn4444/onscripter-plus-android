@@ -68,7 +68,7 @@
     <string name="settings_controls_swipe_default_entry">Swipe from all sides</string>
     <string-array name="settings_controls_swipe_entries">
         <item>@string/settings_controls_swipe_default_entry</item>
-        <item>Swipe from feft</item>
+        <item>Swipe from left</item>
         <item>Swipe from right</item>
         <item>Swipe from either left or right</item>
         <item>Swipe from bottom</item>
