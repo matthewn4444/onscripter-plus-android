@@ -33,6 +33,7 @@
 #include <SDL_mixer.h>
 
 #ifdef ANDROID
+#include <android/log.h>
 #include <jni.h>
 #endif
 
