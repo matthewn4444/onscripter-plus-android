@@ -44,6 +44,14 @@
     <string name="settings_render_font_outline_summary">Displays an outline for each character for easier reading.</string>
     <string name="settings_render_font_outline_title">Render Font Outline</string>
 
+    <string name="settings_controls_cate">Controls</string>
+    <string name="settings_controls_display_key">settings.controls.display.key</string>
+    <string name="settings_controls_display_summary">Hides controls until user swipes to display them.</string>
+    <string name="settings_controls_display_title">Swipe to Show Controls</string>
+    <string name="settings_controls_swipe_key">settings.controls.swipe.key</string>
+    <string name="settings_controls_swipe_summary">Gesture to show the controls when controls are hidden.</string>
+    <string name="settings_controls_swipe_title">Swipe Gesture</string>
+
     <string name="settings_folder_cate">Folder</string>
     <string name="settings_folder_default_key">settings.folder.default.key</string>
     <string name="settings_folder_default_summary">Select a default folder location to read visual novel files.</string>
@@ -54,4 +62,20 @@
     <string name="dialog_select_button_text">Select</string>
     <string name="dialog_sd_card_text">Go to SD Card</string>
     <string name="dialog_interal_storage_text">Go to Phone</string>
+
+    <!-- Settings Control Display -->
+    <string-array name="settings_controls_swipe_entries">
+        <item>Swipe from all sides</item>
+        <item>Swipe from feft</item>
+        <item>Swipe from right</item>
+        <item>Swipe from either left or right</item>
+        <item>Swipe from bottom</item>
+    </string-array>
+    <string-array name="settings_controls_swipe_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
 </resources>
