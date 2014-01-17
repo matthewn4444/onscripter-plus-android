@@ -3,10 +3,11 @@
     android:layout_width="match_parent"
     android:background="@android:color/black"
     android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res/com.onscripter.plus">
-    <LinearLayout
+    <com.onscripter.plus.TwoStateLayout
         android:id="@+id/left_menu"
-        android:layout_gravity="left"
-        style="@style/controls_menu_style">
+        style="@style/controls_menu_style"
+        android:layout_marginLeft="-80dp"
+        app:side="left_side">
         <com.onscripter.plus.ImageButton2
             android:id="@+id/controls_quit_button"
             style="@style/controls_button_style"
@@ -26,9 +27,11 @@
             app:src_selected="@drawable/menu_auto_selected"
             style="@style/controls_button_style"
             app:src="@drawable/menu_auto"/>
-    </LinearLayout>
-    <LinearLayout 
+    </com.onscripter.plus.TwoStateLayout>
+    <com.onscripter.plus.TwoStateLayout
         android:id="@+id/right_menu"
+        app:side="right_side"
+        android:layout_marginRight="-80dp"
         android:layout_gravity="right"
         style="@style/controls_menu_style">
         <com.onscripter.plus.ImageButton2
@@ -47,7 +50,7 @@
             android:id="@+id/controls_scroll_down_button"
             style="@style/controls_button_style"
             app:src="@drawable/menu_mouse_scroll_down"/>
-    </LinearLayout>
+    </com.onscripter.plus.TwoStateLayout>
     <FrameLayout
         android:id="@+id/game_wrapper"
         android:layout_height="wrap_content" 

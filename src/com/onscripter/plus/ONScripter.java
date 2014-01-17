@@ -17,20 +17,16 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class ONScripter extends Activity implements OnSeekBarChangeListener, OnClickListener, OnDismissListener, OnTouchListener
+public class ONScripter extends Activity implements OnSeekBarChangeListener, OnClickListener, OnDismissListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
@@ -40,6 +36,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 
     private static int BEZEL_SWIPE_DISTANCE = 0;
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
+    private static int CONTROL_LAYOUT_WIDTH = 0;
 
     private static UpdateHandler sHandler;
     private static String DISPLAY_CONTROLS_KEY;
@@ -48,8 +45,8 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 
     private VNSettingsDialog mDialog;
     private FrameLayout mGameLayout;
-    private LinearLayout mLeftLayout;
-    private LinearLayout mRightLayout;
+    private TwoStateLayout mLeftLayout;
+    private TwoStateLayout mRightLayout;
     private ImageButton2 mBackButton;
     private ImageButton2 mChangeSpeedButton;
     private ImageButton2 mSkipButton;
@@ -117,8 +114,8 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         View layout = getLayoutInflater().inflate(R.layout.onscripter, null);
         setContentView(layout);
         mGameLayout = (FrameLayout)findViewById(R.id.game_wrapper);
-        mLeftLayout = (LinearLayout)findViewById(R.id.left_menu);
-        mRightLayout = (LinearLayout)findViewById(R.id.right_menu);
+        mLeftLayout = (TwoStateLayout)findViewById(R.id.left_menu);
+        mRightLayout = (TwoStateLayout)findViewById(R.id.right_menu);
         mBackButton = (ImageButton2)findViewById(R.id.controls_quit_button);
         mChangeSpeedButton = (ImageButton2)findViewById(R.id.controls_change_speed_button);
         mSkipButton = (ImageButton2)findViewById(R.id.controls_skip_button);
@@ -138,11 +135,12 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         mDialog = new VNSettingsDialog(this);
         mDialog.setOnDimissListener(this);
 
-        mGestureScanner = new GestureDetector(bezelGesture);
-        layout.setOnTouchListener(this);
-
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        CONTROL_LAYOUT_WIDTH = mLeftLayout.getLayoutParams().width;
         updateControlPreferences();
+
+        mLeftLayout.setOtherLayout(mRightLayout);
+        mRightLayout.setOtherLayout(mLeftLayout);
 
         sHandler = new UpdateHandler(this);
         mHideControlsHandler = new Handler();
@@ -329,34 +327,6 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 		}
 	}
 
-	SimpleOnGestureListener bezelGesture = new SimpleOnGestureListener() {
-	    @Override
-        public boolean onDown(MotionEvent e) {
-	        return true;
-	    }
-	    @Override
-        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-	        if (BEZEL_SWIPE_DISTANCE == 0) {
-	            BEZEL_SWIPE_DISTANCE = getResources().getInteger(R.integer.bezel_swipe_distance);
-	        }
-	        if (mAllowLeftBezelSwipe && e1.getX() < BEZEL_SWIPE_DISTANCE) {
-	            // Left Bezel
-	            showControls();
-	            return true;
-	        } else if (mAllowRightBezelSwipe && e1.getX() > mDisplayWidth - BEZEL_SWIPE_DISTANCE) {
-	            // Right Bezel
-	            showControls();
-                return true;
-            }
-	        return false;
-	    };
-	};
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        return mGestureScanner.onTouchEvent(event);
-    }
-
 	@Override
 	protected void onPause()
 	{
@@ -413,19 +383,21 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
     }
 
 	private void hideControls() {
-	    if (mLeftLayout.getVisibility() != View.VISIBLE) {
-            return;
-        }
-	    mLeftLayout.setVisibility(View.GONE);      // TODO animate this in from the left
-	    mRightLayout.setVisibility(View.GONE);     // TODO animate this in from the right
+	    hideControls(true);
 	}
 
 	private void showControls() {
-	    if (mLeftLayout.getVisibility() == View.VISIBLE) {
-	        return;
-	    }
-	    mLeftLayout.setVisibility(View.VISIBLE);      // TODO animate this in from the left
-        mRightLayout.setVisibility(View.VISIBLE);     // TODO animate this in from the right
+	    showControls(true);
+    }
+
+	private void hideControls(boolean animate) {
+	    mLeftLayout.moveLeft(animate);
+	    mRightLayout.moveRight(animate);
+	}
+
+	private void showControls(boolean animate) {
+	    mLeftLayout.moveRight(animate);
+        mRightLayout.moveLeft(animate);
         refreshHideControlsTimer();
 	}
 

@@ -52,6 +52,9 @@ public class ImageButton2 extends FrameLayout implements OnTouchListener, OnClic
 
     public void setNormalDrawable(Drawable drawable) {
         mSrcImage = drawable;
+        if (!mSelected) {
+            mImageView.setImageDrawable(drawable);
+        }
     }
 
     public void setSelectedDrawable(Drawable drawable) {
@@ -88,7 +91,9 @@ public class ImageButton2 extends FrameLayout implements OnTouchListener, OnClic
 
     @Override
     public void onClick(View v) {
-        mClickListener.onClick(v);
+        if (mClickListener != null) {
+            mClickListener.onClick(v);
+        }
     }
 
     @Override

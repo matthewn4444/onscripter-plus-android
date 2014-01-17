@@ -2,9 +2,9 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
     <style name="controls_menu_style">
         <item name="android:background">#CC000000</item>
+        <item name="orientation">vertical</item>
         <item name="android:layout_width">80dp</item>
         <item name="android:padding">20dp</item>
-        <item name="android:orientation">vertical</item>
         <item name="android:weightSum">4</item>
         <item name="android:layout_height">fill_parent</item>
     </style>

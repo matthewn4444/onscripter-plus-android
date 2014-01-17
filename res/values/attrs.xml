@@ -4,4 +4,15 @@
         <attr name="src" format="reference" />
         <attr name="src_selected" format="reference" />
     </declare-styleable>
+    <declare-styleable name="TwoStateLayout">
+        <attr name="orientation" format="enum">
+            <enum name="vertical" value="0"/>
+            <enum name="horizontal" value="1"/>
+        </attr>
+        <attr name="weightSum" format="float"/>
+        <attr name="side" format="enum">
+            <enum name="left_side" value="0"/>
+            <enum name="right_side" value="1"/>
+        </attr>
+    </declare-styleable>
 </resources>
