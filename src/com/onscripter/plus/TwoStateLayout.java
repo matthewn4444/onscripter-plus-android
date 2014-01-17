@@ -10,42 +10,39 @@ import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
 
 public class TwoStateLayout extends ViewGroup {
     private final LinearLayout mLayout;
-    private int mScrollX;
     private final boolean mIsRight;
+    private final int mFlingDistance;
+    private final LinearLayout.LayoutParams mSpacedParams;
+    private final int mMinimumVelocity;
+    private final Scroller mScroller;
+    private final int mMarginThreshold;
+
+    private float mLastMotionX;
     private boolean mScrolling;
     private boolean mQuickReturn;
     private boolean mIsUnableToDrag;
     private boolean mIsDragging;
-    protected int mActivePointerId = INVALID_POINTER;
-    private final int mFlingDistance;
-    private float mLastMotionX;
-    private float mLastMotionY;
-    private final LinearLayout.LayoutParams mSpacedParams;
-    protected VelocityTracker mVelocityTracker;
-    protected int mMaximumVelocity;
-    private final int mMinimumVelocity;
+    private int mScrollX;
     private float mInitialMotionX;
-    private final Scroller mScroller;
-    private final int mMarginThreshold;
     private SIDE mSide;
-    private final int mDisplayWidth;
-    private final int mDisplayHeight;
-    private int mOffsetX;
     private boolean mIsOnRightSide;
     private TwoStateLayout mOtherLayout;
+    private OnSideMovedListener mListener;
+
+    protected int mActivePointerId = INVALID_POINTER;
+    protected int mMaximumVelocity;
+    protected VelocityTracker mVelocityTracker;
 
     public static enum SIDE {LEFT, RIGHT};
 
@@ -62,13 +59,17 @@ public class TwoStateLayout extends ViewGroup {
     private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
     private static final int MARGIN_THRESHOLD = 48; // dips
 
+    public interface OnSideMovedListener {
+        public void onLeftSide(TwoStateLayout v);
+        public void onRightSide(TwoStateLayout v);
+    }
+
     public TwoStateLayout(Context context) {
         this(context, null);
     }
 
     public TwoStateLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-
         mScrollX = 0;
         mIsRight = true;
         mQuickReturn = false;
@@ -76,7 +77,6 @@ public class TwoStateLayout extends ViewGroup {
         mScrolling = false;
         mScroller = new Scroller(context, sInterpolator);
         mIsOnRightSide = false;
-
 
         final ViewConfiguration configuration = ViewConfiguration.get(context);
         mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
@@ -86,10 +86,6 @@ public class TwoStateLayout extends ViewGroup {
 
         final float density = context.getResources().getDisplayMetrics().density;
         mFlingDistance = (int) (MIN_DISTANCE_FOR_FLING * density);
-
-        Display disp = ((WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        mDisplayWidth = disp.getWidth();
-        mDisplayHeight = disp.getHeight();
 
         // Create inner layout and put current children in it
         mLayout = new LinearLayout(context);
@@ -164,24 +160,28 @@ public class TwoStateLayout extends ViewGroup {
 
     public void moveLeft(boolean animate) {
         if (animate) {
-            smoothScrollTo(getRightBound());
+            smoothScrollTo(getMaxBound());
         } else {
-            scrollTo(getRightBound(), 0);
+            scrollTo(getMaxBound(), 0);
         }
         mIsOnRightSide = false;
     }
 
     public void moveRight(boolean animate) {
         if (animate) {
-            smoothScrollTo(getLeftBound());
+            smoothScrollTo(getMinBound());
         } else {
-            scrollTo(getLeftBound(), 0);
+            scrollTo(getMinBound(), 0);
         }
         mIsOnRightSide = true;
     }
 
     public boolean isOnRight() {
         return mIsRight;
+    }
+
+    public void setOnSideMovedListener(OnSideMovedListener listener) {
+        mListener = listener;
     }
 
     private void endDrag() {
@@ -215,10 +215,8 @@ public class TwoStateLayout extends ViewGroup {
             return;
         }
         final float x = MotionEventCompat.getX(ev, pointerIndex);
-        final float y = MotionEventCompat.getY(ev, pointerIndex);
         startDrag();
         mLastMotionX = x;
-        mLastMotionY = y;
     }
 
     float distanceInfluenceForSnapDuration(float f) {
@@ -227,11 +225,11 @@ public class TwoStateLayout extends ViewGroup {
         return FloatMath.sin(f);
     }
 
-    private int getLeftBound() {
+    private int getMinBound() {
         return -mLayout.getWidth();
     }
 
-    private int getRightBound() {
+    private int getMaxBound() {
         return 0;
     }
 
@@ -319,9 +317,15 @@ public class TwoStateLayout extends ViewGroup {
             mScrollX = x;
             if (mOtherLayout != null && mLayout.getWidth() > 0) {
                 mOtherLayout.scrollTo(- Math.abs(-x - mLayout.getWidth()), y);
-//                log(- Math.abs(-x - mLayout.getWidth()), x);
             }
             super.scrollTo(x, y);
+            if (mListener != null) {
+                if (x == getMinBound()) {
+                    mListener.onRightSide(this);
+                } else if (x == getMaxBound()) {
+                    mListener.onLeftSide(this);
+                }
+            }
         }
     }
 
@@ -337,6 +341,10 @@ public class TwoStateLayout extends ViewGroup {
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (isEnabled()) {
+            return false;
+        }
+
         final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
 
         if (action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP
@@ -356,7 +364,6 @@ public class TwoStateLayout extends ViewGroup {
                 break;
             }
             mLastMotionX = mInitialMotionX = MotionEventCompat.getX(ev, index);
-            mLastMotionY = MotionEventCompat.getY(ev, index);
             if (thisTouchAllowed(ev)) {
                 mIsUnableToDrag = false;
                 mIsDragging = false;
@@ -381,6 +388,9 @@ public class TwoStateLayout extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+        if (isEnabled()) {
+            return false;
+        }
 
         final int action = ev.getAction();
 
@@ -424,22 +434,18 @@ public class TwoStateLayout extends ViewGroup {
                 mLastMotionX = x;
                 float oldScrollX = getScrollX();
                 float scrollX = oldScrollX + deltaX;
-                final float leftBound = getLeftBound();
-                final float rightBound = getRightBound();
-                if (scrollX < leftBound) {
-                    scrollX = leftBound;
-                } else if (scrollX > rightBound) {
-                    scrollX = rightBound;
+                final float minBound = getMinBound();
+                final float maxBound = getMaxBound();
+                if (scrollX < minBound) {
+                    scrollX = minBound;
+                } else if (scrollX > maxBound) {
+                    scrollX = maxBound;
                 }
                 // Don't lose the rounded component
                 mLastMotionX += scrollX - (int) scrollX;
                 scrollTo((int) scrollX, getScrollY());
 
-                if (x == leftBound) {
-                    mIsOnRightSide = false;
-                } else {
-                    mIsOnRightSide = true;
-                }
+                mIsOnRightSide = x != minBound;
             }
             break;
         case MotionEvent.ACTION_UP:

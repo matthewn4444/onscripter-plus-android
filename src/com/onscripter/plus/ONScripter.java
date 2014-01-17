@@ -26,7 +26,9 @@ import android.widget.FrameLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class ONScripter extends Activity implements OnSeekBarChangeListener, OnClickListener, OnDismissListener
+import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
+
+public class ONScripter extends Activity implements OnSeekBarChangeListener, OnClickListener, OnDismissListener, OnSideMovedListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
@@ -142,6 +144,8 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         mLeftLayout.setOtherLayout(mRightLayout);
         mRightLayout.setOtherLayout(mLeftLayout);
 
+        mLeftLayout.setOnSideMovedListener(this);
+
         sHandler = new UpdateHandler(this);
         mHideControlsHandler = new Handler();
 
@@ -175,6 +179,8 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
             hideControls();
         } else {
             showControls();
+            mLeftLayout.setEnabled(true);
+            mRightLayout.setEnabled(true);
         }
 
         // Update the bezel swipe conditions
@@ -192,14 +198,20 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
             case 0:     // All
                 mAllowLeftBezelSwipe = true;
                 mAllowRightBezelSwipe = true;
+                mLeftLayout.setEnabled(false);
+                mRightLayout.setEnabled(false);
                 break;
             case 1:     // Left
                 mAllowLeftBezelSwipe = true;
                 mAllowRightBezelSwipe = false;
+                mLeftLayout.setEnabled(false);
+                mRightLayout.setEnabled(true);
                 break;
             case 2:     // Right
                 mAllowLeftBezelSwipe = false;
                 mAllowRightBezelSwipe = true;
+                mLeftLayout.setEnabled(true);
+                mRightLayout.setEnabled(false);
                 break;
             }
         }
@@ -262,7 +274,6 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         switch(v.getId()) {
         case R.id.controls_quit_button:
             removeHideControlsTimer();
-            hideControls();
             mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             refreshTimer = false;
             break;
@@ -379,7 +390,18 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 	@Override
     public void onDismiss(DialogInterface dialog) {
 	    updateControlPreferences();
-	    refreshHideControlsTimer();
+    }
+
+
+    @Override
+    public void onLeftSide(TwoStateLayout v) {
+    }
+
+    @Override
+    public void onRightSide(TwoStateLayout v) {
+        if (v == mLeftLayout) {
+            refreshHideControlsTimer();
+        }
     }
 
 	private void hideControls() {
@@ -398,7 +420,6 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 	private void showControls(boolean animate) {
 	    mLeftLayout.moveRight(animate);
         mRightLayout.moveLeft(animate);
-        refreshHideControlsTimer();
 	}
 
 	private void removeHideControlsTimer() {
