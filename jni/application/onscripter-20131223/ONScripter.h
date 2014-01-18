@@ -90,6 +90,10 @@ public:
     void invalidateSentenceFontSize() {
         sentence_font.size_invalidated = true;
     }
+
+    int getSentenceFontSize() {
+        return sentence_font.og_font_size_xy[1];
+    }
 #endif
 
     // ----------------------------------------

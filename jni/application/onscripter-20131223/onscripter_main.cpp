@@ -144,6 +144,12 @@ JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNI
 {
     ONScripter::setJavaEnv(jniEnv, thiz);
 }
+
+JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeGetDialogFontSize) (JNIEnv * jniEnv, jobject thiz)
+{
+    return ons.getSentenceFontSize();
+}
+
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)
 {
     ONScripter::JNI_VM = vm;

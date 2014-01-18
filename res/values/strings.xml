@@ -75,4 +75,8 @@
         <item>Swipe from left</item>
         <item>Swipe from right</item>
     </string-array>
+
+    <string name="dialog_settings_text_upscaling">Set the dialogue text upscaling.</string>
+    <string name="dialog_settings_text_upscaling_scale">Scale Size:</string>
+    <string name="dialog_settings_text_upscaling_text">English 日本語</string>
 </resources>

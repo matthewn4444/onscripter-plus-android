@@ -23,12 +23,10 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 
-public class ONScripter extends Activity implements OnSeekBarChangeListener, OnClickListener, OnDismissListener, OnSideMovedListener
+public class ONScripter extends Activity implements OnClickListener, OnDismissListener, OnSideMovedListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
@@ -77,6 +75,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
     private native int nativeGetWidth();
     private native int nativeGetHeight();
     private native void nativeSetSentenceFontScale(double scale);
+    public native int nativeGetDialogFontSize();
 
     Runnable mHideControlsRunnable = new Runnable() {
         @Override
@@ -134,7 +133,8 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         mRightClickButton.setOnClickListener(this);
         mMouseScrollUpButton.setOnClickListener(this);
         mMouseScrollDownButton.setOnClickListener(this);
-        mDialog = new VNSettingsDialog(this);
+        mDialog = new VNSettingsDialog(this, mUseDefaultFont ? LauncherActivity.DEFAULT_FONT_PATH
+                : mCurrentDirectory + "/" + getString(R.string.default_font_file));
         mDialog.setOnDimissListener(this);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -257,17 +257,10 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
         }
     }
 
-    @Override
-    public void onProgressChanged(SeekBar seekBar, int progress,
-            boolean fromUser) {
-        nativeSetSentenceFontScale(Math.floor(progress /10)/10.0 + 1);
+    public int getGameHeight() {
+        return mGameHeight;
     }
-    @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-    }
-    @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-    }
+
     @Override
     public void onClick(View v) {
         boolean refreshTimer = true;
@@ -276,6 +269,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
             removeHideControlsTimer();
             mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             refreshTimer = false;
+            finish();
             break;
         case R.id.controls_change_speed_button:
             mGLView.nativeKey( KeyEvent.KEYCODE_O, 1 );
@@ -390,6 +384,7 @@ public class ONScripter extends Activity implements OnSeekBarChangeListener, OnC
 	@Override
     public void onDismiss(DialogInterface dialog) {
 	    updateControlPreferences();
+	    nativeSetSentenceFontScale(mDialog.getFontScalingFactor());
     }
 
 

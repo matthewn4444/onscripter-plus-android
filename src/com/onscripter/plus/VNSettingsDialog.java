@@ -1,6 +1,5 @@
 package com.onscripter.plus;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -8,22 +7,36 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
 import android.widget.TabHost;
+import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
 
-public class VNSettingsDialog implements OnDismissListener, OnClickListener {
+public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnSeekBarChangeListener, OnTabChangeListener {
     private final AlertDialog mDialog;
-    private final Activity mActivity;
+    private final ONScripter mActivity;
     private final TabHost mTabHost;
     private final FrameLayout mTabContent;
     private final SharedPreferences mPrefs;
+    private final int mScreenHeight;
+    private int mFontPreviewSize;
+    private double mFontScale;
+
+    // Tab Names/id
+    public static final String CONTROLS_TAB_NAME = "Controls";
+    public static final String TEXT_TAB_NAME = "Text";
 
     // Event listeners
     private OnDismissListener mDismissListener;
@@ -38,12 +51,19 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
     // Settings view elements
     private final CheckBox mDisplayControlsChkbx;
     private final Spinner mSwipeGesturesSpinner;
+    private final TextView mUpScalingNumber;
+    private final TextView mUpScalingText;
+    private final SeekBar mUpScalingScroller;
 
     // Settings view elements id
     public static final int DISPLAY_CONTROLS_ID = R.id.dialog_controls_display_checkbox;
     public static final int SWIPE_GESTURES_ID = R.id.dialog_controls_swipe_spinner;
 
-    public VNSettingsDialog(Activity activity) {
+    public static final int UPSCALE_NUMBER_ID = R.id.scaleNumber;
+    public static final int UPSCALE_TEXT_ID = R.id.textPreview;
+    public static final int TEXT_SCROLLER_ID = R.id.fontScaler;
+
+    public VNSettingsDialog(ONScripter activity, String fontPath) {
         mActivity = activity;
         AlertDialog.Builder builder = new Builder(activity);
         mTabHost = (TabHost)activity.getLayoutInflater().inflate(R.layout.vnsettings_dialog, null);
@@ -52,16 +72,18 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
         mDialog = builder.create();
         mDialog.setOnDismissListener(this);
         mTabContent = mTabHost.getTabContentView();
+        mTabHost.setOnTabChangedListener(this);
 
         // Set the height of the window
         WindowManager window = (WindowManager)mActivity.getSystemService(Context.WINDOW_SERVICE);
-        mTabHost.setMinimumHeight(window.getDefaultDisplay().getHeight());
+        mScreenHeight = window.getDefaultDisplay().getHeight();
+        mTabHost.setMinimumHeight(mScreenHeight);
         mDialog.getWindow().setFlags(
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        addTab("Controls", R.layout.vnsettings_dialog_controls, null);
-        addTab("Text", R.layout.vnsettings_dialog_text, null);
+        addTab(CONTROLS_TAB_NAME, R.layout.vnsettings_dialog_controls, null);
+        addTab(TEXT_TAB_NAME, R.layout.vnsettings_dialog_text, null);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
 
@@ -74,7 +96,15 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
 
         mDisplayControlsChkbx = (CheckBox)mTabHost.findViewById(DISPLAY_CONTROLS_ID);
         mSwipeGesturesSpinner = (Spinner)mTabHost.findViewById(SWIPE_GESTURES_ID);
+        mUpScalingNumber = (TextView)mTabHost.findViewById(UPSCALE_NUMBER_ID);
+        mUpScalingText = (TextView)mTabHost.findViewById(UPSCALE_TEXT_ID);
+        mUpScalingScroller = (SeekBar)mTabHost.findViewById(TEXT_SCROLLER_ID);
         mDisplayControlsChkbx.setOnClickListener(this);
+        mUpScalingScroller.setOnSeekBarChangeListener(this);
+
+        // Set the font family
+        mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
+        onProgressChanged(mUpScalingScroller, 0, true);     // TODO change this value from file
     }
 
     public void setOnDimissListener(OnDismissListener listener) {
@@ -98,6 +128,10 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
         }
         mSwipeGesturesSpinner.setEnabled(hideControls);
         mSwipeGesturesSpinner.setSelection(index);
+
+        // Update the text upscaling font size
+        mFontPreviewSize = mActivity.nativeGetDialogFontSize();
+        updateUpscalingNumber();
     }
 
     private void savePreferences() {
@@ -111,6 +145,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
         TabSpec spec = mTabHost.newTabSpec(tab);
         spec.setIndicator(tab);
         View v = mActivity.getLayoutInflater().inflate(resourceLayoutId, null);
+        v.setMinimumHeight(mScreenHeight);
         mTabContent.addView(v);
         spec.setContent(v.getId());
         mTabHost.addTab(spec);
@@ -135,6 +170,14 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
     }
 
     @Override
+    public void onTabChanged(String tabId) {
+        if (tabId.equals(TEXT_TAB_NAME)) {
+            mFontPreviewSize = mActivity.nativeGetDialogFontSize();
+            updateUpscalingNumber();
+        }
+    }
+
+    @Override
     public void onDismiss(DialogInterface dialog) {
         savePreferences();
         if (mDismissListener != null) {
@@ -150,4 +193,35 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener {
             break;
         }
     }
+
+    public double getFontScalingFactor() {
+        return mFontScale;
+    }
+
+    private void updateUpscalingNumber() {
+        // Update the size of the text area
+        ViewGroup vg = (ViewGroup) mUpScalingText.getParent();
+        LayoutParams lp = (LayoutParams) vg.getLayoutParams();
+        lp.height = mScreenHeight / 4;
+        vg.setLayoutParams(lp);
+
+        mUpScalingNumber.setText(mFontScale + "");
+        mUpScalingText.setTextSize((float) (mFontScale * mFontPreviewSize * mActivity.getGameHeight() / mScreenHeight));
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress,
+            boolean fromUser) {
+        mFontScale = Math.round(progress / 10) / 10.0 + 1;
+        updateUpscalingNumber();
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+    }
+
 }
