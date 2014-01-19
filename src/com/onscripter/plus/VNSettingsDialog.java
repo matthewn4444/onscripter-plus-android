@@ -104,7 +104,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
 
         // Set the font family
         mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
-        onProgressChanged(mUpScalingScroller, 0, true);     // TODO change this value from file
+        onProgressChanged(mUpScalingScroller, 0, true);
     }
 
     public void setOnDimissListener(OnDismissListener listener) {
@@ -192,6 +192,12 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
             mSwipeGesturesSpinner.setEnabled(((CheckBox)v).isChecked());
             break;
         }
+    }
+
+    public void setFontScalingFactor(double scaleFactor) {
+        // Round to avoid trailing digits
+        mFontScale = Math.round(scaleFactor * 10) / 10.0;
+        mUpScalingScroller.setProgress((int)Math.round((mFontScale - 1.0) * 100));
     }
 
     public double getFontScalingFactor() {

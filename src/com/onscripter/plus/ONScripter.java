@@ -25,11 +25,13 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
+import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
-public class ONScripter extends Activity implements OnClickListener, OnDismissListener, OnSideMovedListener
+public class ONScripter extends Activity implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
+    public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
 
     private static final int MSG_AUTO_MODE = 1;
     private static final int MSG_SKIP_MODE = 2;
@@ -62,6 +64,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
     private String mCurrentDirectory;
     private boolean mUseDefaultFont;
     private SharedPreferences mPrefs;
+    private VNPreferences mVNPrefs;
 
     private GestureDetector mGestureScanner;
     private boolean mAllowLeftBezelSwipe;
@@ -140,6 +143,9 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         CONTROL_LAYOUT_WIDTH = mLeftLayout.getLayoutParams().width;
         updateControlPreferences();
+
+        mVNPrefs = new VNPreferences(mCurrentDirectory);
+        mVNPrefs.setOnLoadVNPrefListener(this);
 
         mLeftLayout.setOtherLayout(mRightLayout);
         mRightLayout.setOtherLayout(mLeftLayout);
@@ -333,6 +339,14 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	}
 
 	@Override
+    public void onLoadVNPref(boolean successful) {
+	    // Load scale factor
+        double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
+        mDialog.setFontScalingFactor(scaleFactor);
+        nativeSetSentenceFontScale(scaleFactor);
+    }
+
+	@Override
 	protected void onPause()
 	{
 		// TODO: if application pauses it's screen is messed up
@@ -384,9 +398,11 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	@Override
     public void onDismiss(DialogInterface dialog) {
 	    updateControlPreferences();
-	    nativeSetSentenceFontScale(mDialog.getFontScalingFactor());
+	    double scaleFactor = mDialog.getFontScalingFactor();
+	    nativeSetSentenceFontScale(scaleFactor);
+	    mVNPrefs.putFloat(DIALOG_FONT_SCALE_KEY, (float) scaleFactor);
+	    mVNPrefs.commit();
     }
-
 
     @Override
     public void onLeftSide(TwoStateLayout v) {
