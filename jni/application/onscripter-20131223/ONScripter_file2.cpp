@@ -62,6 +62,7 @@ int ONScripter::loadSaveFile2( int file_version )
     sentence_font.num_xy[1] = readInt();
 #if ANDROID
     setSentenceFontParamters(readInt(), readInt(), sentence_font.num_xy[0], sentence_font.num_xy[1]);
+    invalidateSentenceFontSize();
 #else
     sentence_font.font_size_xy[0] = readInt();
     sentence_font.font_size_xy[1] = readInt();
