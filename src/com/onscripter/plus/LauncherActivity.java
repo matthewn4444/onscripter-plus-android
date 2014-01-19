@@ -26,8 +26,10 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
+import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 
-public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener
+public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
     private static final File DEFAULT_LOCATION = Environment.getExternalStorageDirectory();
@@ -50,7 +52,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         // Set up the listView and the adapter
         try {
-            mAdapter = new FileSystemAdapter(this, directory);
+            mAdapter = new FileSystemAdapter(this, directory, false, false, false, this);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -138,6 +140,38 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         }
     }
 
+    @Override
+    public LIST_ITEM_TYPE onFileTypeParse(File file) {
+        if (file.isFile()) {
+            return LIST_ITEM_TYPE.FILE;
+        } else {
+            // Folder
+            if (isDirectoryONScripterGame(file)) {
+                return LIST_ITEM_TYPE.FILE;
+            } else {
+                return LIST_ITEM_TYPE.FOLDER;
+            }
+        }
+    }
+
+    public static boolean isDirectoryONScripterGame(File file) {
+        if (!file.canRead()) {
+            return false;
+        }
+        File[] mDirectoryFiles = file.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File file) {
+                return (file.isFile() &&
+                        (file.getName().equals("0.txt") ||
+                         file.getName().equals("00.txt") ||
+                         file.getName().equals("nscr_sec.dat") ||
+                         file.getName().equals("nscript.___") ||
+                         file.getName().equals("nscript.dat")));
+            }
+        });
+        return mDirectoryFiles.length > 0;
+    }
+
     protected void goToActivity(Class<?> cls) {
         goToActivity(cls, null);
     }
@@ -203,28 +237,13 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         File currentDir = mAdapter.getFile(position);
 
-        // Check to see if this folder contains a visual novel
-        File[] mDirectoryFiles = currentDir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return (file.isFile() &&
-                        (file.getName().equals("0.txt") ||
-                         file.getName().equals("00.txt") ||
-                         file.getName().equals("nscr_sec.dat") ||
-                         file.getName().equals("nscript.___") ||
-                         file.getName().equals("nscript.dat")));
-            }
-        });
-
-        // Unable to read the folder
-        if (mDirectoryFiles == null) {
+        // No permissions
+        if (!currentDir.canRead()) {
             Toast.makeText(LauncherActivity.this, "Unable to open folder because of permissions", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        if (mDirectoryFiles.length == 0){       // It is a regular folder, so open it
-            mAdapter.setChildAsCurrent(position);
-        } else {
+        if (isDirectoryONScripterGame(currentDir)) {
             // Use default font if there is none in the game folder
             if (new File(currentDir + "/" + DEFAULT_FONT_FILE).exists()) {
                 startONScripter(currentDir.getPath());
@@ -235,6 +254,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                     startONScripter(currentDir.getPath(), true);
                 }
             }
+        } else {
+            mAdapter.setChildAsCurrent(position);
         }
     }
 

@@ -3,15 +3,21 @@ package com.onscripter.plus;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import android.app.Activity;
 import android.content.Context;
-import android.widget.ArrayAdapter;
+import android.graphics.drawable.Drawable;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FileSystemAdapter extends ArrayAdapter<String> {
+import com.onscripter.plus.FileSystemAdapter.FileListItem;
+
+public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
 
     private File mCurrentDirectory;
     private boolean mShowHidden;
@@ -20,7 +26,52 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
     private File[] mFileList;
     private final FileSort mFileSorter = new FileSort();
     private TextView mBindedPath;
+    private CustomFileTypeParser mTypeParser;
+
     private static String BackString;
+    private static FileListItem BackFileListItem;
+    private static Drawable IconBackDrawable;
+    private static Drawable IconFileDrawable;
+    private static Drawable IconFolderDrawable;
+
+    static final public int[] LAYOUT_IDS = {
+        R.id.icon,
+        R.id.filename
+    };
+
+    public static enum LIST_ITEM_TYPE {
+        FILE, FOLDER, BACK
+    };
+
+    interface CustomFileTypeParser {
+        public LIST_ITEM_TYPE onFileTypeParse(File file);
+    }
+
+    static class FileListItem {
+        private final LIST_ITEM_TYPE mType;
+        private final String mName;
+
+        public FileListItem(LIST_ITEM_TYPE type, String name) {
+            mType = type;
+            mName = name;
+        }
+
+        public boolean isFile() {
+            return mType == LIST_ITEM_TYPE.FILE;
+        }
+        public boolean isFolder() {
+            return mType == LIST_ITEM_TYPE.FOLDER;
+        }
+        public boolean isBackItem() {
+            return mType == LIST_ITEM_TYPE.BACK;
+        }
+        public LIST_ITEM_TYPE getType() {
+            return mType;
+        }
+        public String getName() {
+            return mName;
+        }
+    }
 
     static class FileSort implements Comparator<File>{
         @Override
@@ -33,16 +84,23 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         this(context, startDirectory, false);
     }
 
-    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton) throws FileNotFoundException {
+    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton)
+            throws FileNotFoundException {
         this(context, startDirectory, showBackButton, false);
     }
 
-    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton, boolean onlyShowFolders) throws FileNotFoundException {
+    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton,
+            boolean onlyShowFolders) throws FileNotFoundException {
         this(context, startDirectory, showBackButton, onlyShowFolders, false);
     }
 
-    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton, boolean onlyShowFolders, boolean showHiddenFolders) throws FileNotFoundException {
-        super(context, android.R.layout.simple_list_item_1);
+    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton,
+            boolean onlyShowFolders, boolean showHiddenFolders) throws FileNotFoundException {
+        this(context, startDirectory, showBackButton, onlyShowFolders, false, null);
+    }
+    public FileSystemAdapter(Context context, File startDirectory, boolean showBackButton,
+            boolean onlyShowFolders, boolean showHiddenFolders, CustomFileTypeParser parser) throws FileNotFoundException {
+        super((Activity)context, R.layout.file_system_layout, LAYOUT_IDS, new ArrayList<FileListItem>());
         if (!startDirectory.exists() || !startDirectory.isDirectory()) {
             throw new FileNotFoundException("Cannot find directory.");
         }
@@ -51,8 +109,13 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         mShowBackItem = showBackButton;
         mCurrentDirectory = startDirectory;
         if (BackString == null) {
-            BackString = getContext().getString(R.string.directory_back);
+            BackString = context.getString(R.string.directory_back);
+            BackFileListItem = new FileListItem(LIST_ITEM_TYPE.BACK, BackString);
+            IconBackDrawable = context.getResources().getDrawable(R.drawable.ic_folder_up);
+            IconFileDrawable = context.getResources().getDrawable(R.drawable.ic_file);
+            IconFolderDrawable = context.getResources().getDrawable(R.drawable.ic_folder);
         }
+        mTypeParser = parser;
         refresh();
     }
 
@@ -65,6 +128,10 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
 
     public String getCurrentDirectoryPath() {
         return mCurrentDirectory.getPath();
+    }
+
+    public void setCustomFileTypeParser(CustomFileTypeParser parser) {
+        mTypeParser = parser;
     }
 
     public File getCurrentDirectory() {
@@ -97,9 +164,9 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         if (mShowBackItem != flag) {
             mShowBackItem = flag;
             if (mShowBackItem) {
-                insert(BackString, 0);
+                insert(BackFileListItem, 0);
             } else {
-                remove(BackString);
+                remove(BackFileListItem);
             }
         }
     }
@@ -133,11 +200,20 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         clear();
         mFileList = files;
         if (mShowBackItem) {
-            add(BackString);
+            add(BackFileListItem);
         }
         Arrays.sort(mFileList, mFileSorter);
         for (int i = 0; i < mFileList.length; i++) {
-            add(mFileList[i].getName());
+            if (mTypeParser != null) {
+                LIST_ITEM_TYPE type = mTypeParser.onFileTypeParse(mFileList[i]);
+                add(new FileListItem(type, mFileList[i].getName()));
+            } else {
+                if (mFileList[i].isDirectory()) {
+                    add(new FileListItem(LIST_ITEM_TYPE.FOLDER, mFileList[i].getName()));
+                } else {
+                    add(new FileListItem(LIST_ITEM_TYPE.FILE, mFileList[i].getName()));
+                }
+            }
         }
         if (mBindedPath != null) {
             mBindedPath.setText(mCurrentDirectory.getPath());
@@ -181,5 +257,24 @@ public class FileSystemAdapter extends ArrayAdapter<String> {
         }
         mCurrentDirectory = old;
         return false;
+    }
+
+    @Override
+    protected void setWidgetValues(int position, FileListItem item, View[] elements,
+            View layout) {
+        Drawable drawable = null;
+        switch(item.getType()) {
+        case FILE:
+            drawable = IconFileDrawable;
+            break;
+        case BACK:
+            drawable = IconBackDrawable;
+            break;
+        case FOLDER:
+            drawable = IconFolderDrawable;
+            break;
+        }
+        ((ImageView)elements[0]).setImageDrawable(drawable);
+        ((TextView)elements[1]).setText(item.getName());
     }
 }

@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">ONScripter Plus</string>
     <string name="version">ONScripter 20130202\nStudio O.G.A. Ogapee</string>
+    <string name="empty"></string>
     <bool name="button_visible">true</bool>
     <bool name="render_font_outline">true</bool>
     <string name="public_key"></string>
