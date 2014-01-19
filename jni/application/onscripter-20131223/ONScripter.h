@@ -78,11 +78,12 @@ public:
     static jobject JavaONScripter;
     static jmethodID JavaPlayVideo;
     static jmethodID JavaReceiveMessage;
+    static jclass JavaONScripterClass;
 
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
-        ONScripter::JavaONScripter = jniEnv->NewGlobalRef(thiz);
-        jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
-        ONScripter::JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
+        JavaONScripter = jniEnv->NewGlobalRef(thiz);
+        JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
+        JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
     }
 

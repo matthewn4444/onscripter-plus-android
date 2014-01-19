@@ -43,6 +43,7 @@ JavaVM *    ONScripter::JNI_VM = NULL;
 jobject     ONScripter::JavaONScripter = NULL;
 jmethodID   ONScripter::JavaPlayVideo = NULL;
 jmethodID   ONScripter::JavaReceiveMessage = NULL;
+jclass      ONScripter::JavaONScripterClass = NULL;
 #endif
 
 static void SDL_Quit_Wrapper()
@@ -1318,7 +1319,6 @@ void ONScripter::setInternalSkipMode(bool enabled) {
     }
 
     jboolean jb = enabled ? JNI_TRUE : JNI_FALSE;
-    jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
     jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, ANDROID_MSG_SKIP_MODE, jb);
 #endif
 }
@@ -1335,7 +1335,6 @@ void ONScripter::setInternalAutoMode(bool enabled) {
     }
 
     jboolean jb = enabled ? JNI_TRUE : JNI_FALSE;
-    jclass JavaONScripterClass = jniEnv->GetObjectClass(ONScripter::JavaONScripter);
     jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, ANDROID_MSG_AUTO_MODE, jb);
 #endif
 }
