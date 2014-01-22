@@ -14,6 +14,16 @@
         <item name="android:layout_weight">1</item>
     </style>
     
+    <!-- Settings About -->
+    <style name="about_settings_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceSmall</item>
+    </style>
+    <style name="about_settings_header_style" parent="@style/about_settings_text_style">
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <!-- VN Dialog Settings -->
     <style name="dialog_settings_row_style">
         <item name="android:weightSum">10</item>

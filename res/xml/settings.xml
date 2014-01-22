@@ -27,4 +27,8 @@
             android:key="@string/settings_folder_default_key"
             android:title="@string/settings_folder_default_title"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_about_cate"
+        android:key="@string/settings_about_key">
+        <PreferenceScreen android:layout="@layout/about_preference_layout"/>
+    </PreferenceCategory>
 </PreferenceScreen>

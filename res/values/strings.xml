@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ONScripter Plus</string>
-    <string name="version">ONScripter 20130202\nStudio O.G.A. Ogapee</string>
+    <string name="version_name">1.0</string>
     <string name="empty"></string>
-    <bool name="button_visible">true</bool>
-    <bool name="render_font_outline">true</bool>
-    <string name="public_key"></string>
     <integer name="gingerbread_version">10</integer>
+    <string name="website_thanks">http://onscripter.sourceforge.jp/android/android.html</string>
+    <string name="website_github">http://git.io/M5fI7g</string>
+    <string name="author">Matthew Ng</string>
+
+    <bool name="render_font_outline">true</bool>
     <string name="directory_back">(Back)</string>
     <string name="dialog_quit_button">Quit</string>
 
@@ -61,6 +63,15 @@
     <string name="settings_folder_default_key">settings.folder.default.key</string>
     <string name="settings_folder_default_summary">Select a default folder location to read visual novel files.</string>
     <string name="settings_folder_default_title">Select Default Folder</string>
+
+    <string name="settings_about_cate">About</string>
+    <string name="settings_about_key">settings.about.key</string>
+    <string name="settings_about_author_header">Author:</string>
+    <string name="settings_about_og_author_header">Studio O.G.A.:</string>
+    <string name="settings_about_version_header">Version:</string>
+    <string name="settings_about_github_header">Website:</string>
+    <string name="settings_about_summary">This application is open source and free. If you plan to use the code, please mention Studio O.G.A. Ogapee and I.</string>
+    <string name="settings_about_thanks_text">Thanks to Studio O.G.A. Ogapee (original author) for the source and instructions to run and build this app.</string>
 
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
