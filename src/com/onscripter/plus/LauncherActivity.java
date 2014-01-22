@@ -33,6 +33,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
     private static final File DEFAULT_LOCATION = Environment.getExternalStorageDirectory();
+    private static final String LAST_DIRECTORY = "last_directory_key";
     public static String DEFAULT_FONT_PATH = null;
     public static String DEFAULT_FONT_FILE = null;
 
@@ -45,9 +46,18 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         super.onCreate(savedInstanceState);
         mDialog = new AlertDialog.Builder(this);
 
-        File directory = getStartingDirectory();
-        if (directory == null) {
-            return;
+        File directory = null;
+        String lastDirectory = null;
+        if (savedInstanceState != null) {
+            lastDirectory = savedInstanceState.getString(LAST_DIRECTORY);
+        }
+        if (lastDirectory == null) {
+            directory = getStartingDirectory();
+            if (directory == null) {
+                return;
+            }
+        } else {
+            directory = new File(lastDirectory);
         }
 
         // Set up the listView and the adapter
@@ -73,6 +83,12 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             mCopyTask.setCancelable(false);
             mCopyTask.execute();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(LAST_DIRECTORY, mAdapter.getCurrentDirectoryPath());
     }
 
     private File getStartingDirectory() {
