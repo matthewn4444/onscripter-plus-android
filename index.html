@@ -1,145 +1,74 @@
 <!DOCTYPE html>
 <html>
+
   <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <title>Onscripter-plus-android by matthewn4444</title>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="ONScipter Plus : ONScripter forked with a different UI for Android" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>ONScipter Plus</title>
   </head>
 
   <body>
-    <div id="container">
-      <div class="inner">
 
-        <header>
-          <h1>Onscripter-plus-android</h1>
-          <h2>ONScripter (Android) forked with a different UI</h2>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/matthewn4444/onscripter-plus-android">View on GitHub</a>
+
+          <h1 id="project_title">ONScipter Plus</h1>
+          <h2 id="project_tagline">ONScripter forked with a different UI for Android</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/matthewn4444/onscripter-plus-android/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/matthewn4444/onscripter-plus-android/tarball/master">Download this project as a tar.gz file</a>
+            </section>
         </header>
-
-        <section id="downloads" class="clearfix">
-          <a href="https://github.com/matthewn4444/onscripter-plus-android/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
-          <a href="https://github.com/matthewn4444/onscripter-plus-android/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
-          <a href="https://github.com/matthewn4444/onscripter-plus-android" id="view-on-github" class="button"><span>View on GitHub</span></a>
-        </section>
-
-        <hr>
-
-        <section id="main_content">
-          <h1></h1>
-
-<h1>
-<a name="onscripter-plus-for-android" class="anchor" href="#onscripter-plus-for-android"><span class="octicon octicon-link"></span></a>Onscripter Plus For Android</h1>
-
-<p>December 27, 2013</p>
-
-<p>Fork of Onscripter for Android (<a href="http://onscripter.sourceforge.jp/android/android.html">http://onscripter.sourceforge.jp/android/android.html</a>)
-that is compiled on Windows including full source (with dependencies).</p>
-
-<p>This Android application allows you to play visual novel games using the NScripter engine
-on your Android device.</p>
-
-<h1>
-<a name="steps-to-compile" class="anchor" href="#steps-to-compile"><span class="octicon octicon-link"></span></a>Steps to Compile</h1>
-
-<ol>
-<li>Install Java <a href="match%20bit%20with%20Eclipse,%20probably%20get%2032-bit">https://www.java.com/en/</a>
-</li>
-<li>Install Eclipse with Android SDK <a href="32bit%20probably">https://developer.android.com/sdk/index.html</a> </li>
-<li>Run the "Android SDK Manager" and install:
-
-<ul>
-<li>Tools/ - All</li>
-<li>Android 2.2 (API 8) - All</li>
-<li>Extras/ -&gt; Support Repo, Support Library, Google USB Driver, Google Web Driver</li>
-<li>[OPTIONAL] Android 4.0 (API 14) and/or anything newer</li>
-</ul>
-</li>
-<li>[WINDOWS] Install Cywin [<a href="http://cygwin.com/install.html">http://cygwin.com/install.html</a>]
-
-<ul>
-<li>When choosing what to install, only install:
-DLevel -&gt; make</li>
-</ul>
-</li>
-<li>[WINDOWS] Set up the environment variable for cygwin in PATH (to the bin folder)
-C:&lt;path to cywin&gt;/bin;</li>
-<li>Install the NDK <a href="Doesn't%20matter%20the%20bit">http://developer.android.com/tools/sdk/ndk/index.html</a>
-</li>
-<li>Setup NDK in Eclipse: 
-
-<ul>
-<li>Open Eclipse</li>
-<li>Window -&gt; Preference -&gt; Android -&gt; NDK -&gt; [Browse the location of the NDK folder]
-C:&lt;folder to ndk&gt;\android-ndk</li>
-</ul>
-</li>
-<li>Git clone this repo a folder</li>
-<li>Open Eclipse and Import the project
-
-<ul>
-<li>Open Eclipse</li>
-<li>File -&gt; Import... -&gt; Android -&gt; Existing Android Code Into Workspace -&gt; [Then find the repo]</li>
-</ul>
-</li>
-<li>Add Native Support to project:
-
-<ul>
-<li>Right click ONScripterPlus -&gt; Android Tools -&gt; Add Native Support (If no option, then you already have native support)</li>
-</ul>
-</li>
-<li>[WINDOWS] Open file "/jni/application/Android.mk"
-
-<ul>
-<li>Change the part of APP_SUBDIR of "C:\Programming\cygwin64\bin\find" to cygwin "find"</li>
-</ul>
-</li>
-<li>[WINDOWS] Open file "/jni/freetype/Android.mk"
-
-<ul>
-<li>Change the part of APP_SUBDIR of "C:\Programming\cygwin64\bin\find" to cygwin "find"</li>
-</ul>
-</li>
-<li>Build the project (ONScipter takes a while to build) and run on device</li>
-</ol><h1>
-<a name="change-version-of-onscripter" class="anchor" href="#change-version-of-onscripter"><span class="octicon octicon-link"></span></a>Change version of ONScripter</h1>
-
-<ol>
-<li>Download new version of ONScripter source code based on your operating system from <a href="http://onscripter.sourceforge.jp/onscripter.html">http://onscripter.sourceforge.jp/onscripter.html</a>
-</li>
-<li>Delete the folder "/jni/application/onscripter-*" (e.g. /onscripter-20130202)</li>
-<li>Extract the folder "onscripter-*" (e.g. onscripter-20130202) source into "/jni/application"</li>
-<li>Rebuild the code from Eclipse</li>
-</ol><h1>
-<a name="play-visual-novel" class="anchor" href="#play-visual-novel"><span class="octicon octicon-link"></span></a>Play Visual Novel</h1>
-
-<ol>
-<li>Download a visual novel game that uses NScripter</li>
-<li>Plug Android device in computer and navigate to the internal memory of the Android device</li>
-<li>Make a new folder "ons"</li>
-<li>Place the game folder into "ons" folder</li>
-<li>[OPTIONAL] Place a font (Japanese preferably) into the game folder and name it "default.ttf"
-
-<ul>
-<li>if no font is provided, it will use a default font</li>
-</ul>
-</li>
-<li>You can delete the dll files</li>
-</ol>
-        </section>
-
-        <footer>
-          Onscripter-plus-android is maintained by <a href="https://github.com/matthewn4444">matthewn4444</a><br>
-          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
-        </footer>
-
-        
-      </div>
     </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>Current version: v1.0</p>
+
+<p>Google Play Store: <a href="https://play.google.com/store/apps/details?id=com.onscripter.plus&amp;hl=en">ONScripter Plus App</a></p>
+
+<h2>
+<a name="what-is-this" class="anchor" href="#what-is-this"><span class="octicon octicon-link"></span></a>What is this?</h2>
+
+<p>Play ONScripter (visual novel) games on your Android phone.</p>
+
+<p><img src="https://raw.github.com/wiki/matthewn4444/onscripter-plus-android/images/playing.PNG" alt="Narcissu"></p>
+
+<h2>
+<a name="how-do-i-set-this-up" class="anchor" href="#how-do-i-set-this-up"><span class="octicon octicon-link"></span></a>How do I set this up</h2>
+
+<p><a href="https://github.com/matthewn4444/onscripter-plus-android/wiki/Setting-up-a-Visual-Novel">View link</a> to setup games and play them on your phone</p>
+
+<h2>
+<a name="view-the-wiki-pages-to-get-more-information" class="anchor" href="#view-the-wiki-pages-to-get-more-information"><span class="octicon octicon-link"></span></a>View the wiki pages to get more information</h2>
+
+<ul>
+<li><a href="https://github.com/matthewn4444/onscripter-plus-android/wiki/Features">Features</a></li>
+<li><a href="https://github.com/matthewn4444/onscripter-plus-android/wiki/Compile-from-source">Compile source</a></li>
+</ul><h2>
+<a name="thanks" class="anchor" href="#thanks"><span class="octicon octicon-link"></span></a>Thanks</h2>
+
+<p>Thanks to Studio O.G.A. for the original source code and instructions to compile.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">ONScipter Plus maintained by <a href="https://github.com/matthewn4444">matthewn4444</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
   </body>
 </html>
