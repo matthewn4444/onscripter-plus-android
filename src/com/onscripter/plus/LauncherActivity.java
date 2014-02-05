@@ -62,7 +62,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         // Set up the listView and the adapter
         try {
-            mAdapter = new FileSystemAdapter(this, directory, false, false, false, this);
+            mAdapter = new FileSystemAdapter(this, directory, true, false, false, this);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -240,18 +240,33 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public void onBackPressed() {
         if (mAdapter != null) {
             // Back button will exit
-            if (mAdapter.getCurrentDirectory().equals(Environment.getExternalStorageDirectory())
-                    || mAdapter.getCurrentDirectory().equals(Environment2.getExternalSDCardDirectory())) {
+            if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
                 super.onBackPressed();
             } else {
+                mAdapter.showBackListItem(true);
                 mAdapter.moveUp();
+                if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
+                    mAdapter.showBackListItem(false);
+                }
             }
         }
+    }
+
+    private boolean isFileAtLowerBound(File file) {
+        return file.equals(Environment.getExternalStorageDirectory())
+                || file.equals(Environment2.getExternalSDCardDirectory());
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         File currentDir = mAdapter.getFile(position);
+
+        // Check if it goes back up
+        if (currentDir == null) {
+            mAdapter.moveUp();
+            mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
+            return;
+        }
 
         // No permissions
         if (!currentDir.canRead()) {
@@ -273,6 +288,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         } else {
             mAdapter.setChildAsCurrent(position);
         }
+        mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
     }
 
     private void startONScripter(String path) {
