@@ -102,13 +102,17 @@ public class TwoStateLayout extends ViewGroup {
                 LinearLayout.VERTICAL : LinearLayout.HORIZONTAL;
         mLayout.setOrientation(orientation);
 
-        // Set the background color
-        if (getBackground() instanceof ColorDrawable) {
-            mLayout.setBackgroundColor(((ColorDrawable) getBackground()).getColor());
-            setBackgroundColor(Color.TRANSPARENT);
-        } else {
-            mLayout.setBackgroundDrawable(getBackground());
-            setBackgroundDrawable(null);
+        try {
+            // Set the background color
+            if (getBackground() instanceof ColorDrawable) {
+                mLayout.setBackgroundColor(((ColorDrawable) getBackground()).getColor());
+                setBackgroundColor(Color.TRANSPARENT);
+            } else {
+                mLayout.setBackgroundDrawable(getBackground());
+                setBackgroundDrawable(null);
+            }
+        } catch (Exception e) {
+            mLayout.setBackgroundColor(Color.BLACK);        // Hack work around for some errors
         }
 
         // This is hardcoded
