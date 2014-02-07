@@ -128,6 +128,8 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
 
         try {
             mAdapter = new FileSystemAdapter(mCtx, openDir, !openDir.equals(mUpperBoundFile), true);
+            mAdapter.addLowerBoundFile(InternalStorage);
+            mAdapter.addLowerBoundFile(ExternalStorage);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             mDialog.dismiss();
@@ -153,21 +155,15 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
            mUpperBoundFile = InternalStorage;
            mAdapter.setCurrentDirectory(mCurrentInternalPath);
        }
-
-       // Remove the back list item if we are at upperbound
-       mAdapter.showBackListItem(!mUpperBoundFile.equals(mAdapter.getCurrentDirectory()));
    }
 
     @Override
     public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
         // Move up a directory if back is pressed and have not hit the folder upperlimit
         if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mAdapter.getCurrentDirectory().equals(mUpperBoundFile)) {
+            if (mAdapter.isDirectoryAtLowerBound()) {
                 mDialog.dismiss();
             } else {
-                if (mAdapter.getCurrentDirectory().getParentFile().equals(mUpperBoundFile)) {
-                    mAdapter.showBackListItem(false);
-                }
                 mAdapter.moveUp();
             }
         }
@@ -177,7 +173,5 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         mAdapter.setChildAsCurrent(position);
-        mAdapter.showBackListItem(position > 0 || !mAdapter.getCurrentDirectory()
-                .equals(mUpperBoundFile));
     }
 }
