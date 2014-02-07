@@ -34,11 +34,11 @@ import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
-    private static final File DEFAULT_LOCATION = Environment.getExternalStorageDirectory();
     private static final String LAST_DIRECTORY = "last_directory_key";
     public static String DEFAULT_FONT_PATH = null;
     public static String DEFAULT_FONT_FILE = null;
     public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
+    private static File DEFAULT_LOCATION;
 
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
@@ -52,6 +52,15 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mDirBrowse = new FolderBrowserDialogWrapper(this);
         mDialog = new AlertDialog.Builder(this);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Set all static values
+        if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
+            DEFAULT_FONT_FILE = getString(R.string.default_font_file);
+            DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
+            SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
+            DEFAULT_LOCATION = Environment2.getExternalSDCardDirectory() != null ?
+                    Environment2.getExternalSDCardDirectory() : Environment.getExternalStorageDirectory();
+        }
 
         File directory = null;
         String lastDirectory = null;
@@ -80,12 +89,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         setContentView(listView);
-
-        if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
-            DEFAULT_FONT_FILE = getString(R.string.default_font_file);
-            DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
-            SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
-        }
 
         // Copy the font file if it does not exist yet
         if (!new File(DEFAULT_FONT_PATH).exists()) {
@@ -139,7 +142,14 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                 }
             }
         }
-        File directory = path != null && new File(path).exists() ? new File(path) : DEFAULT_LOCATION;
+        // Set path unless it still can't find it, then set default folder
+        File directory = null;
+        if ( path != null && new File(path).exists()) {
+            directory = new File(path);
+        } else {
+            directory = DEFAULT_LOCATION;
+            mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, DEFAULT_LOCATION.getPath()).commit();
+        }
         if (!directory.exists()){
             showError(getString(R.string.message_cannot_find_internal_storage));
             return null;
