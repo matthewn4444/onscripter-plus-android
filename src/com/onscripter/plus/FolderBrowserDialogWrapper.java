@@ -22,6 +22,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyListener {
     private final LinearLayout mLayout;
     private final ListView mListView;
@@ -129,6 +131,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             mDialog.dismiss();
+            BugSenseHandler.sendException(e);
             Toast.makeText(mCtx, R.string.message_cannot_find_internal_storage, Toast.LENGTH_SHORT).show();
             return;
         }

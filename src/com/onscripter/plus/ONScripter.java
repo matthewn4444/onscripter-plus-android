@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
@@ -161,6 +163,10 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         mDisplayHeight = disp.getHeight();
 
         runSDLApp();
+
+        if (!isDebug()) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
+        }
     }
 
     private void updateControls(int mode, boolean flag) {
@@ -448,6 +454,10 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             mHideControlsHandler.postDelayed(mHideControlsRunnable, 1000 * HIDE_CONTROLS_TIMEOUT_SECONDS);
         }
 	}
+
+	private boolean isDebug() {
+        return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
 
 	static {
 		System.loadLibrary("mad");

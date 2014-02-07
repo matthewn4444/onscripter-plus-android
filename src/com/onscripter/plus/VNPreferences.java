@@ -17,6 +17,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Xml;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class VNPreferences {
     private static final String TAG = "VNPreferences";
     private static final String XML_HEADER = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>";
@@ -116,12 +118,15 @@ public class VNPreferences {
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
+                    BugSenseHandler.sendException(e);
                     return false;
                 } catch (XmlPullParserException e) {
                     e.printStackTrace();
+                    BugSenseHandler.sendException(e);
                     return false;
                 } catch (IOException e) {
                     e.printStackTrace();
+                    BugSenseHandler.sendException(e);
                     return false;
                 } finally {
                     if (in != null) {
@@ -388,8 +393,10 @@ public class VNPreferences {
                             os.flush();
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
+                            BugSenseHandler.sendException(e);
                         } catch (IOException e) {
                             e.printStackTrace();
+                            BugSenseHandler.sendException(e);
                         } finally {
                             if (os != null) {
                                 try {

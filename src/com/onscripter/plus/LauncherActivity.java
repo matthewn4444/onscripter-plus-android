@@ -15,6 +15,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -28,6 +29,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 
@@ -83,6 +85,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             mAdapter.addLowerBoundFile(Environment2.getExternalSDCardDirectory());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            BugSenseHandler.sendException(e);
         }
         final ListView listView = new ListView(this);
         mAdapter.onlyShowFolders(true);
@@ -98,6 +101,9 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         }
 
         createDirectoryBrowserDialog();
+        if (!isDebug()) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
+        }
     }
 
     @Override
@@ -373,6 +379,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                 return PRIVATE_PATH_NOT_FOUND;
             } catch (IOException e) {
                 e.printStackTrace();
+                BugSenseHandler.sendException(e);
                 return ASSET_NOT_FOUND;
             }
 
@@ -386,6 +393,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                 os.flush();
             } catch (IOException e) {
                 e.printStackTrace();
+                BugSenseHandler.sendException(e);
                 return WRITING_ERROR;
             } finally {
                 try {
@@ -417,5 +425,9 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             }
             mCopyTask = null;
         }
+    }
+
+    private boolean isDebug() {
+        return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 }
