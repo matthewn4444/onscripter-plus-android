@@ -38,6 +38,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private static final String LAST_DIRECTORY = "last_directory_key";
     public static String DEFAULT_FONT_PATH = null;
     public static String DEFAULT_FONT_FILE = null;
+    public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
 
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
@@ -83,6 +84,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
             DEFAULT_FONT_FILE = getString(R.string.default_font_file);
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
+            SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
         }
 
         // Copy the font file if it does not exist yet
@@ -110,7 +112,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             public void onClick(DialogInterface dialog, int which) {
                 Editor editor = mPrefs.edit();
                 String path = mDirBrowse.getResultDirectory().getPath();
-                editor.putString(getString(R.string.settings_folder_default_key), path);
+                editor.putString(SETTINGS_FOLDER_DEFAULT_KEY, path);
                 editor.commit();
                 setPath(path);
             }
@@ -121,20 +123,19 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
     private File getStartingDirectory() {
         // Detect folder location if none is provided
-        String defaultDirPref = getString(R.string.settings_folder_default_key);
-        String path = mPrefs.getString(defaultDirPref, null);
+        String path = mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null);
         if (path == null) {
             // Check to see if there is a <internal storage>/ons
             File onsDefaultDir = new File(Environment.getExternalStorageDirectory() + "/ons");
             if (onsDefaultDir.exists()) {
                 path = onsDefaultDir.getPath();
-                mPrefs.edit().putString(defaultDirPref, path).commit();
+                mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).commit();
             } else if (Environment2.hasExternalSDCard()) {
                 // Check to see if there is a <extSdCard storage>/ons
                 onsDefaultDir = new File(Environment2.getExternalSDCardDirectory() + "/ons");
                 if (onsDefaultDir.exists()) {
                     path = onsDefaultDir.getPath();
-                    mPrefs.edit().putString(defaultDirPref, path).commit();
+                    mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).commit();
                 }
             }
         }
@@ -161,7 +162,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             startActivityForResult(i, REQUEST_CODE_SETTINGS);
             break;
         case R.id.action_change_folder:
-            mDirBrowse.show(mAdapter.getCurrentDirectoryPath());
+            mDirBrowse.show(mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null));
             break;
         default:
             return super.onOptionsItemSelected(item);
@@ -183,7 +184,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
         case REQUEST_CODE_SETTINGS:
-            String path = mPrefs.getString(getString(R.string.settings_folder_default_key), null);
+            String path = mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null);
             setPath(path);
             break;
         }
