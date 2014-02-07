@@ -104,6 +104,9 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         }
 
         createDirectoryBrowserDialog();
+        if (!isDebug()) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
+        }
     }
 
     @Override

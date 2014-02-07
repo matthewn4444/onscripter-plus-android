@@ -18,6 +18,10 @@ public final class Settings extends SherlockPreferenceActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.menu_action_settings);
         addPreferencesFromResource(R.xml.settings);
+
+        if (!isDebug()) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
+        }
     }
 
     @Override

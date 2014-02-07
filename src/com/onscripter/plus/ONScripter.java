@@ -166,6 +166,10 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         mDisplayHeight = disp.getHeight();
 
         runSDLApp();
+
+        if (!isDebug()) {
+            BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
+        }
     }
 
     private void updateControls(int mode, boolean flag) {
