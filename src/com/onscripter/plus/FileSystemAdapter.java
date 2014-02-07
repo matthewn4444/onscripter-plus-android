@@ -262,13 +262,17 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     }
 
     public void addLowerBoundFile(File path) {
-        mLowerBoundFiles.add(path);
+        if (path != null && path.exists()) {
+            mLowerBoundFiles.add(path);
+        }
     }
 
     public boolean isDirectoryAtLowerBound() {
-        for (int i = 0; i < mLowerBoundFiles.size(); i++) {
-            if (mLowerBoundFiles.get(i).getPath().equals(mCurrentDirectory.getPath())) {
-                return true;
+        if (mLowerBoundFiles != null) {
+            for (int i = 0; i < mLowerBoundFiles.size(); i++) {
+                if (mLowerBoundFiles.get(i).getPath().equals(mCurrentDirectory.getPath())) {
+                    return true;
+                }
             }
         }
         return false;
