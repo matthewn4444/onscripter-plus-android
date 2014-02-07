@@ -32,9 +32,9 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private final TextView mPathText;
     private final Button mTogglePath;
     private Dialog mDialog;
+    private boolean isInInternalStorage;
 
     // Files
-    private File mUpperBoundFile;
     private File mCurrentInternalPath;
     private File mCurrentExternalPath;
     private static File InternalStorage;
@@ -118,16 +118,16 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
 
         // Detect where the current directory is either from internal or external storage
         if (openDir.getPath().contains(InternalStorage.getPath())) {
-            mUpperBoundFile = InternalStorage;
+            isInInternalStorage = true;
             mCurrentExternalPath = ExternalStorage;
         } else {
-            mUpperBoundFile = ExternalStorage;
+            isInInternalStorage = false;
             mCurrentInternalPath = InternalStorage;
             mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
         }
 
         try {
-            mAdapter = new FileSystemAdapter(mCtx, openDir, !openDir.equals(mUpperBoundFile), true);
+            mAdapter = new FileSystemAdapter(mCtx, openDir, true, true);
             mAdapter.addLowerBoundFile(InternalStorage);
             mAdapter.addLowerBoundFile(ExternalStorage);
         } catch (FileNotFoundException e) {
@@ -144,17 +144,16 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
 
     private void toggleGotoButton() {
        // Toggle between the internal and external storage
-       if (mUpperBoundFile.equals(InternalStorage)) {
+       if (isInInternalStorage) {
            mCurrentInternalPath = mAdapter.getCurrentDirectory();
            mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
-           mUpperBoundFile = ExternalStorage;
            mAdapter.setCurrentDirectory(mCurrentExternalPath);
        } else {
            mCurrentExternalPath = mAdapter.getCurrentDirectory();
            mTogglePath.setText(mCtx.getString(R.string.dialog_sd_card_text));
-           mUpperBoundFile = InternalStorage;
            mAdapter.setCurrentDirectory(mCurrentInternalPath);
        }
+       isInInternalStorage = !isInInternalStorage;
    }
 
     @Override
