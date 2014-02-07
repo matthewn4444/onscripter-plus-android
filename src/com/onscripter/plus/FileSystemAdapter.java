@@ -27,6 +27,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     private final FileSort mFileSorter = new FileSort();
     private TextView mBindedPath;
     private CustomFileTypeParser mTypeParser;
+    private final ArrayList<File> mLowerBoundFiles;
 
     private static String BackString;
     private static FileListItem BackFileListItem;
@@ -104,6 +105,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         if (!startDirectory.exists() || !startDirectory.isDirectory()) {
             throw new FileNotFoundException("Cannot find directory.");
         }
+        mLowerBoundFiles = new ArrayList<File>();
         mShowHidden = showHiddenFolders;
         mOnlyShowFolders = onlyShowFolders;
         mShowBackItem = showBackButton;
@@ -176,7 +178,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     }
 
     public File getFile(int index) {
-        if (mShowBackItem) {
+        if (isBackButtonShown()) {
             if (index == 0) {   // Back button
                 return null;
             }
@@ -199,7 +201,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         }
         clear();
         mFileList = files;
-        if (mShowBackItem) {
+        if (mShowBackItem && !isDirectoryAtLowerBound()) {
             add(BackFileListItem);
         }
         Arrays.sort(mFileList, mFileSorter);
@@ -223,7 +225,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     }
 
     public void setChildAsCurrent(int index) {
-        if (mShowBackItem) {
+        if (isBackButtonShown()) {
             if (index == 0) {
                 moveUp();
                 return;
@@ -257,6 +259,23 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         }
         mCurrentDirectory = old;
         return false;
+    }
+
+    public void addLowerBoundFile(File path) {
+        mLowerBoundFiles.add(path);
+    }
+
+    public boolean isDirectoryAtLowerBound() {
+        for (int i = 0; i < mLowerBoundFiles.size(); i++) {
+            if (mLowerBoundFiles.get(i).getPath().equals(mCurrentDirectory.getPath())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isBackButtonShown() {
+        return mShowBackItem && !isDirectoryAtLowerBound();
     }
 
     @Override

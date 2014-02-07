@@ -69,9 +69,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         // Set up the listView and the adapter
         try {
             mAdapter = new FileSystemAdapter(this, directory, true, false, false, this);
-            if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
-                mAdapter.showBackListItem(false);
-            }
+            mAdapter.addLowerBoundFile(Environment.getExternalStorageDirectory());
+            mAdapter.addLowerBoundFile(Environment2.getExternalSDCardDirectory());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -176,7 +175,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             File dir = new File(path);
             mAdapter.setCurrentDirectory(dir);
             currentPath = path;
-            mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
         }
     }
 
@@ -275,21 +273,13 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public void onBackPressed() {
         if (mAdapter != null) {
             // Back button will exit
-            if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
+            if (mAdapter.isDirectoryAtLowerBound()) {
                 super.onBackPressed();
             } else {
                 mAdapter.showBackListItem(true);
                 mAdapter.moveUp();
-                if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
-                    mAdapter.showBackListItem(false);
-                }
             }
         }
-    }
-
-    private boolean isFileAtLowerBound(File file) {
-        return file.equals(Environment.getExternalStorageDirectory())
-                || file.equals(Environment2.getExternalSDCardDirectory());
     }
 
     @Override
@@ -299,7 +289,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         // Check if it goes back up
         if (currentDir == null) {
             mAdapter.moveUp();
-            mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
             return;
         }
 
@@ -323,7 +312,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         } else {
             mAdapter.setChildAsCurrent(position);
         }
-        mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
     }
 
     private void startONScripter(String path) {
