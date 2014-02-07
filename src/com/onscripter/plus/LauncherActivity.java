@@ -8,11 +8,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -40,11 +42,15 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
     private FontFileCopyTask mCopyTask = null;
+    private FolderBrowserDialogWrapper mDirBrowse = null;
+    private SharedPreferences mPrefs = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mDirBrowse = new FolderBrowserDialogWrapper(this);
         mDialog = new AlertDialog.Builder(this);
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         File directory = null;
         String lastDirectory = null;
@@ -63,6 +69,9 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         // Set up the listView and the adapter
         try {
             mAdapter = new FileSystemAdapter(this, directory, true, false, false, this);
+            if (isFileAtLowerBound(mAdapter.getCurrentDirectory())) {
+                mAdapter.showBackListItem(false);
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -83,6 +92,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             mCopyTask.setCancelable(false);
             mCopyTask.execute();
         }
+
+        createDirectoryBrowserDialog();
     }
 
     @Override
@@ -91,23 +102,40 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         outState.putString(LAST_DIRECTORY, mAdapter.getCurrentDirectoryPath());
     }
 
+    private void createDirectoryBrowserDialog() {
+        AlertDialog.Builder builder = new Builder(this);
+        builder.setView(mDirBrowse.getDialogLayout());
+        builder.setTitle(R.string.settings_folder_default_title);
+        builder.setPositiveButton(R.string.dialog_select_button_text, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Editor editor = mPrefs.edit();
+                String path = mDirBrowse.getResultDirectory().getPath();
+                editor.putString(getString(R.string.settings_folder_default_key), path);
+                editor.commit();
+                setPath(path);
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, null);
+        mDirBrowse.setDialog(builder.create());
+    }
+
     private File getStartingDirectory() {
         // Detect folder location if none is provided
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String defaultDirPref = getString(R.string.settings_folder_default_key);
-        String path = sp.getString(defaultDirPref, null);
+        String path = mPrefs.getString(defaultDirPref, null);
         if (path == null) {
             // Check to see if there is a <internal storage>/ons
             File onsDefaultDir = new File(Environment.getExternalStorageDirectory() + "/ons");
             if (onsDefaultDir.exists()) {
                 path = onsDefaultDir.getPath();
-                sp.edit().putString(defaultDirPref, path).commit();
+                mPrefs.edit().putString(defaultDirPref, path).commit();
             } else if (Environment2.hasExternalSDCard()) {
                 // Check to see if there is a <extSdCard storage>/ons
                 onsDefaultDir = new File(Environment2.getExternalSDCardDirectory() + "/ons");
                 if (onsDefaultDir.exists()) {
                     path = onsDefaultDir.getPath();
-                    sp.edit().putString(defaultDirPref, path).commit();
+                    mPrefs.edit().putString(defaultDirPref, path).commit();
                 }
             }
         }
@@ -133,10 +161,23 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             Intent i = new Intent(this, Settings.class);
             startActivityForResult(i, REQUEST_CODE_SETTINGS);
             break;
+        case R.id.action_change_folder:
+            mDirBrowse.show(mAdapter.getCurrentDirectoryPath());
+            break;
         default:
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    protected void setPath(String path) {
+        String currentPath = mAdapter.getCurrentDirectoryPath();
+        if (path != null && path != currentPath) {
+            File dir = new File(path);
+            mAdapter.setCurrentDirectory(dir);
+            currentPath = path;
+            mAdapter.showBackListItem(!isFileAtLowerBound(mAdapter.getCurrentDirectory()));
+        }
     }
 
     @Override
@@ -144,14 +185,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
         case REQUEST_CODE_SETTINGS:
-            SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-            String path = sp.getString(getString(R.string.settings_folder_default_key), null);
-            String currentPath = mAdapter.getCurrentDirectoryPath();
-            if (path != null && path != currentPath) {
-                File dir = new File(path);
-                mAdapter.setCurrentDirectory(dir);
-                currentPath = path;
-            }
+            String path = mPrefs.getString(getString(R.string.settings_folder_default_key), null);
+            setPath(path);
             break;
         }
     }

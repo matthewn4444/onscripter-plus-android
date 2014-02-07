@@ -22,7 +22,7 @@
             android:entryValues="@array/settings_controls_swipe_entries"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_folder_cate">
-        <com.onscripter.plus.FolderBrowserDialog
+        <com.onscripter.plus.FolderBrowserDialogPreference
             android:summary="@string/settings_folder_default_summary"
             android:key="@string/settings_folder_default_key"
             android:title="@string/settings_folder_default_title"/>

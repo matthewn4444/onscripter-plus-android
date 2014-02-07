@@ -44,6 +44,7 @@
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
+    <string name="menu_action_change_folder">Change Folder</string>
 
     <!-- Settings -->
     <string name="settings_render_cate">Render</string>

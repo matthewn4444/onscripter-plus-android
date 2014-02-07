@@ -29,7 +29,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class FolderBrowserDialog extends DialogPreference implements OnItemClickListener, OnKeyListener, OnClickListener {
+public class FolderBrowserDialogPreference extends DialogPreference implements OnItemClickListener, OnKeyListener, OnClickListener {
     private final LinearLayout mLayout;
     private final ListView mListView;
     private FileSystemAdapter mAdapter;
@@ -44,11 +44,11 @@ public class FolderBrowserDialog extends DialogPreference implements OnItemClick
     private static File InternalStorage;
     private static File ExternalStorage;
 
-    public FolderBrowserDialog(Context context, AttributeSet attrs) {
+    public FolderBrowserDialogPreference(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public FolderBrowserDialog(Context context, AttributeSet attrs, int defStyle) {
+    public FolderBrowserDialogPreference(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         mCtx = context;
         setPositiveButtonText(R.string.dialog_select_button_text);

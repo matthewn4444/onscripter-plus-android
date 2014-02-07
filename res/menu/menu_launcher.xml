@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+     <item
+        android:id="@+id/action_change_folder"
+        android:showAsAction="always"
+        android:orderInCategory="99"
+        android:icon="@drawable/ic_menu_change_folder"
+        android:title="@string/menu_action_change_folder"/>
     <item 
         android:id="@+id/action_settings"
         android:showAsAction="always"
