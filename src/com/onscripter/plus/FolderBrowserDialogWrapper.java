@@ -88,7 +88,10 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         return mAdapter.getCurrentDirectory();
     }
 
-    private void setupDirectories(String path) {
+    public void setupDirectories(String path) {
+        if (mDialog == null) {
+            throw new NullPointerException("Did not run setDialog() before showing.");
+        }
         // Detect if External sdcard is available, if not then remove the sdcard button and adjust the layout
         final LinearLayout.LayoutParams textLayout = (LinearLayout.LayoutParams) mPathText.getLayoutParams();
         if (ExternalStorage != null) {
