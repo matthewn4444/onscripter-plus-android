@@ -23,6 +23,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.OnTabChangeListener;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnSeekBarChangeListener, OnTabChangeListener {
     private final AlertDialog mDialog;
@@ -103,7 +104,16 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mUpScalingScroller.setOnSeekBarChangeListener(this);
 
         // Set the font family
-        mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
+        try {
+            mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
+        } catch (RuntimeException e) {
+            // Cannot read the font file, then set the default one
+            e.printStackTrace();
+            Toast.makeText(activity, R.string.message_read_font_error, Toast.LENGTH_SHORT).show();
+            if (!fontPath.equals(LauncherActivity.DEFAULT_FONT_PATH)) {
+                mUpScalingText.setTypeface(Typeface.createFromFile(LauncherActivity.DEFAULT_FONT_PATH));
+            }
+        }
         onProgressChanged(mUpScalingScroller, 0, true);
     }
 
