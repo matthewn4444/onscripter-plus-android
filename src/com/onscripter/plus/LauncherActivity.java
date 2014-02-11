@@ -235,7 +235,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                          file.getName().equals("nscript.dat")));
             }
         });
-        return mDirectoryFiles.length > 0;
+        return mDirectoryFiles != null && mDirectoryFiles.length > 0;
     }
 
     protected void goToActivity(Class<?> cls) {
