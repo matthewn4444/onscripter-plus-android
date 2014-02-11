@@ -25,6 +25,8 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnSeekBarChangeListener, OnTabChangeListener {
     private final AlertDialog mDialog;
     private final ONScripter mActivity;
@@ -110,6 +112,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
             // Cannot read the font file, then set the default one
             e.printStackTrace();
             Toast.makeText(activity, R.string.message_read_font_error, Toast.LENGTH_SHORT).show();
+            BugSenseHandler.sendExceptionMessage("Font path", fontPath, e);
             if (!fontPath.equals(LauncherActivity.DEFAULT_FONT_PATH)) {
                 mUpScalingText.setTypeface(Typeface.createFromFile(LauncherActivity.DEFAULT_FONT_PATH));
             }
