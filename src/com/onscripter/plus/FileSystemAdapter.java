@@ -232,7 +232,9 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
             }
             index--;
         }
-        setCurrentDirectory(mFileList[index]);
+        if (index < mFileList.length) {
+            setCurrentDirectory(mFileList[index]);
+        }
     }
 
     public boolean setCurrentDirectory(File currentDirectory) {
