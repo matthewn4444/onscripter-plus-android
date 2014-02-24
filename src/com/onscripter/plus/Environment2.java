@@ -66,10 +66,14 @@ public final class Environment2 {
         InternalStorageFile = Environment.getExternalStorageDirectory();
         for (int i = 0; i < EXTERNAL_SD_DIR.length; i++) {
             File file = new File(EXTERNAL_SD_DIR[i]);
-            if (file.exists() && !file.equals(InternalStorageFile)      // Directory must exist and not be internal memory
-                    && file.length() > 0 && file.list().length > 0) {   // Directory also must have space and files
-                ExternalSDCardStorageFile = file;
-                break;
+            if (file != null && file.exists() && !file.equals(InternalStorageFile)      // Directory must exist and not be internal memory
+                    && file.length() > 0) {
+                // Directory also must have space and files
+                String[] fileList = file.list();
+                if (fileList != null && fileList.length > 0) {
+                    ExternalSDCardStorageFile = file;
+                    break;
+                }
             }
         }
         HasScanned = true;
