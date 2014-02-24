@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -94,6 +95,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mAdapter.onlyShowFolders(true);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
+        listView.setBackgroundColor(Color.WHITE);
         setContentView(listView);
 
         // Copy the font file if it does not exist yet
