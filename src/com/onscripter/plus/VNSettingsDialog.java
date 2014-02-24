@@ -1,5 +1,7 @@
 package com.onscripter.plus;
 
+import java.io.File;
+
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -105,16 +107,18 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mDisplayControlsChkbx.setOnClickListener(this);
         mUpScalingScroller.setOnSeekBarChangeListener(this);
 
-        // Set the font family
-        try {
-            mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
-        } catch (RuntimeException e) {
-            // Cannot read the font file, then set the default one
-            e.printStackTrace();
-            Toast.makeText(activity, R.string.message_read_font_error, Toast.LENGTH_SHORT).show();
-            BugSenseHandler.sendExceptionMessage("Font path", fontPath, e);
-            if (!fontPath.equals(LauncherActivity.DEFAULT_FONT_PATH)) {
-                mUpScalingText.setTypeface(Typeface.createFromFile(LauncherActivity.DEFAULT_FONT_PATH));
+        // Set the font family only if it exists, most of the time it will work, some people will fail
+        if (new File(fontPath).exists()) {
+            try {
+                mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
+            } catch (RuntimeException e) {
+                // Cannot read the font file, then set the default one
+                e.printStackTrace();
+                Toast.makeText(activity, R.string.message_read_font_error, Toast.LENGTH_SHORT).show();
+                BugSenseHandler.sendExceptionMessage("Font path", fontPath, e);
+                if (!fontPath.equals(LauncherActivity.DEFAULT_FONT_PATH)) {
+                    mUpScalingText.setTypeface(Typeface.createFromFile(LauncherActivity.DEFAULT_FONT_PATH));
+                }
             }
         }
         onProgressChanged(mUpScalingScroller, 0, true);
