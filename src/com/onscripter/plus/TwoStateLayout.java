@@ -3,7 +3,6 @@ package com.onscripter.plus;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.AttributeSet;
@@ -101,19 +100,7 @@ public class TwoStateLayout extends ViewGroup {
         int orientation = ta.getInt(R.styleable.TwoStateLayout_orientation, 0) == 0 ?
                 LinearLayout.VERTICAL : LinearLayout.HORIZONTAL;
         mLayout.setOrientation(orientation);
-
-        try {
-            // Set the background color
-            if (getBackground() instanceof ColorDrawable) {
-                mLayout.setBackgroundColor(((ColorDrawable) getBackground()).getColor());
-                setBackgroundColor(Color.TRANSPARENT);
-            } else {
-                mLayout.setBackgroundDrawable(getBackground());
-                setBackgroundDrawable(null);
-            }
-        } catch (Exception e) {
-            mLayout.setBackgroundColor(Color.BLACK);        // Hack work around for some errors
-        }
+        mLayout.setBackgroundColor(Color.BLACK);
 
         // This is hardcoded
         if (orientation == LinearLayout.VERTICAL) {
