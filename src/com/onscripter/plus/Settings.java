@@ -1,5 +1,6 @@
 package com.onscripter.plus;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -13,6 +14,7 @@ public final class Settings extends SherlockPreferenceActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.menu_action_settings);
         addPreferencesFromResource(R.xml.settings);
+        getListView().setBackgroundColor(Color.WHITE);
     }
 
     @Override
