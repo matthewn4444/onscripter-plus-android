@@ -73,13 +73,13 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
 void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], bool shadow_flag, AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
 {
     unsigned short unicode;
-    if (IS_TWO_BYTE(text[0])){
+    if (IS_UTF8(text[0])){
+        unicode = decodeUTF8Character(text, NULL);
+    }
+    else if (IS_TWO_BYTE(text[0])){
         unsigned index = ((unsigned char*)text)[0];
         index = index << 8 | ((unsigned char*)text)[1];
         unicode = convSJIS2UTF16( index );
-    }
-    else if (IS_UTF8(text[0])){
-        unicode = decodeUTF8Character(text, NULL);
     }
     else{
         if ((text[0] & 0xe0) == 0xa0 || (text[0] & 0xe0) == 0xc0) unicode = ((unsigned char*)text)[0] - 0xa0 + 0xff60;
@@ -211,8 +211,11 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     info->old_xy[0] = info->x();
     info->old_xy[1] = info->y();
 
-    char text2[2] = {text[0], 0};
-    if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])) text2[1] = text[1];
+    char text2[3] = {text[0], 0, 0};
+    if (IS_UTF8(text[0])) {
+        text2[1] = text[1];
+        text2[2] = text[2];
+    } else if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
@@ -316,7 +319,6 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             }
         }
 #endif
-
         if ( IS_TWO_BYTE(*str) ){
             if ( checkLineBreak( str, info ) ){
                 info->newLine();
@@ -326,6 +328,9 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
 
             text[0] = *str++;
             text[1] = *str++;
+            if (IS_UTF8(text[0])) {
+                text[2] = *str++;
+            }
             drawChar( text, info, false, false, surface, cache_info );
         }
         else if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
@@ -877,6 +882,10 @@ bool ONScripter::processText()
         out_text[0] = script_h.getStringBuffer()[string_buffer_offset];
         out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
 
+        if (IS_UTF8(ch)) {
+            out_text[2] = script_h.getStringBuffer()[string_buffer_offset + 2];
+        }
+
         if (script_h.checkClickstr(&script_h.getStringBuffer()[string_buffer_offset]) > 0){
             if (sentence_font.getRemainingLine() <= clickstr_line)
                 return clickNewPage( out_text );
@@ -886,7 +895,7 @@ bool ONScripter::processText()
         else{
             clickstr_state = CLICK_NONE;
         }
-        
+
         if ( skip_mode || ctrl_pressed_status ){
             drawChar( out_text, &sentence_font, false, true, accumulation_surface, &text_info );
         }
@@ -899,9 +908,14 @@ bool ONScripter::processText()
             else
                 waitEvent( sentence_font.wait_time );
         }
-        
+
         num_chars_in_sentence++;
-        string_buffer_offset += 2;
+
+        if (IS_UTF8(ch)) {
+            string_buffer_offset += UTF8ByteLength(ch);
+        } else {
+            string_buffer_offset += 2;
+        }
 
         return true;
     }
