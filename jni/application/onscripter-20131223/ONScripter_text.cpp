@@ -21,6 +21,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "utf8_decode.h"
 #include "ONScripter.h"
 
 extern unsigned short convSJIS2UTF16( unsigned short in );
@@ -76,6 +77,9 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
         unsigned index = ((unsigned char*)text)[0];
         index = index << 8 | ((unsigned char*)text)[1];
         unicode = convSJIS2UTF16( index );
+    }
+    else if (IS_UTF8(text[0])){
+        unicode = decodeUTF8Character(text, NULL);
     }
     else{
         if ((text[0] & 0xe0) == 0xa0 || (text[0] & 0xe0) == 0xc0) unicode = ((unsigned char*)text)[0] - 0xa0 + 0xff60;
@@ -208,7 +212,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     info->old_xy[1] = info->y();
 
     char text2[2] = {text[0], 0};
-    if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
+    if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])) text2[1] = text[1];
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
@@ -234,7 +238,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
             flushDirect( dst_rect, REFRESH_NONE_MODE );
         }
 
-        if (IS_TWO_BYTE(text[0])){
+        if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])){
             info->advanceCharInHankaku(2);
             break;
         }
@@ -857,6 +861,7 @@ bool ONScripter::processText()
     new_line_skip_flag = false;
     
     char ch = script_h.getStringBuffer()[string_buffer_offset];
+
     if ( IS_TWO_BYTE(ch) ){ // Shift jis
         /* ---------------------------------------- */
         /* Kinsoku process */
@@ -1080,6 +1085,12 @@ bool ONScripter::processText()
             num_chars_in_sentence++;
         }
         else if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
+            // Handle UTF8
+            if (IS_UTF8(ch)) {
+                out_text[1] = script_h.getStringBuffer()[string_buffer_offset + 1];
+                string_buffer_offset += UTF8ByteLength(ch) - 1;
+            }
+
 #ifdef ENABLE_ENGLISH
             // Scan text for next whitespace to break on if at the end
             bool newLineEarly = false;
@@ -1108,6 +1119,7 @@ bool ONScripter::processText()
                     current_page->add(' ');
                 }
             }
+
             if (!newLineEarly)
 #endif
             drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
