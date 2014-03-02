@@ -72,6 +72,11 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         String lastDirectory = null;
         if (savedInstanceState != null) {
             lastDirectory = savedInstanceState.getString(LAST_DIRECTORY);
+
+            // Check if the last directory exists
+            if (lastDirectory != null && !(new File(lastDirectory).exists())) {
+                lastDirectory = null;
+            }
         }
         if (lastDirectory == null) {
             directory = getStartingDirectory();
