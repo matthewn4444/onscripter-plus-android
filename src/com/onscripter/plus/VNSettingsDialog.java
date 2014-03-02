@@ -108,7 +108,10 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mUpScalingScroller.setOnSeekBarChangeListener(this);
 
         // Set the font family only if it exists, most of the time it will work, some people will fail
-        if (new File(fontPath).exists()) {
+        if (fontPath == null) {
+            fontPath = LauncherActivity.DEFAULT_FONT_PATH;
+        }
+        if (fontPath != null && new File(fontPath).exists()) {
             try {
                 mUpScalingText.setTypeface(Typeface.createFromFile(fontPath));
             } catch (RuntimeException e) {
