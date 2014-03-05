@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">온스크립터 플러스</string>
+
+    <bool name="render_font_outline">true</bool>
+    <string name="directory_back">(뒤로가기)</string>
+    <string name="dialog_quit_button">종료</string>
+
+    <!-- Messages -->
+    <string name="message_cannot_find_internal_storage">내장 메모리를 찾을 수 없습니다. 무언가 잘못 되었습니다!</string>
+    <string name="message_loading_fonts">&#8230;폰트 로딩중</string>
+    <string name="message_asset_not_found">default.ttf 파일을 찾을 수 없습니다!</string>
+    <string name="message_private_dir_not_found">디렉토리를 찾을 수 없습니다!</string>
+    <string name="message_internal_write_error">내장 메모리로 폰트를 옮길 수 없습니다!</string>
+    <string name="message_read_font_error">폰트를 읽을 수 없습니다!</string>
+
+    <!-- ActionBar -->
+    <string name="menu_action_settings">설정</string>
+    <string name="menu_action_change_folder">폴더 바꾸기</string>
+
+    <!-- Settings -->
+    <string name="settings_render_cate">렌더</string>
+    <string name="settings_render_font_outline_summary">글자를 읽기 쉽게 윤곽선을 그립니다.</string>
+    <string name="settings_render_font_outline_title">글자에 윤곽선 그리기.</string>
+
+    <string name="settings_controls_cate">버튼</string>
+    <string name="settings_controls_display_summary">스와이프 하기 전까지 버튼을 숨깁니다.</string>
+    <string name="settings_controls_display_title">버튼을 표시하기 위한 제스처.</string>
+    <string name="settings_controls_swipe_summary">제스처로 숨겨진 버튼을 불러옵니다.</string>
+    <string name="settings_controls_swipe_title">스와이프 제스처</string>
+
+    <string name="settings_folder_cate">폴더</string>
+    <string name="settings_folder_default_summary">게임이 들어있는 기본 폴더를 설정합니다.</string>
+    <string name="settings_folder_default_title">기본 폴더 설정</string>
+
+    <string name="settings_about_cate">어플에 대하여</string>
+    <string name="settings_about_author_header">제작자:</string>
+    <string name="settings_about_og_author_header">Studio O.G.A.:</string>
+    <string name="settings_about_version_header">버전:</string>
+    <string name="settings_about_github_header">웹사이트:</string>
+    <string name="settings_about_summary">이 어플리케이션 소스는 무료입니다. 만약 이 코드를 사용하고자 한다면, Studio O.G.A. Ogapee 와 Matthew Ng에게 연락해주시길 바랍니다.</string>
+    <string name="settings_about_thanks_text">Studio O.G.A. Ogapee (오리지널 제작자)에게 이 어플과 소스를 제공한 것에 대해 감사를 표합니다.\n이 어플을 한글로 번역해주신 MadZun에게 감사를 표합니다.\n(http://madzun.blog.me)</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_folder_title">폴더 고르기</string>
+    <string name="dialog_select_button_text">선택</string>
+    <string name="dialog_sd_card_text">SD 카드로 가기</string>
+    <string name="dialog_interal_storage_text">내장 메모리로 가기</string>
+
+    <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_global">이 설정은 모든 게임에서 기본으로 설정됩니다.</string>
+    <string name="settings_controls_swipe_default_entry">양쪽에서 밀기</string>
+    <string-array name="settings_controls_swipe_entries">
+        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>왼쪽에서 밀기</item>
+        <item>오른쪽에서 밀기</item>
+    </string-array>
+
+    <string name="dialog_settings_text_upscaling">글자 크기를 고정시킵니다.</string>
+    <string name="dialog_settings_text_upscaling_scale">글자 크기:</string>
+    <string name="dialog_settings_text_upscaling_text">한국어 日本語</string>
+</resources>
