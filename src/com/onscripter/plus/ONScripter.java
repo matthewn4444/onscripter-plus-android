@@ -200,6 +200,11 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
                     break;
                 }
             }
+            // If it did not find the correct value, we will default to 0
+            if (index == -1) {
+                mPrefs.edit().putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_ENTRIES[0]).commit();
+                index = 0;
+            }
             switch(index) {
             case 0:     // All
                 mAllowLeftBezelSwipe = true;
