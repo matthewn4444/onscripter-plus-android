@@ -29,6 +29,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private final Context mCtx;
     private final TextView mPathText;
     private final Button mTogglePath;
+    private final TextView mExternalNotFoundText;
     private Dialog mDialog;
     private boolean isInInternalStorage;
 
@@ -46,6 +47,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         mLayout = (LinearLayout) inflater.inflate(R.layout.folder_browser_dialog, null);
         mListView = (ListView) mLayout.findViewById(R.id.list);
         mPathText = (TextView) mLayout.findViewById(R.id.path);
+        mExternalNotFoundText = (TextView) mLayout.findViewById(R.id.extNotFound);
         mTogglePath = (Button) mLayout.findViewById(R.id.toggleLocation);
         mListView.setOnItemClickListener(this);
         mTogglePath.setOnClickListener(new View.OnClickListener() {
@@ -63,6 +65,9 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         if (InternalStorage == null) {
             InternalStorage = Environment.getExternalStorageDirectory();
             ExternalStorage = Environment2.getExternalSDCardDirectory();
+        }
+        if (ExternalStorage != null || mCtx.getString(R.string.dialog_ext_not_found).equals("")) {
+            mExternalNotFoundText.setVisibility(View.GONE);
         }
     }
 
