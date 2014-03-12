@@ -4,7 +4,13 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := application
 
-APP_SUBDIR := $(firstword $(patsubst $(LOCAL_PATH)/%, %, $(shell C:\Programming\cygwin64\bin\find $(LOCAL_PATH)/onscripter* -type d)))
+ifeq ($(OS),Windows_NT)
+FIND = $(CYGWIN_HOME)/find
+else
+FIND = find
+endif
+
+APP_SUBDIR := $(firstword $(patsubst $(LOCAL_PATH)/%, %, $(shell $(FIND) $(LOCAL_PATH)/onscripter* -type d)))
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/$(APP_SUBDIR) \
 	$(LOCAL_PATH)/.. \

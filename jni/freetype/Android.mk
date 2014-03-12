@@ -4,7 +4,13 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := freetype
 
-APP_SUBDIRS := $(patsubst $(LOCAL_PATH)/%, %, $(shell C:\Programming\cygwin64\bin\find $(LOCAL_PATH)/src -type d))
+ifeq ($(OS),Windows_NT)
+FIND = $(CYGWIN_HOME)/find
+else
+FIND = find
+endif
+
+APP_SUBDIRS := $(patsubst $(LOCAL_PATH)/%, %, $(shell $(FIND) $(LOCAL_PATH)/src -type d))
 
 # Add more subdirs here, like src/subdir1 src/subdir2
 
