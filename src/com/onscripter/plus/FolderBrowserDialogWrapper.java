@@ -135,6 +135,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
             mAdapter = new FileSystemAdapter(mCtx, openDir, true, true);
             mAdapter.addLowerBoundFile(InternalStorage);
             mAdapter.addLowerBoundFile(ExternalStorage);
+            mAdapter.refresh();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             mDialog.dismiss();
