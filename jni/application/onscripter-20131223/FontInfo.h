@@ -88,6 +88,10 @@ public:
     void advanceCharInHankaku(int offest);
     void addLineOffset(int margin);
     void setRubyOnFlag(bool flag);
+#ifdef ANDROID
+    void setFontParametersForScaling(int sizeX, int sizeY, double scale);
+    void updateFontScaling(double scale);
+#endif
 
     SDL_Rect calcUpdatedArea(int start_xy[2], int ratio1, int ratio2);
     void addShadeArea(SDL_Rect &rect, int dx, int dy, int dw, int dh);
