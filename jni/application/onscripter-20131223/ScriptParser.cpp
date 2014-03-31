@@ -218,8 +218,12 @@ void ScriptParser::reset()
 
     /* ---------------------------------------- */
     /* Dialog related variables */
+#if ANDROID
+    dialog_font.setFontParametersForScaling(DEFAULT_DIALOG_FONT_SIZE, DEFAULT_DIALOG_FONT_SIZE, 1);
+#else
     dialog_font.font_size_xy[0] = DEFAULT_DIALOG_FONT_SIZE;
     dialog_font.font_size_xy[1] = DEFAULT_DIALOG_FONT_SIZE;
+#endif
     dialog_font.pitch_xy[0] = dialog_font.font_size_xy[0];
     dialog_font.pitch_xy[1] = 2 + dialog_font.font_size_xy[1];
     dialog_font.is_bold = false;
