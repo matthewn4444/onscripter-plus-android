@@ -615,8 +615,12 @@ int ScriptParser::menusetwindowCommand()
 {
     menu_font.ttf_font[0]     = NULL;
     menu_font.ttf_font[1]     = NULL;
+#if ANDROID
+    menu_font.setFontParametersForScaling(script_h.readInt(), script_h.readInt(), 1);
+#else
     menu_font.font_size_xy[0] = script_h.readInt();
     menu_font.font_size_xy[1] = script_h.readInt();
+#endif
     menu_font.pitch_xy[0]     = script_h.readInt() + menu_font.font_size_xy[0];
     menu_font.pitch_xy[1]     = script_h.readInt() + menu_font.font_size_xy[1];
     menu_font.is_bold         = script_h.readInt()?true:false;
