@@ -629,7 +629,7 @@ void ONScripter::setwindowCore()
     sentence_font.num_xy[0] = script_h.readInt();
     sentence_font.num_xy[1] = script_h.readInt();
 #if ANDROID
-    setSentenceFontParamters(script_h.readInt(), script_h.readInt(), sentence_font.num_xy[0], sentence_font.num_xy[1]);
+    setSentenceFontParamters(script_h.readInt(), script_h.readInt());
 #else
     sentence_font.font_size_xy[0] = script_h.readInt();
     sentence_font.font_size_xy[1] = script_h.readInt();

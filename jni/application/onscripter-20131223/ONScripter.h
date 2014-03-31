@@ -433,22 +433,12 @@ private:
     int  getNumberFromBuffer( const char **buf );
 
 #ifdef ANDROID
-    void setSentenceFontParamters(int sizeX, int sizeY, int numX, int numY) {
-        sentence_font.og_font_size_xy[0] = sizeX;
-        sentence_font.og_font_size_xy[1] = sizeY;
-        sentence_font.og_num_xy[0] = numX;
-        sentence_font.og_num_xy[1] = numY;
-        updateSentenceFontSizes();
+    void setSentenceFontParamters(int sizeX, int sizeY) {
+        sentence_font.setFontParametersForScaling(sizeX, sizeY, Sentence_font_scale);
     }
 
     void updateSentenceFontSizes() {
-        sentence_font.font_size_xy[0] = floor(sentence_font.og_font_size_xy[0] * Sentence_font_scale);
-        sentence_font.font_size_xy[1] = floor(sentence_font.og_font_size_xy[1] * Sentence_font_scale);
-        sentence_font.pitch_xy[0] = sentence_font.font_size_xy[0];
-        sentence_font.pitch_xy[1] = sentence_font.font_size_xy[1];
-        sentence_font.display_width = sentence_font.og_num_xy[0] * sentence_font.og_font_size_xy[0];
-        sentence_font.num_xy[0] = floor(sentence_font.display_width / sentence_font.font_size_xy[0]);
-        sentence_font.num_xy[1] = ceil(1.0 * sentence_font.og_num_xy[0] * sentence_font.og_num_xy[1] / sentence_font.num_xy[0]);
+        sentence_font.updateFontScaling(Sentence_font_scale);
     }
 
     void reassureSentenceFontSize() {

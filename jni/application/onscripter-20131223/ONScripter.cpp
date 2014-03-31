@@ -630,7 +630,7 @@ void ONScripter::resetSentenceFont()
 {
     sentence_font.reset();
 #if ANDROID
-    setSentenceFontParamters(DEFAULT_FONT_SIZE, DEFAULT_FONT_SIZE, sentence_font.num_xy[0], sentence_font.num_xy[1]);
+    setSentenceFontParamters(DEFAULT_FONT_SIZE, DEFAULT_FONT_SIZE);
 #else
     sentence_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
     sentence_font.font_size_xy[1] = DEFAULT_FONT_SIZE;

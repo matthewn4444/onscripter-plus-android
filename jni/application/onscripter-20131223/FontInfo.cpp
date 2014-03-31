@@ -256,6 +256,26 @@ void FontInfo::addLineOffset(int offset)
     line_offset_xy[tateyoko_mode] += offset;
 }
 
+#ifdef ANDROID
+void FontInfo::setFontParametersForScaling(int sizeX, int sizeY, double scale) {
+    og_font_size_xy[0] = sizeX;
+    og_font_size_xy[1] = sizeY;
+    og_num_xy[0] = num_xy[0];
+    og_num_xy[1] = num_xy[1];
+    updateFontScaling(scale);
+}
+
+void FontInfo::updateFontScaling(double scale) {
+    font_size_xy[0] = floor(og_font_size_xy[0] * scale);
+    font_size_xy[1] = floor(og_font_size_xy[1] * scale);
+    pitch_xy[0] = font_size_xy[0];
+    pitch_xy[1] = font_size_xy[1];
+    display_width = og_num_xy[0] * og_font_size_xy[0];
+    num_xy[0] = floor(display_width / font_size_xy[0]);
+    num_xy[1] = ceil(1.0 * og_num_xy[0] * og_num_xy[1] / num_xy[0]);
+}
+#endif
+
 SDL_Rect FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
 {
     SDL_Rect rect;
