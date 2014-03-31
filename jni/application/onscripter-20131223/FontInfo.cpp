@@ -274,6 +274,12 @@ void FontInfo::updateFontScaling(double scale) {
     num_xy[0] = floor(display_width / font_size_xy[0]);
     num_xy[1] = ceil(1.0 * og_num_xy[0] * og_num_xy[1] / num_xy[0]);
 }
+
+void FontInfo::updateFontScaling(int numX, int numY, double scale) {
+    og_num_xy[0] = numX;
+    og_num_xy[1] = numY;
+    updateFontScaling(scale);
+}
 #endif
 
 SDL_Rect FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)

@@ -91,6 +91,7 @@ public:
 #ifdef ANDROID
     void setFontParametersForScaling(int sizeX, int sizeY, double scale);
     void updateFontScaling(double scale);
+    void updateFontScaling(int numX, int numY, double scale);
 #endif
 
     SDL_Rect calcUpdatedArea(int start_xy[2], int ratio1, int ratio2);
