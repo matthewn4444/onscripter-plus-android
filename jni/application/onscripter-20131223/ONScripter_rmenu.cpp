@@ -263,9 +263,12 @@ bool ONScripter::executeSystemLoad()
     current_font = &menu_font;
 
     text_info.fill( 0, 0, 0, 0 );
-        
+
     menu_font.num_xy[0] = (strlen(save_item_name)+1)/2+2+13;
     menu_font.num_xy[1] = num_save_file+2;
+#if ANDROID
+    menu_font.updateFontScaling(menu_font.num_xy[0], menu_font.num_xy[1], 1);
+#endif
     menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 - menu_font.num_xy[0] * menu_font.pitch_xy[0]) / 2;
     menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1  - menu_font.num_xy[1] * menu_font.pitch_xy[1]) / 2;
     menu_font.setXY( (menu_font.num_xy[0] - strlen( load_menu_name ) / 2) / 2, 0 );
@@ -368,6 +371,9 @@ void ONScripter::executeSystemSave()
 
     menu_font.num_xy[0] = (strlen(save_item_name)+1)/2+2+13;
     menu_font.num_xy[1] = num_save_file+2;
+#if ANDROID
+    menu_font.updateFontScaling(menu_font.num_xy[0], menu_font.num_xy[1], 1);
+#endif
     menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 - menu_font.num_xy[0] * menu_font.pitch_xy[0]) / 2;
     menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1  - menu_font.num_xy[1] * menu_font.pitch_xy[1]) / 2;
     menu_font.setXY((menu_font.num_xy[0] - strlen( save_menu_name ) / 2 ) / 2, 0);
@@ -460,6 +466,9 @@ bool ONScripter::executeSystemYesNo( int caller, int file_no )
         
     menu_font.num_xy[0] = strlen(name)/2;
     menu_font.num_xy[1] = 3;
+#if ANDROID
+    menu_font.updateFontScaling(menu_font.num_xy[0], menu_font.num_xy[1], 1);
+#endif
     menu_font.top_xy[0] = (screen_width * screen_ratio2 / screen_ratio1 - menu_font.num_xy[0] * menu_font.pitch_xy[0]) / 2;
     menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1  - menu_font.num_xy[1] * menu_font.pitch_xy[1]) / 2;
     menu_font.setXY(0, 0);

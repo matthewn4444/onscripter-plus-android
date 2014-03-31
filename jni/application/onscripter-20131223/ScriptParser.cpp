@@ -204,12 +204,17 @@ void ScriptParser::reset()
 
     /* ---------------------------------------- */
     /* Menu related variables */
-    menu_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
-    menu_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
     menu_font.top_xy[0] = 0;
     menu_font.top_xy[1] = 16;
+#if ANDROID
+    menu_font.setFontParametersForScaling(DEFAULT_FONT_SIZE, DEFAULT_FONT_SIZE, 1);
+    menu_font.updateFontScaling(32, 23, 1);
+#else
+    menu_font.font_size_xy[0] = DEFAULT_FONT_SIZE;
+    menu_font.font_size_xy[1] = DEFAULT_FONT_SIZE;
     menu_font.num_xy[0] = 32;
     menu_font.num_xy[1] = 23;
+#endif
     menu_font.pitch_xy[0] = menu_font.font_size_xy[0];
     menu_font.pitch_xy[1] = 2 + menu_font.font_size_xy[1];
     menu_font.window_color[0] = menu_font.window_color[1] = menu_font.window_color[2] = 0xcc;
