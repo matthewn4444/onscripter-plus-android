@@ -682,8 +682,14 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
     uchar3 col3={0, 0, 0};
     dialog_font.top_xy[0] = 7;
     dialog_font.top_xy[1] = DIALOG_HEADER+5;
+#if ANDROID
+    dialog_font.og_num_xy[0] = (DIALOG_W-7*2)/dialog_font.pitch_xy[0];
+    dialog_font.og_num_xy[1] = 3;
+    dialog_font.updateFontScaling(1);
+#else
     dialog_font.num_xy[0] = (DIALOG_W-7*2)/dialog_font.pitch_xy[0];
     dialog_font.num_xy[1] = 3;
+#endif
     dialog_font.clear();
     drawString( mes1, col3, &dialog_font, false, s2, NULL, NULL );
 
