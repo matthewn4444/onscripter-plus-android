@@ -532,13 +532,18 @@ int ONScripter::splitCommand()
     const char *save_buf = script_h.saveStringBuffer();
     
     char delimiter = script_h.readStr()[0];
-
     char token[256];
     while( script_h.getEndStatus() & ScriptHandler::END_COMMA ){
 
         unsigned int c=0;
         while(save_buf[c] != delimiter && save_buf[c] != '\0'){
-            if (IS_TWO_BYTE(save_buf[c]))
+            unsigned short index = save_buf[c + 1] != '\0' && save_buf[c + 1] != '\\' ?
+                (save_buf[c] & 0xFF) << 8 ^ save_buf[c + 1] & 0xFF : 0;
+            if (IS_TWO_BYTE(save_buf[c])
+#ifdef ENABLE_KOREAN
+                || IS_KOR(index)
+#endif
+            )
                 c += 2;
             else
                 c++;
