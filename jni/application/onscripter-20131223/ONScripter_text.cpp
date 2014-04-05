@@ -24,6 +24,10 @@
 #include "utf8_decode.h"
 #include "ONScripter.h"
 
+#ifdef ENABLE_KOREAN
+extern unsigned short convKOR2UTF16(unsigned short code);
+#endif
+
 extern unsigned short convSJIS2UTF16( unsigned short in );
 
 #define IS_ROTATION_REQUIRED(x)	\
@@ -73,12 +77,17 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
 void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], bool shadow_flag, AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
 {
     unsigned short unicode;
+    unsigned index = ((unsigned char*)text)[0];
+    index = index << 8 | ((unsigned char*)text)[1];
+#ifdef ENABLE_KOREAN
+    if (draw_korean_flag && IS_KOR(index)) {
+		unicode = convKOR2UTF16( index );
+    } else
+#endif
     if (IS_UTF8(text[0])){
         unicode = decodeUTF8Character(text, NULL);
     }
     else if (IS_TWO_BYTE(text[0])){
-        unsigned index = ((unsigned char*)text)[0];
-        index = index << 8 | ((unsigned char*)text)[1];
         unicode = convSJIS2UTF16( index );
     }
     else{
@@ -201,8 +210,18 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
+            #ifdef ENABLE_KOREAN
+                if (draw_korean_flag) {
+                    current_page->add(((char*)"°°")[0]);
+                    current_page->add(((char*)"°°")[1]);
+                } else {
+                    current_page->add(0x81);
+                    current_page->add(0x40);
+                }
+            #else
                 current_page->add(0x81);
                 current_page->add(0x40);
+            #endif
             }
             info->advanceCharInHankaku(2);
         }
@@ -216,6 +235,11 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         text2[1] = text[1];
         text2[2] = text[2];
     } else if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
+
+#ifdef ENABLE_KOREAN
+    unsigned short index = (text[0] & 0xFF) << 8 ^ text[1] & 0xFF;
+    if (IS_KOR(index)) text2[1] = text[1];
+#endif
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
@@ -241,7 +265,11 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
             flushDirect( dst_rect, REFRESH_NONE_MODE );
         }
 
-        if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])){
+        if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])
+#ifdef ENABLE_KOREAN
+            || IS_KOR(index)
+#endif
+        ){
             info->advanceCharInHankaku(2);
             break;
         }
@@ -273,7 +301,9 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
     bool skip_whitespace_flag = true;
     char text[3] = { '\0', '\0', '\0' };
     while( *str ){
+    #ifndef ENABLE_KOREAN
         while (*str == ' ' && skip_whitespace_flag) str++;
+    #endif
 
 #ifdef ENABLE_1BYTE_CHAR
         if ( *str == '`' ){
@@ -342,6 +372,12 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             if (*str && *str != 0x0a) text[1] = *str++;
             else                      text[1] = 0;
             drawChar( text, info, false, false, surface, cache_info );
+        #ifndef ENABLE_KOREAN
+            if (*str && *str != 0x0a){
+                text[0] = *str++;
+                drawChar( text, info, false, false, surface, cache_info );
+            }
+        #endif
         }
     }
     for ( i=0 ; i<3 ; i++ ) info->color[i] = org_color[i];
@@ -700,8 +736,13 @@ int ONScripter::textCommand()
     if (buf[string_buffer_offset] == '[')
         string_buffer_offset++;
     else if (zenkakko_flag && 
+    #ifdef ENABLE_KOREAN
+            buf[string_buffer_offset  ] == "°º"[0] &&
+            buf[string_buffer_offset+1] == "°º"[1])
+    #else
              buf[string_buffer_offset  ] == "Åy"[0] && 
              buf[string_buffer_offset+1] == "Åy"[1])
+    #endif
         string_buffer_offset += 2;
     else
         tag_flag = false;
@@ -710,8 +751,13 @@ int ONScripter::textCommand()
     int end_offset = start_offset;
     while (tag_flag && buf[string_buffer_offset]){
         if (zenkakko_flag && 
+        #ifdef ENABLE_KOREAN
+            buf[string_buffer_offset  ] == "°º"[0] &&
+            buf[string_buffer_offset+1] == "°º"[1]){
+        #else
             buf[string_buffer_offset  ] == "Åz"[0] && 
             buf[string_buffer_offset+1] == "Åz"[1]){
+        #endif
             end_offset = string_buffer_offset;
             string_buffer_offset += 2;
             break;
@@ -753,6 +799,31 @@ int ONScripter::textCommand()
 
     line_enter_status = 2;
     if (pagetag_flag) page_enter_status = 1;
+
+#ifdef ENABLE_KOREAN
+    draw_korean_flag = true;
+
+    // If Korean is supported, check the string if it is Korean text and not UTF8
+    char *ptr = script_h.getStringBuffer();
+    while(*ptr != '\0' && *ptr != '\\') {
+        char c1 = *ptr;
+        char c2 = *(ptr + 1);
+
+        // Old length of string therefore not Korean text
+        if (c2 == '\0' || c2 == '\\') {
+            draw_korean_flag = false;
+            break;
+        }
+
+        // Not Korean text
+        unsigned short index = (c1 & 0xFF) << 8 ^ c2 & 0xFF;
+        if (!IS_KOR(index)) {
+            draw_korean_flag = false;
+            break;
+        }
+        ptr += 2;
+    }
+#endif
 
     while(processText());
 
@@ -873,8 +944,18 @@ bool ONScripter::processText()
         if ( checkLineBreak( script_h.getStringBuffer() + string_buffer_offset, &sentence_font ) ){
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
+            #ifdef ENABLE_KOREAN
+                if (draw_korean_flag) {
+                    current_page->add(((char*)"°°")[0]);
+                    current_page->add(((char*)"°°")[1]);
+                } else {
+                    current_page->add(0x81);
+                    current_page->add(0x40);
+                }
+            #else
                 current_page->add(0x81);
                 current_page->add(0x40);
+            #endif
                 sentence_font.advanceCharInHankaku(2);
             }
         }
@@ -1126,8 +1207,13 @@ bool ONScripter::processText()
                 if (newLineEarly) {
                     sentence_font.newLine();
                     for (int i=0 ; i<indent_offset ; i++){
+                    #ifdef ENABLE_KOREAN
+                        current_page->add(((char*)"°°")[0]);
+                        current_page->add(((char*)"°°")[1]);
+                    #else
                         current_page->add(0x81);
                         current_page->add(0x40);
+                    #endif
                         sentence_font.advanceCharInHankaku(2);
                     }
                     current_page->add(' ');

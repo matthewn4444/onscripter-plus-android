@@ -24,19 +24,22 @@ GUI_OBJS = ONScripter$(OBJSUFFIX) \
 DECODER_OBJS = DirectReader$(OBJSUFFIX) \
 	SarReader$(OBJSUFFIX) \
 	NsaReader$(OBJSUFFIX) \
-	sjis2utf16$(OBJSUFFIX)
+	sjis2utf16$(OBJSUFFIX) \
+	kr2utf$(OBJSUFFIX)
 
 SARDEC_OBJS  = sardec$(OBJSUFFIX) \
 	DirectReader$(OBJSUFFIX) \
 	SarReader$(OBJSUFFIX) \
-	sjis2utf16$(OBJSUFFIX)
+	sjis2utf16$(OBJSUFFIX) \
+	kr2utf$(OBJSUFFIX)
 
 SARCONV_OBJS = sarconv$(OBJSUFFIX) \
 	conv_shared$(OBJSUFFIX) \
 	resize_image$(OBJSUFFIX) \
 	DirectReader$(OBJSUFFIX) \
 	SarReader$(OBJSUFFIX) \
-	sjis2utf16$(OBJSUFFIX)
+	sjis2utf16$(OBJSUFFIX) \
+	kr2utf$(OBJSUFFIX)
 
 NSADEC_OBJS  = nsadec$(OBJSUFFIX) \
 	$(DECODER_OBJS)
