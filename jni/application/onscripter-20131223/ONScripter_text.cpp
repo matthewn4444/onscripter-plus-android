@@ -452,8 +452,8 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
                 continue;
             }
 #endif
-
-            if (IS_TWO_BYTE(out_text[0])){
+            unsigned short index = (out_text[0] & 0xFF) << 8 ^ current_page->text[i+1] & 0xFF;
+            if (IS_TWO_BYTE(out_text[0]) || IS_KOR(index)){
                 out_text[1] = current_page->text[i+1];
 
                 if ( checkLineBreak( current_page->text+i, &f_info ) )
