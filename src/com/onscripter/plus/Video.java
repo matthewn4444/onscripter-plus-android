@@ -1,5 +1,7 @@
 package com.onscripter.plus;
 
+import java.util.Locale;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -27,7 +29,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		context = _context;
 		mCurrentDirectory = currentDirectory;
 		mFontPath = fontPath;
-		int n = 1;
+		int n = 3;
 		if (shouldRenderFontOutline()) {
             n++;
         }
@@ -36,6 +38,8 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		}
 		String[] arg = new String[n];
 		n = 0;
+	    arg[n++] = "--language";
+	    arg[n++] = Locale.getDefault().getLanguage();
 		arg[n++] = "--open-only";
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
@@ -76,7 +80,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		nativeInitJavaCallbacks();
 
         // Calls main() and never returns, hehe - we'll call eglSwapBuffers() from native code
-		int n = 0;
+		int n = 2;
 		if (shouldRenderFontOutline()) {
             n++;
         }
@@ -85,6 +89,8 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 		}
 		String[] arg = new String[n];
 		n = 0;
+	    arg[n++] = "--language";
+	    arg[n++] = Locale.getDefault().getLanguage();
 		if (shouldRenderFontOutline()) {
             arg[n++] = "--render-font-outline";
         }

@@ -76,6 +76,18 @@ public:
 
 #ifdef ANDROID
 
+// Menu text
+static const char* MESSAGE_SAVE_EXIST;
+static const char* MESSAGE_SAVE_EMPTY;
+static const char* MESSAGE_SAVE_CONFIRM;
+static const char* MESSAGE_LOAD_CONFIRM;
+static const char* MESSAGE_RESET_CONFIRM;
+static const char* MESSAGE_END_CONFIRM;
+static const char* MESSAGE_YES;
+static const char* MESSAGE_NO;
+static const char* MESSAGE_OK;
+static const char* MESSAGE_CANCEL;
+
 private:
 static const int ANDROID_MSG_AUTO_MODE = 1;
 static const int ANDROID_MSG_SKIP_MODE = 2;
@@ -126,6 +138,9 @@ public:
     int  getHeight(){return screen_height;};
     const char* getCurrentButtonStr(){return current_button_state.str;};
     int  getSkip(){return automode_flag?2:((skip_mode&SKIP_NORMAL)?1:0);};
+#ifdef ANDROID
+    void setMenuLanguage(const char* languageStr);
+#endif
         
     int  openScript();
     int  init();

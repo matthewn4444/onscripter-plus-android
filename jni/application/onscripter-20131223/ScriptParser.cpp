@@ -26,9 +26,15 @@
 #define VERSION_STR1 "ONScripter"
 #define VERSION_STR2 "Copyright (C) 2001-2013 Studio O.G.A. All Rights Reserved."
 
+#ifdef ANDROID
+const char* ScriptParser::DEFAULT_SAVE_MENU_NAME = NULL;
+const char* ScriptParser::DEFAULT_LOAD_MENU_NAME = NULL;
+const char* ScriptParser::DEFAULT_SAVE_ITEM_NAME = NULL;
+#else
 #define DEFAULT_SAVE_MENU_NAME "＜セーブ＞"
 #define DEFAULT_LOAD_MENU_NAME "＜ロード＞"
 #define DEFAULT_SAVE_ITEM_NAME "しおり"
+#endif
 
 #define DEFAULT_TEXT_SPEED_LOW    40
 #define DEFAULT_TEXT_SPEED_MIDDLE 20
@@ -67,6 +73,10 @@ ScriptParser::ScriptParser()
     render_font_outline = false;
     page_list = NULL;
 
+#ifdef ANDROID
+    setMenuLanguage("en");
+#endif
+
     /* ---------------------------------------- */
     /* Sound related variables */
     int i;
@@ -95,6 +105,13 @@ ScriptParser::~ScriptParser()
     if (save_data_buf) delete[] save_data_buf;
 
     if (save_dir_envdata) delete[] save_dir_envdata;
+
+#ifdef ANDROID
+    if (menuText) {
+        delete menuText;
+        menuText = NULL;
+    }
+#endif
 }
 
 void ScriptParser::reset()
@@ -867,4 +884,25 @@ bool ScriptParser::isEndKinsoku(const char *str)
             return true;
     }
     return false;
+}
+
+void ScriptParser::setMenuLanguage(const char* languageStr)
+{
+    if (menuText) {
+        delete menuText;
+        menuText = NULL;
+    }
+    if (!strcmp( languageStr, "ko")) {
+        menuText = new KoreanMenu();
+    } else if (!strcmp( languageStr, "en")) {
+        menuText = new EnglishMenu();
+    } else {
+        // Default is Japanese
+        menuText = new JapaneseMenu();
+    }
+
+    // Update constant strings
+    DEFAULT_SAVE_MENU_NAME = menuText->message_save_menu();
+    DEFAULT_LOAD_MENU_NAME = menuText->message_load_menu();
+    DEFAULT_SAVE_ITEM_NAME = menuText->message_save_item();
 }
