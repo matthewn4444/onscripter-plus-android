@@ -44,6 +44,17 @@ jobject     ONScripter::JavaONScripter = NULL;
 jmethodID   ONScripter::JavaPlayVideo = NULL;
 jmethodID   ONScripter::JavaReceiveMessage = NULL;
 jclass      ONScripter::JavaONScripterClass = NULL;
+
+const char* ONScripter::MESSAGE_SAVE_EXIST = NULL;
+const char* ONScripter::MESSAGE_SAVE_EMPTY = NULL;
+const char* ONScripter::MESSAGE_SAVE_CONFIRM = NULL;
+const char* ONScripter::MESSAGE_LOAD_CONFIRM = NULL;
+const char* ONScripter::MESSAGE_RESET_CONFIRM = NULL;
+const char* ONScripter::MESSAGE_END_CONFIRM = NULL;
+const char* ONScripter::MESSAGE_YES = NULL;
+const char* ONScripter::MESSAGE_NO = NULL;
+const char* ONScripter::MESSAGE_OK = NULL;
+const char* ONScripter::MESSAGE_CANCEL = NULL;
 #endif
 
 static void SDL_Quit_Wrapper()
@@ -255,6 +266,10 @@ ONScripter::ONScripter()
     sprite2_info = new AnimationInfo[MAX_SPRITE2_NUM];
     current_button_state.down_flag = false;
 
+#ifdef ANDROID
+    setMenuLanguage("en");
+#endif
+
     int i;
     for (i=0 ; i<MAX_SPRITE2_NUM ; i++)
         sprite2_info[i].affine_flag = true;
@@ -359,6 +374,25 @@ void ONScripter::setKeyEXE(const char *filename)
 {
     setStr(&key_exe_file, filename);
 }
+
+#ifdef ANDROID
+void ONScripter::setMenuLanguage(const char* languageStr)
+{
+    ScriptParser::setMenuLanguage(languageStr);
+
+    // Update constant strings
+    MESSAGE_SAVE_EXIST = menuText->message_save_exist();
+    MESSAGE_SAVE_EMPTY = menuText->message_save_empty();
+    MESSAGE_SAVE_CONFIRM = menuText->message_save_confirm();
+    MESSAGE_LOAD_CONFIRM = menuText->message_load_confirm();
+    MESSAGE_RESET_CONFIRM = menuText->message_reset_confirm();
+    MESSAGE_END_CONFIRM = menuText->message_end_confirm();
+    MESSAGE_YES = menuText->message_yes();
+    MESSAGE_NO = menuText->message_no();
+    MESSAGE_OK = menuText->message_ok();
+    MESSAGE_CANCEL = menuText->message_cancel();
+}
+#endif
 
 int ONScripter::openScript()
 {

@@ -43,6 +43,10 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+#ifdef ANDROID
+#include "MenuText.h"
+#endif
+
 #define DEFAULT_FONT_SIZE 26
 #define DEFAULT_SENTENCE_SCALE 1
 #define DEFAULT_DIALOG_FONT_SIZE 18
@@ -389,7 +393,16 @@ protected:
     void setKinsoku(const char *start_chrs, const char *end_chrs, bool add);
     bool isStartKinsoku(const char *str);
     bool isEndKinsoku(const char *str);
-    
+#ifdef ANDROID
+    static const char* DEFAULT_SAVE_MENU_NAME;
+    static const char* DEFAULT_LOAD_MENU_NAME;
+    static const char* DEFAULT_SAVE_ITEM_NAME;
+
+    MenuTextBase* menuText;
+
+    void setMenuLanguage(const char* languageStr);
+#endif
+
     /* ---------------------------------------- */
     /* Sound related variables */
     int music_volume;

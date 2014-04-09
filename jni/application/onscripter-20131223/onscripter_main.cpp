@@ -315,6 +315,11 @@ int main( int argc, char **argv )
                 if (ons.openScript()) exit(-1);
                 return 0;
             }
+            else if ( !strcmp( argv[0]+1, "l" ) || !strcmp( argv[0]+1, "-language" ) ){
+                argc--;
+                argv++;
+                ons.setMenuLanguage(argv[0]);
+            }
 #endif
             else{
                 printf(" unknown option %s\n", argv[0] );

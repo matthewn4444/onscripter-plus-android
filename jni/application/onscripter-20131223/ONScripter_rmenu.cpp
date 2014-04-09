@@ -30,6 +30,7 @@
 #define DIALOG_BUTTON_W 96
 #define DIALOG_BUTTON_H 42
 
+#ifndef ANDROID
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
 #define MESSAGE_SAVE_EXIST "`%s%s    Date %s/%s    Time %s:%s"
 #define MESSAGE_SAVE_EMPTY "`%s%s    ------------------------"
@@ -52,6 +53,7 @@
 #define MESSAGE_NO "‚¢‚¢‚¦"
 #define MESSAGE_OK "‚n‚j"
 #define MESSAGE_CANCEL "ƒLƒƒƒ“ƒZƒ‹"
+#endif
 #endif
 
 void ONScripter::enterSystemCall()
