@@ -34,6 +34,14 @@
 #define FORCE_1BYTE_CHAR
 #endif
 
+#ifdef ENABLE_KOREAN
+// http://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/KOREAN.TXT
+#define IS_KOR(x) \
+    /* Hangul syllables */  ((x >= 0xB0A1 && x <= 0xC8FE) \
+    /* Standard Korean */ || (x >= 0xA141 && x <= 0xA974) \
+                            ) == true
+#endif
+
 #define IS_TWO_BYTE(x) \
         ( ((x) & 0xe0) == 0xe0 || ((x) & 0xe0) == 0x80 )
 
@@ -152,6 +160,9 @@ public:
     void skipLine( int no=1 );
     void setLinepage( bool val );
     void setEnglishMode( bool val ){ english_mode = val; };
+#ifdef ENABLE_KOREAN
+    bool isKoreanMode(){ return korean_mode; };
+#endif
 
     // function for kidoku history
     bool isKidoku();
@@ -244,7 +255,7 @@ public:
     int global_variable_border;
 
     BaseReader *cBR;
-    
+
 private:
     enum { OP_INVALID = 0, // 000
            OP_PLUS    = 2, // 010
@@ -286,6 +297,9 @@ private:
     };
     
     int  readScript(char *path);
+#ifdef ENABLE_KOREAN
+    void detectKoreanText();
+#endif
     int  readScriptSub(FILE *fp, char **buf, int encrypt_mode);
     void readConfiguration();
     int  labelScript();
@@ -353,6 +367,10 @@ private:
 
     unsigned char key_table[256];
     bool key_table_flag;
+
+#ifdef ENABLE_KOREAN
+    bool korean_mode;
+#endif
 };
 
 #endif // __SCRIPT_HANDLER_H__
