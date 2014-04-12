@@ -80,7 +80,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
     unsigned index = ((unsigned char*)text)[0];
     index = index << 8 | ((unsigned char*)text)[1];
 #ifdef ENABLE_KOREAN
-    if (draw_korean_flag && IS_KOR(index)) {
+    if (script_h.isKoreanMode() && IS_KOR(index)) {
 		unicode = convKOR2UTF16( index );
     } else
 #endif
@@ -211,7 +211,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
             #ifdef ENABLE_KOREAN
-                if (draw_korean_flag) {
+                if (script_h.isKoreanMode()) {
                     current_page->add(((char*)"　")[0]);
                     current_page->add(((char*)"　")[1]);
                 } else {
@@ -800,31 +800,6 @@ int ONScripter::textCommand()
     line_enter_status = 2;
     if (pagetag_flag) page_enter_status = 1;
 
-#ifdef ENABLE_KOREAN
-    draw_korean_flag = true;
-
-    // If Korean is supported, check the string if it is Korean text and not UTF8
-    char *ptr = script_h.getStringBuffer();
-    while(*ptr != '\0' && *ptr != '\\') {
-        char c1 = *ptr;
-        char c2 = *(ptr + 1);
-
-        // Old length of string therefore not Korean text
-        if (c2 == '\0' || c2 == '\\') {
-            draw_korean_flag = false;
-            break;
-        }
-
-        // Not Korean text
-        unsigned short index = (c1 & 0xFF) << 8 ^ c2 & 0xFF;
-        if (!IS_KOR(index)) {
-            draw_korean_flag = false;
-            break;
-        }
-        ptr += 2;
-    }
-#endif
-
     while(processText());
 
     return RET_CONTINUE;
@@ -945,7 +920,7 @@ bool ONScripter::processText()
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
             #ifdef ENABLE_KOREAN
-                if (draw_korean_flag) {
+                if (script_h.isKoreanMode()) {
                     current_page->add(((char*)"　")[0]);
                     current_page->add(((char*)"　")[1]);
                 } else {

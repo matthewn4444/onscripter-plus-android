@@ -1039,9 +1039,75 @@ int ScriptHandler::readScript( char *path )
     delete[] tmp_script_buf;
 
     script_buffer_length = p_script_buffer - script_buffer;
-
+#ifdef ENABLE_KOREAN
+    detectKoreanText();
+#endif
     return 0;
 }
+
+#ifdef ENABLE_KOREAN
+void ScriptHandler::detectKoreanText() {
+    // Read the script buffer and find out if script contains at least two lines of Korean text
+    char* ptr = script_buffer;
+    korean_mode = false;
+    int found_korean_lines = 0;
+    for (int i = 0; (ptr - script_buffer) < script_buffer_length; i++) {
+        SKIP_SPACE(ptr);
+        char c = *ptr;
+        if (c == '*' || c == ';' || c == ':' || c == 0x0a) {
+            // Move to next line
+            while(*ptr != 0x0a) ptr++;
+            ptr++;
+            continue;
+        }
+#ifdef ENABLE_1BYTE_CHAR
+        // Guaranteed English characters
+        else if (c == '`') {
+            return;
+        }
+#endif
+        else if (c == '\0') {
+            return;
+        } else if (c == '[') {
+            // Skip the text inside the brackets
+            while(*ptr != ']') ptr++;
+            ptr++;
+            continue;
+        } else {
+            // Scan for Korean text
+            int korean_text_count = 0;
+            while(*ptr != 0x0a) {
+                if (korean_text_count >= 0) {
+                    char nextC = *(ptr + 1);
+                    if (nextC == '\0' || nextC == '\\') {
+                        korean_text_count = -1;
+                    } else if (*ptr == '\\') {
+                    } else {
+                        unsigned short index = (*ptr & 0xFF) << 8 ^ nextC & 0xFF;
+                        if (!IS_KOR(index)) {
+                            korean_text_count = -1;
+                        } else {
+                            // Found korean text
+                            korean_text_count++;
+                            ptr++;
+                        }
+                    }
+                }
+                ptr++;
+            }
+            ptr++;
+            // See if we have gotten 2 lines of Korean text in the script
+            if (korean_text_count > 0) {
+                found_korean_lines++;
+                if (found_korean_lines >= 2) {
+                    korean_mode = true;
+                    return;
+                }
+            }
+        }
+    }
+}
+#endif
 
 int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
 {

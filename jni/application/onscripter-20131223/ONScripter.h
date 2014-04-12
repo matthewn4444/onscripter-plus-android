@@ -32,14 +32,6 @@
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
-#ifdef ENABLE_KOREAN
-// http://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/KOREAN.TXT
-#define IS_KOR(x) \
-    /* Hangul syllables */  ((x >= 0xB0A1 && x <= 0xC8FE) \
-    /* Standard Korean */ || (x >= 0xA141 && x <= 0xA974) \
-                            ) == true
-#endif
-
 #ifdef ANDROID
 #include <android/log.h>
 #include <jni.h>
@@ -382,9 +374,6 @@ private:
     long btnwait_time;
     bool btndown_flag;
     bool transbtn_flag;
-#ifdef ENABLE_KOREAN
-    bool draw_korean_flag;
-#endif
 
     int current_over_button;
     int shift_over_button;
