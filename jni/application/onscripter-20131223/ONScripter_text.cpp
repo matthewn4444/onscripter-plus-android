@@ -109,7 +109,13 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
     // Use the glyth's advance for non-Japanese characters
     if (IS_TWO_BYTE(text[0])) {
         info->addMonospacedCharacterAdvance();
-    } else {
+    }
+#ifdef ENABLE_KOREAN
+    else if (script_h.isKoreanMode() && IS_KOR(index)) {
+        info->addMonospacedCharacterAdvance();
+    }
+#endif
+    else {
         info->addProportionalCharacterAdvance(advanced);
     }
 #endif
