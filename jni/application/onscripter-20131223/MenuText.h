@@ -33,7 +33,7 @@
 
 // Korean Menu Text
 #define KOREAN_MSG_SAVE_EXIST "%s%s　%s월%s일%s시%s분"
-#define KOREAN_MSG_SAVE_EMPTY "%s%s　－－－－－－－－－－"
+#define KOREAN_MSG_SAVE_EMPTY "%s%s　－－－－－－－－－－－－"
 #define KOREAN_MSG_SAVE_CONFIRM "%s%s에　저장됩니다．　확실합니까？"
 #define KOREAN_MSG_LOAD_CONFIRM "%s%s을　불러올까요？"
 #define KOREAN_MSG_RESET_CONFIRM "게임이　초기화됩니다．　확실합니까？"
@@ -55,6 +55,8 @@ public:
         language = lang;
     }
     ~MenuTextBase() {}
+
+    Language getLanguage() { return language; };
 
     virtual const char* message_save_exist() = 0;
     virtual const char* message_save_empty() = 0;
