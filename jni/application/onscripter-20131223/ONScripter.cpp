@@ -379,6 +379,7 @@ void ONScripter::setKeyEXE(const char *filename)
 void ONScripter::setMenuLanguage(const char* languageStr)
 {
     ScriptParser::setMenuLanguage(languageStr);
+    MenuTextBase* menuText = script_h.getSystemLanguageText();
 
     // Update constant strings
     MESSAGE_SAVE_EXIST = menuText->message_save_exist();

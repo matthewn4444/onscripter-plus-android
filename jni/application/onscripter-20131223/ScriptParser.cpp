@@ -105,13 +105,6 @@ ScriptParser::~ScriptParser()
     if (save_data_buf) delete[] save_data_buf;
 
     if (save_dir_envdata) delete[] save_dir_envdata;
-
-#ifdef ANDROID
-    if (menuText) {
-        delete menuText;
-        menuText = NULL;
-    }
-#endif
 }
 
 void ScriptParser::reset()
@@ -888,18 +881,8 @@ bool ScriptParser::isEndKinsoku(const char *str)
 
 void ScriptParser::setMenuLanguage(const char* languageStr)
 {
-    if (menuText) {
-        delete menuText;
-        menuText = NULL;
-    }
-    if (!strcmp( languageStr, "ko")) {
-        menuText = new KoreanMenu();
-    } else if (!strcmp( languageStr, "en")) {
-        menuText = new EnglishMenu();
-    } else {
-        // Default is Japanese
-        menuText = new JapaneseMenu();
-    }
+    script_h.setSystemLanguage(languageStr);
+    MenuTextBase* menuText = script_h.getSystemLanguageText();
 
     // Update constant strings
     DEFAULT_SAVE_MENU_NAME = menuText->message_save_menu();
