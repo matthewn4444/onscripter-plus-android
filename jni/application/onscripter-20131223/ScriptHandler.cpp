@@ -41,6 +41,9 @@ ScriptHandler::ScriptHandler()
     string_buffer       = new char[STRING_BUFFER_LENGTH];
     str_string_buffer   = new char[STRING_BUFFER_LENGTH];
     saved_string_buffer = new char[STRING_BUFFER_LENGTH];
+#ifdef ANDROID
+    setSystemLanguage("en");
+#endif
 
     variable_data = NULL;
     extended_variable_data = NULL;
@@ -65,6 +68,13 @@ ScriptHandler::~ScriptHandler()
     delete[] str_string_buffer;
     delete[] saved_string_buffer;
     if (variable_data) delete[] variable_data;
+
+#ifdef ANDROID
+    if (menuText) {
+        delete menuText;
+        menuText = NULL;
+    }
+#endif
 }
 
 void ScriptHandler::reset()
@@ -555,6 +565,23 @@ bool ScriptHandler::isKidoku()
     return skip_enabled;
 }
 
+#ifdef ANDROID
+void ScriptHandler::setSystemLanguage(const char* languageStr) {
+    if (menuText) {
+        delete menuText;
+        menuText = NULL;
+    }
+    if (!strcmp( languageStr, "ko")) {
+        menuText = new KoreanMenu();
+    } else if (!strcmp( languageStr, "en")) {
+        menuText = new EnglishMenu();
+    } else {
+        // Default is Japanese
+        menuText = new JapaneseMenu();
+    }
+}
+#endif
+
 void ScriptHandler::markAsKidoku( char *address )
 {
     if (!kidokuskip_flag || internal_current_script != NULL) return;
@@ -771,6 +798,9 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
     }
 
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
+#ifdef ANDROID
+    if (menuText->getLanguage() == MenuTextBase::ENGLISH) {
+#endif
     if (num_minus == 1) no = -no;
     char format[6];
     if (is_zero_inserted)
@@ -780,7 +810,10 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
     sprintf(buffer, format, no);
     
     return num_column;
-#else
+#ifdef ANDROID
+    }
+#endif
+#endif
     int c = 0;
 #ifdef ENABLE_KOREAN
     if (is_zero_inserted){
@@ -831,9 +864,7 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
         c -= 2;
     }
     buffer[num_column*2] = '\0';
-
     return num_column*2;
-#endif    
 }
 
 int ScriptHandler::openScript(char *path)

@@ -29,6 +29,10 @@
 #include <string.h>
 #include "BaseReader.h"
 
+#ifdef ANDROID
+#include "MenuText.h"
+#endif
+
 #ifdef ENABLE_ENGLISH
 #define ENABLE_1BYTE_CHAR
 #define FORCE_1BYTE_CHAR
@@ -160,6 +164,10 @@ public:
     void skipLine( int no=1 );
     void setLinepage( bool val );
     void setEnglishMode( bool val ){ english_mode = val; };
+#ifdef ANDROID
+    void setSystemLanguage(const char* languageStr);
+    MenuTextBase* getSystemLanguageText() { return menuText; };
+#endif
 #ifdef ENABLE_KOREAN
     bool isKoreanMode(){ return korean_mode; };
 #endif
@@ -368,6 +376,9 @@ private:
     unsigned char key_table[256];
     bool key_table_flag;
 
+#ifdef ANDROID
+    MenuTextBase* menuText;
+#endif
 #ifdef ENABLE_KOREAN
     bool korean_mode;
 #endif
