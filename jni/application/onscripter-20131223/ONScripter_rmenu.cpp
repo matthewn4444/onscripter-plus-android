@@ -478,6 +478,7 @@ bool ONScripter::executeSystemYesNo( int caller, int file_no )
     drawString( name, color, &menu_font, true, accumulation_surface, NULL, &text_info );
 
     flush( refreshMode() );
+    log("Hello dialog")
         
     int offset1 = strlen(name)/5;
     int offset2 = strlen(name)/2 - offset1;
@@ -769,7 +770,15 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
             dialog_font.top_xy[1] = rect.y+(rect.h-dialog_font.font_size_xy[1])/2;
             dialog_font.setLineArea( strlen(mes[i])/2+1 );
             dialog_font.clear();
+#ifdef ENABLE_KOREAN
+            if (script_h.getSystemLanguageText()->getLanguage() == MenuTextBase::KOREAN) {
+                force_korean_text = true;
+            }
+#endif
             drawString( mes[i], col3, &dialog_font, false, bs2, NULL, NULL );
+#ifdef ENABLE_KOREAN
+            force_korean_text = false;
+#endif
         }
 
         ButtonLink *btn = new ButtonLink();
