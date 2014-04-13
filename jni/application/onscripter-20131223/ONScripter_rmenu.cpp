@@ -464,9 +464,8 @@ bool ONScripter::executeSystemYesNo( int caller, int file_no )
         strcpy( name, MESSAGE_RESET_CONFIRM );
     else if ( caller ==  SYSTEM_END )
         strcpy( name, MESSAGE_END_CONFIRM );
-        
-        
-    menu_font.num_xy[0] = strlen(name)/2;
+
+    menu_font.num_xy[0] = strlen(name)/2 + 1;       // Hack fix to allow Japanese message fit
     menu_font.num_xy[1] = 3;
 #if ANDROID
     menu_font.updateFontScaling(menu_font.num_xy[0], menu_font.num_xy[1], 1);
@@ -478,8 +477,7 @@ bool ONScripter::executeSystemYesNo( int caller, int file_no )
     drawString( name, color, &menu_font, true, accumulation_surface, NULL, &text_info );
 
     flush( refreshMode() );
-    log("Hello dialog")
-        
+
     int offset1 = strlen(name)/5;
     int offset2 = strlen(name)/2 - offset1;
     strcpy( name, MESSAGE_YES );
