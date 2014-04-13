@@ -269,6 +269,9 @@ ONScripter::ONScripter()
 #ifdef ANDROID
     setMenuLanguage("en");
 #endif
+#ifdef ENABLE_KOREAN
+    force_korean_text = false;
+#endif
 
     int i;
     for (i=0 ; i<MAX_SPRITE2_NUM ; i++)

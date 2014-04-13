@@ -770,6 +770,9 @@ private:
     bool draw_cursor_flag;
     int  textgosub_clickstr_state;
     int  indent_offset;
+#ifdef ENABLE_KOREAN
+    bool force_korean_text;
+#endif
 
     void setwindowCore();
     

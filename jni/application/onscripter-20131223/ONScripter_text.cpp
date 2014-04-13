@@ -80,7 +80,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
     unsigned index = ((unsigned char*)text)[0];
     index = index << 8 | ((unsigned char*)text)[1];
 #ifdef ENABLE_KOREAN
-    if (script_h.isKoreanMode() && IS_KOR(index)) {
+    if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
 		unicode = convKOR2UTF16( index );
     } else
 #endif
@@ -111,7 +111,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
         info->addMonospacedCharacterAdvance();
     }
 #ifdef ENABLE_KOREAN
-    else if (script_h.isKoreanMode() && IS_KOR(index)) {
+    else if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
         info->addMonospacedCharacterAdvance();
     }
 #endif
@@ -217,7 +217,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
             #ifdef ENABLE_KOREAN
-                if (script_h.isKoreanMode()) {
+                if (script_h.isKoreanMode() || force_korean_text) {
                     current_page->add(((char*)"　")[0]);
                     current_page->add(((char*)"　")[1]);
                 } else {
@@ -355,7 +355,12 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             }
         }
 #endif
-        if ( IS_TWO_BYTE(*str) ){
+        unsigned short index = (*str & 0xFF) << 8 ^ *(str + 1) & 0xFF;
+        if ( IS_TWO_BYTE(*str)
+#ifdef ENABLE_KOREAN
+        || IS_KOR(index)
+#endif
+            ){
             if ( checkLineBreak( str, info ) ){
                 info->newLine();
                 for (int i=0 ; i<indent_offset ; i++)
@@ -364,7 +369,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
 
             text[0] = *str++;
             text[1] = *str++;
-            if (IS_UTF8(text[0])) {
+            if (IS_UTF8(text[0]) && !force_korean_text && !script_h.isKoreanMode()) {
                 text[2] = *str++;
             }
             drawChar( text, info, false, false, surface, cache_info );
@@ -378,12 +383,6 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             if (*str && *str != 0x0a) text[1] = *str++;
             else                      text[1] = 0;
             drawChar( text, info, false, false, surface, cache_info );
-        #ifndef ENABLE_KOREAN
-            if (*str && *str != 0x0a){
-                text[0] = *str++;
-                drawChar( text, info, false, false, surface, cache_info );
-            }
-        #endif
         }
     }
     for ( i=0 ; i<3 ; i++ ) info->color[i] = org_color[i];
@@ -926,7 +925,7 @@ bool ONScripter::processText()
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
             #ifdef ENABLE_KOREAN
-                if (script_h.isKoreanMode()) {
+                if (script_h.isKoreanMode() || force_korean_text) {
                     current_page->add(((char*)"　")[0]);
                     current_page->add(((char*)"　")[1]);
                 } else {
