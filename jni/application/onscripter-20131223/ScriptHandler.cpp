@@ -808,7 +808,6 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
     else
         sprintf(format, "%%%dd", num_column);
     sprintf(buffer, format, no);
-    
     return num_column;
 #ifdef ANDROID
     }
@@ -852,11 +851,7 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
     #endif
     }
     c = (num_column-1)*2;
-#ifdef ENABLE_KOREAN
-    char num_str[] = "£°£±£²£³£´£µ£¶£·£¸£¹";
-#else
     char num_str[] = "‚O‚P‚Q‚R‚S‚T‚U‚V‚W‚X";
-#endif
     for (i=0 ; i<num_digit ; i++){
         buffer[c]   = num_str[ no % 10 * 2];
         buffer[c+1] = num_str[ no % 10 * 2 + 1];
