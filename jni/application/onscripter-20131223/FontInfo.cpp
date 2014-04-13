@@ -289,7 +289,11 @@ SDL_Rect FontInfo::calcUpdatedArea(int start_xy[2], int ratio1, int ratio2)
     if (tateyoko_mode == YOKO_MODE){
         if (start_xy[1] == xy[1]){
             rect.x = top_xy[0] + pitch_xy[0]*start_xy[0]/2;
+#ifdef ENABLE_ENGLISH
+            rect.w = advance_position + 1;
+#else
             rect.w = pitch_xy[0]*(xy[0]-start_xy[0])/2+1;
+#endif
         }
         else{
             rect.x = top_xy[0];
