@@ -380,8 +380,18 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
         }
         else if (*str){
             text[0] = *str++;
-            if (*str && *str != 0x0a) text[1] = *str++;
+            // Add the next character if it is not the first byte of an Asian character
+            if (*str && !IS_TWO_BYTE(*str) && *str != 0x0a) text[1] = *str++;
             else                      text[1] = 0;
+#ifdef ENABLE_KOREAN
+            // If next character is Korean, then we block it from being added to the text
+            if (*str) {
+                index = *(str + 1) && *(str + 1) != 0x0a ? (*str & 0xFF) << 8 ^ *(str + 1) & 0xFF : 0;
+                if (IS_KOR(index)) {
+                    text[1] = 0;
+                }
+            }
+#endif
             drawChar( text, info, false, false, surface, cache_info );
         }
     }
