@@ -29,6 +29,8 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_about_cate"
         android:key="@string/settings_about_key">
+        <Preference android:title="@string/settings_about_change_log_title"
+            android:key="@string/settings_about_change_log_key"/>
         <PreferenceScreen android:layout="@layout/about_preference_layout"/>
     </PreferenceCategory>
 </PreferenceScreen>
