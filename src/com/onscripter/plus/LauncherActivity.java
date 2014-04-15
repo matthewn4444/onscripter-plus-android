@@ -48,6 +48,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private FontFileCopyTask mCopyTask = null;
     private FolderBrowserDialogWrapper mDirBrowse = null;
     private SharedPreferences mPrefs = null;
+    private ChangeLog mChangeLog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +112,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         }
 
         createDirectoryBrowserDialog();
+        mChangeLog = new ChangeLog(this);
     }
 
     @Override
