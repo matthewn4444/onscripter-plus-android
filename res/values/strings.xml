@@ -75,6 +75,9 @@
     <string name="settings_about_summary">This application is open source and free. If you plan to use the code, please mention Studio O.G.A. Ogapee and I.</string>
     <string name="settings_about_thanks_text">Thanks to Studio O.G.A. Ogapee (original author) for the source and instructions to run and build this app.</string>
 
+    <string name="settings_about_change_log_title">View Change Log</string>
+    <string name="settings_about_change_log_key">settings.about.change.log.key</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_select_button_text">Select</string>
