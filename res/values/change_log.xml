@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_log_key">change.log.pref.key</string>
+    <string name="change_log_dialog_title">Recent Changes</string>
+    <string name="bullet_point">&#8226;</string>
+    <string-array name="change_log">
+        <item>Version 1.1.5,4/16/2014</item>
+        <item>Korean (Hangul) font is supported</item>
+        <item>Fixes system text for each language</item>
+    </string-array>
+</resources>

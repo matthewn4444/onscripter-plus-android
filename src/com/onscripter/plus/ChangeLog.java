@@ -1,0 +1,147 @@
+package com.onscripter.plus;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.preference.PreferenceManager;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.TextView;
+
+public class ChangeLog {
+    private AlertDialog mDialog;
+    private final Activity mCtx;
+    private final SharedPreferences mPref;
+    private ListView mList;
+    private static String PREF_KEY = null;
+    private static String BULLET_POINT = null;
+
+    public ChangeLog(Activity ctx) {
+        mPref = PreferenceManager.getDefaultSharedPreferences(ctx);
+        mCtx = ctx;
+        if (PREF_KEY == null) {
+            PREF_KEY = ctx.getString(R.string.change_log_key);
+            BULLET_POINT = ctx.getString(R.string.bullet_point);
+        }
+        LauncherActivity.log(1);
+        long lastDate = mPref.getLong(PREF_KEY, 0);
+        try {
+            ApplicationInfo appInfo = ctx.getPackageManager()
+                    .getApplicationInfo(ctx.getPackageName(), 0);
+            String appFile = appInfo.sourceDir;
+            LauncherActivity.log(1);
+            long installed = new File(appFile).lastModified();
+            LauncherActivity.log(lastDate < installed, lastDate, installed);
+            if (lastDate < installed) {
+                // Show the change log
+                show();
+            }
+        } catch (NameNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void show() {
+        if (mDialog == null) {
+            AlertDialog.Builder b = new Builder(mCtx);
+            b.setNeutralButton(android.R.string.ok,
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Editor editor = mPref.edit();
+                            editor.putLong(PREF_KEY, Calendar.getInstance()
+                                    .getTimeInMillis());
+                            editor.commit();
+                        }
+                    });
+            mList = new ListView(mCtx);
+            b.setTitle(R.string.change_log_dialog_title);
+            b.setView(mList);
+            b.setCancelable(false);
+            buildContents();
+            mDialog = b.create();
+        }
+        mDialog.show();
+    }
+
+    public void hide() {
+        if (mDialog != null) {
+            mDialog.hide();
+        }
+    }
+
+    private void buildContents() {
+        ArrayList<Entry> entries = new ArrayList<ChangeLog.Entry>();
+        String[] info = mCtx.getResources().getStringArray(R.array.change_log);
+
+        // Build the list of entries
+        Entry currentEntry = null;
+        for (int i = 0; i < info.length; i++) {
+            String line = info[i];
+            if (line.startsWith("Version ")) {
+                if (currentEntry != null) {
+                    entries.add(currentEntry);
+                }
+
+                // Parse new version number
+                currentEntry = new Entry();
+                String[] items = line.split(",");
+                currentEntry.versionName = items[0];
+                currentEntry.dateStr = items[1];
+            } else if (currentEntry != null) {
+                currentEntry.changeList.add(line);
+            }
+        }
+        if (currentEntry != null) {
+            entries.add(currentEntry);
+        }
+
+        ChangeLogAdapter adapter = new ChangeLogAdapter(mCtx, entries);
+        mList.setAdapter(adapter);
+        mList.setSelector(android.R.color.transparent);
+    }
+
+    private class Entry {
+        public String dateStr;
+        public String versionName;
+        public ArrayList<String> changeList = new ArrayList<String>();
+    }
+
+    private static int[] WIDGET_IDS = { R.id.version, R.id.date, R.id.data };
+
+    private class ChangeLogAdapter extends ViewAdapterBase<Entry> {
+        public ChangeLogAdapter(Activity a, ArrayList<Entry> list) {
+            super(a, R.layout.change_log_entry, WIDGET_IDS, list);
+        }
+
+        @Override
+        protected void setWidgetValues(int position, Entry item,
+                View[] elements, View layout) {
+            ((TextView)elements[0]).setText(item.versionName);
+            ((TextView)elements[1]).setText(item.dateStr);
+
+            // Build the list of changes
+            if (item.changeList.size() > 0) {
+                StringBuilder sb = new StringBuilder();
+                sb.append('\t').append(BULLET_POINT).append(' ').append(item.changeList.get(0));
+                for (int i = 1; i < item.changeList.size(); i++) {
+                    sb.append('\n').append('\t').append(BULLET_POINT).append(' ')
+                            .append(item.changeList.get(i));
+                }
+                ((TextView)elements[2]).setText(sb);
+                elements[2].setVisibility(View.VISIBLE);
+            } else {
+                elements[2].setVisibility(View.GONE);
+            }
+        }
+    }
+}
