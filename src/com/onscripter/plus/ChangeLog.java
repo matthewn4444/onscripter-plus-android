@@ -87,7 +87,7 @@ public class ChangeLog {
         Entry currentEntry = null;
         for (int i = 0; i < info.length; i++) {
             String line = info[i];
-            if (line.startsWith("Version ")) {
+            if (line.startsWith("v")) {
                 if (currentEntry != null) {
                     entries.add(currentEntry);
                 }
@@ -95,7 +95,7 @@ public class ChangeLog {
                 // Parse new version number
                 currentEntry = new Entry();
                 String[] items = line.split(",");
-                currentEntry.versionName = items[0];
+                currentEntry.versionName = items[0].substring(1, items[0].length());
                 currentEntry.dateStr = items[1];
             } else if (currentEntry != null) {
                 currentEntry.changeList.add(line);

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_log_dialog_title">변경사항</string>
+    <string-array name="change_log">
+        <item>v버전 1.1.5,2014년 4월 16일</item>
+        <item>일반적인 한글 인코딩(ANSI, EUC-KR)스크립트로 게임실행가능</item>
+    </string-array>
+</resources>
