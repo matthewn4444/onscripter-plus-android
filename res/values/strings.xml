@@ -7,6 +7,7 @@
     <string name="website_thanks">http://onscripter.sourceforge.jp/android/android.html</string>
     <string name="website_github">http://git.io/M5fI7g</string>
     <string name="author">Matthew Ng</string>
+    <string name="email">matthewn4444@gmail.com</string>
 
     <bool name="render_font_outline">true</bool>
     <string name="directory_back">(Back)</string>
@@ -84,6 +85,7 @@
     <string name="dialog_sd_card_text">Go to SD Card</string>
     <string name="dialog_interal_storage_text">Go to Phone</string>
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
+    <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_global">These control settings are set globally.</string>
