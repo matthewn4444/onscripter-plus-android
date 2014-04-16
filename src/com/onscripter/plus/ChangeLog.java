@@ -3,6 +3,7 @@ package com.onscripter.plus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,7 +14,11 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.preference.PreferenceManager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -64,8 +69,31 @@ public class ChangeLog {
                         }
                     });
             mList = new ListView(mCtx);
+
+            LinearLayout layout = new LinearLayout(mCtx);
+            layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+            int padding = (int)mCtx.getResources().getDimension(R.dimen.change_log_padding);
+            layout.setPadding(padding, padding, padding, padding);
+            layout.setOrientation(LinearLayout.VERTICAL);
+
+            // If displaying English, then add the message to add translation
+            String lang = Locale.getDefault().getLanguage();
+            if (!lang.equals(Locale.JAPANESE.toString()) && !lang.equals(Locale.KOREAN.toString())) {
+                layout.setPadding(padding, padding, padding, padding);
+                TextView emailText = new TextView(mCtx);
+                TextView translationText = new TextView(mCtx);
+                emailText.setMovementMethod(LinkMovementMethod.getInstance());
+                String email = mCtx.getString(R.string.email);
+                emailText.setText(Html.fromHtml("<a href=\"" + email + "\">" + email + "</a>"));
+                translationText.setText(Html.fromHtml(mCtx.getString(R.string.dialog_add_translation)));
+                layout.addView(translationText);
+                layout.addView(emailText);
+            } else {
+                layout.setPadding(padding, 0, padding, 0);
+            }
+            layout.addView(mList);
+            b.setView(layout);
             b.setTitle(R.string.change_log_dialog_title);
-            b.setView(mList);
             b.setCancelable(false);
             buildContents();
             mDialog = b.create();
