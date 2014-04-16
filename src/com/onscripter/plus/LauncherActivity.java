@@ -40,6 +40,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public static String DEFAULT_FONT_FILE = null;
     public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
     private static File DEFAULT_LOCATION;
+    private static String FONTS_FOLDER = null;
 
     private AlertDialog.Builder mDialog = null;
     private FileSystemAdapter mAdapter = null;
@@ -57,7 +58,14 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         // Set all static values
         if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
-            DEFAULT_FONT_FILE = getString(R.string.default_font_file);
+            FONTS_FOLDER = getString(R.string.assets_font_folder);
+            try {
+                String[] file = getAssets().list(FONTS_FOLDER);
+                DEFAULT_FONT_FILE = file[0];
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                // Seriously something bad happened
+            }
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
             SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
             DEFAULT_LOCATION = Environment2.getExternalSDCardDirectory() != null ?
@@ -372,7 +380,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             InputStream is = null;
             OutputStream os = null;
             try {
-                 is = getAssets().open(DEFAULT_FONT_FILE);
+                 is = getAssets().open(FONTS_FOLDER + "/" + DEFAULT_FONT_FILE);
                  os = openFileOutput(DEFAULT_FONT_FILE, Context.MODE_PRIVATE);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -401,6 +409,19 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
                     is.close();
                     os.close();
                 } catch (IOException e) {}
+            }
+
+            // Delete the older font files
+            File[] files = getFilesDir().listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    String filename = pathname.getName();
+                    return !filename.equals(DEFAULT_FONT_FILE) && filename.startsWith("default")
+                            && filename.endsWith(".ttf");
+                }
+            });
+            for (int i = 0; i < files.length; i++) {
+                files[i].delete();
             }
             return NO_PROBLEM;
         }

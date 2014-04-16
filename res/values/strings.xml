@@ -19,6 +19,7 @@
 
     <!-- Files -->
     <string name="default_font_file">default.ttf</string>
+    <string name="assets_font_folder">fonts</string>
 
     <!-- Playback Buttons -->
     <string name="button_rclick">Right Click</string>
