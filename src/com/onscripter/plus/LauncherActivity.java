@@ -70,6 +70,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             } catch (IOException e1) {
                 e1.printStackTrace();
                 // Seriously something bad happened
+                BugSenseHandler.sendException(e1);
             }
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
             SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
