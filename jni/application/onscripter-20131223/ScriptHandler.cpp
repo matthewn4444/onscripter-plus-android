@@ -573,11 +573,11 @@ void ScriptHandler::setSystemLanguage(const char* languageStr) {
     }
     if (!strcmp( languageStr, "ko")) {
         menuText = new KoreanMenu();
-    } else if (!strcmp( languageStr, "en")) {
-        menuText = new EnglishMenu();
-    } else {
-        // Default is Japanese
+    } else if (!strcmp( languageStr, "ja")) {
         menuText = new JapaneseMenu();
+    } else {
+        // Default is English
+        menuText = new EnglishMenu();
     }
 }
 #endif
