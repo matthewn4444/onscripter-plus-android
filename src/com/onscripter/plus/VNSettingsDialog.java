@@ -189,6 +189,10 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mDialog.show();
     }
 
+    public boolean isShowing() {
+        return mDialog.isShowing();
+    }
+
     @Override
     public void onTabChanged(String tabId) {
         if (tabId.equals(TEXT_TAB_NAME)) {
