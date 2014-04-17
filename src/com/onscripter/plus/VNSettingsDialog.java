@@ -28,6 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnSeekBarChangeListener, OnTabChangeListener {
     private final AlertDialog mDialog;
@@ -59,6 +61,8 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
     private final TextView mUpScalingNumber;
     private final TextView mUpScalingText;
     private final SeekBar mUpScalingScroller;
+
+    private AdView mAdView;
 
     // Settings view elements id
     public static final int DISPLAY_CONTROLS_ID = R.id.dialog_controls_display_checkbox;
@@ -125,6 +129,17 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
             }
         }
         onProgressChanged(mUpScalingScroller, 0, true);
+        attachAds();
+    }
+
+    private void attachAds() {
+        mAdView = (AdView)mTabHost.findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
+
+    public AdView getAdView() {
+        return mAdView;
     }
 
     public void setOnDimissListener(OnDismissListener listener) {
@@ -182,11 +197,17 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
 
     public void hide() {
         mDialog.hide();
+        if (mAdView != null) {
+            mAdView.pause();
+        }
     }
 
     public void show() {
         loadPreferences();
         mDialog.show();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
     }
 
     public boolean isShowing() {

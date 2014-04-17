@@ -21,8 +21,12 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -31,6 +35,9 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 
@@ -50,6 +57,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private FolderBrowserDialogWrapper mDirBrowse = null;
     private SharedPreferences mPrefs = null;
     private ChangeLog mChangeLog;
+
+    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,12 +131,61 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
         createDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
+        attachAds(listView);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(LAST_DIRECTORY, mAdapter.getCurrentDirectoryPath());
+    }
+
+    private void attachAds(ListView listView) {
+        // Create the ad and attach it to the content
+        mAdView = new AdView(this);
+        mAdView.setAdSize(AdSize.BANNER);
+        mAdView.setAdUnitId(getString(R.string.admob_key));
+
+        FrameLayout.LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        mAdView.setLayoutParams(params);
+
+        ViewGroup content = (ViewGroup)findViewById(android.R.id.content);
+        content.addView(mAdView);
+
+        // Update the listview's height to allow space for ad
+        FrameLayout.LayoutParams layout = (LayoutParams)listView.getLayoutParams();
+        layout.bottomMargin = AdSize.BANNER.getHeightInPixels(this);
+        listView.setLayoutParams(layout);
+
+        // Request the ads
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mAdView != null) {
+            mAdView.resume();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (mAdView != null) {
+            mAdView.pause();
+        }
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        // Destroy the AdView.
+        if (mAdView != null) {
+            mAdView.destroy();
+        }
+        super.onDestroy();
     }
 
     private void createDirectoryBrowserDialog() {

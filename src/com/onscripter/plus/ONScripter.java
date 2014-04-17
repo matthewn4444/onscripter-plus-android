@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
@@ -370,6 +371,12 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 		if( mAudioThread != null ) {
             mAudioThread.onPause();
         }
+        if (mDialog != null && mDialog.isShowing()) {
+            final AdView ad = mDialog.getAdView();
+            if (ad != null) {
+                ad.pause();
+            }
+        }
 	}
 
 	@Override
@@ -384,6 +391,12 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         }
 		if( mAudioThread != null ) {
             mAudioThread.onResume();
+        }
+        if (mDialog != null && mDialog.isShowing()) {
+            final AdView ad = mDialog.getAdView();
+            if (ad != null) {
+                ad.resume();
+            }
         }
 	}
 
@@ -403,6 +416,12 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             mGLView.exitApp();
         }
 		super.onDestroy();
+        if (mDialog != null) {
+            final AdView ad = mDialog.getAdView();
+            if (ad != null) {
+                ad.destroy();
+            }
+        }
 	}
 
 	@Override
