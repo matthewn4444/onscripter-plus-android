@@ -482,6 +482,12 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
                     f_info.newLine();
                 i++;
             }
+            else if (IS_UTF8(out_text[0])) {
+                int numCharBytes = UTF8ByteLength(out_text[0]);
+                for (int j = 1; j < numCharBytes; j++, i++) {
+                    out_text[j] = current_page->text[i+1];
+                }
+            }
             else{
                 out_text[1] = 0;
             }
