@@ -5,6 +5,8 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.6,5/7/2014</item>
+        <item>Added Russian support</item>
         <item>vVersion 1.1.5,4/16/2014</item>
         <item>Korean (Hangul) font is supported</item>
         <item>Fixes system text for each language</item>
