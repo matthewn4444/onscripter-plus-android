@@ -17,7 +17,7 @@
             style="@style/dialog_settings_row_style">
             <TextView
                 style="@style/dialog_settings_row_description_style"
-                android:text="@string/settings_controls_display_title"/>
+                android:text="@string/dialog_settings_controls_display_title"/>
             <CheckBox
                 android:id="@+id/dialog_controls_display_checkbox"
                 style="@style/dialog_settings_row_view_style"/>
@@ -26,7 +26,7 @@
             style="@style/dialog_settings_row_style">
             <TextView
                 style="@style/dialog_settings_row_description_style"
-                android:text="@string/settings_controls_swipe_title"/>
+                android:text="@string/dialog_settings_controls_swipe_title"/>
             <Spinner
                 android:id="@+id/dialog_controls_swipe_spinner"
                 android:entries="@array/settings_controls_swipe_entries"

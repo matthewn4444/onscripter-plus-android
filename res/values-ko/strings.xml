@@ -57,6 +57,8 @@
         <item>왼쪽에서 밀기</item>
         <item>오른쪽에서 밀기</item>
     </string-array>
+    <string name="dialog_settings_controls_display_title">버튼을 표시하기 위한 제스처.</string>
+    <string name="dialog_settings_controls_swipe_title">스와이프 제스처</string>
 
     <string name="dialog_settings_text_upscaling">글자 크기를 고정시킵니다.</string>
     <string name="dialog_settings_text_upscaling_scale">글자 크기:</string>

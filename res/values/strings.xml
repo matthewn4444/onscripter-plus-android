@@ -99,6 +99,8 @@
         <item>Swipe from left</item>
         <item>Swipe from right</item>
     </string-array>
+    <string name="dialog_settings_controls_display_title">Swipe to Show Controls</string>
+    <string name="dialog_settings_controls_swipe_title">Swipe Gesture</string>
 
     <string name="dialog_settings_text_upscaling">Set the dialogue text upscaling.</string>
     <string name="dialog_settings_text_upscaling_scale">Scale Size:</string>
