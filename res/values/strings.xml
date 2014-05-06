@@ -87,6 +87,8 @@
     <string name="dialog_interal_storage_text">Go to Phone</string>
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
+    
+    <string name="dialog_button_rate">Rate this App!</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Controls</string>

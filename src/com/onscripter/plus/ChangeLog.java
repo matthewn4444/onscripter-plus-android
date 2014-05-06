@@ -9,10 +9,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -62,13 +64,18 @@ public class ChangeLog {
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Editor editor = mPref.edit();
-                            editor.putLong(PREF_KEY, Calendar.getInstance()
-                                    .getTimeInMillis());
-                            editor.commit();
+                            setChangeLogTimestamp();
                         }
                     });
             mList = new ListView(mCtx);
+            b.setPositiveButton(R.string.dialog_button_rate,
+                    new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showAppInMarket();
+                    setChangeLogTimestamp();
+                }
+            });
 
             LinearLayout layout = new LinearLayout(mCtx);
             layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
@@ -105,6 +112,21 @@ public class ChangeLog {
         if (mDialog != null) {
             mDialog.hide();
         }
+    }
+
+    private void showAppInMarket() {
+        final String appPackageName = mCtx.getApplicationContext().getPackageName();
+        try {
+            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+        }
+    }
+
+    private void setChangeLogTimestamp() {
+        Editor editor = mPref.edit();
+        editor.putLong(PREF_KEY, Calendar.getInstance().getTimeInMillis());
+        editor.commit();
     }
 
     private void buildContents() {
