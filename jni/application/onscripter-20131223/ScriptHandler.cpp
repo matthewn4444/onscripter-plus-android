@@ -801,7 +801,7 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
 
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
 #ifdef ANDROID
-    if (menuText->getLanguage() == MenuTextBase::ENGLISH) {
+    if (menuText->getLanguage() != MenuTextBase::JAPANESE && menuText->getLanguage() != MenuTextBase::KOREAN) {
 #endif
     if (num_minus == 1) no = -no;
     char format[6];
