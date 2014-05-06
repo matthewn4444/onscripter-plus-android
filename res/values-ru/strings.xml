@@ -48,7 +48,12 @@
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
 
+    <string name="dialog_button_rate">Оцените приложение</string>
+
     <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_title">Управление</string>
+    <string name="dialog_settings_text_title">Текст</string>
+
     <string name="dialog_settings_controls_global">Глобальные настройки управления</string>
     <string name="settings_controls_swipe_default_entry">Проведите с двух сторон</string>
     <string-array name="settings_controls_swipe_entries">
