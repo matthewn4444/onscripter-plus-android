@@ -72,7 +72,7 @@ public class ChangeLog {
                     new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    showAppInMarket();
+                    showThisAppInMarket();
                     setChangeLogTimestamp();
                 }
             });
@@ -114,13 +114,17 @@ public class ChangeLog {
         }
     }
 
-    private void showAppInMarket() {
-        final String appPackageName = mCtx.getApplicationContext().getPackageName();
+    private void showAppInMarket(String packageName) {
         try {
-            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
         } catch (android.content.ActivityNotFoundException anfe) {
-            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+            mCtx.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
         }
+    }
+
+    private void showThisAppInMarket() {
+        final String appPackageName = mCtx.getApplicationContext().getPackageName();
+        showAppInMarket(appPackageName);
     }
 
     private void setChangeLogTimestamp() {
