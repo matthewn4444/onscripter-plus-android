@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_log_dialog_title">Последние изменения</string>
+    <string-array name="change_log">
+        <item>vVersion 1.1.6,5/7/2014</item>
+        <item>Добавлена поддержка русского текста в приложении</item>
+    </string-array>
+</resources>
