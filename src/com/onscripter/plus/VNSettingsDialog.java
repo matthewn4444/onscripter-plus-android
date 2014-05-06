@@ -38,8 +38,8 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
     private double mFontScale;
 
     // Tab Names/id
-    public static final String CONTROLS_TAB_NAME = "Controls";
-    public static final String TEXT_TAB_NAME = "Text";
+    private static String CONTROLS_TAB_NAME = "Controls";
+    private static String TEXT_TAB_NAME = "Text";
 
     // Event listeners
     private OnDismissListener mDismissListener;
@@ -85,9 +85,6 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
                 WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        addTab(CONTROLS_TAB_NAME, R.layout.vnsettings_dialog_controls, null);
-        addTab(TEXT_TAB_NAME, R.layout.vnsettings_dialog_text, null);
-
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mActivity);
 
         // Load static strings
@@ -95,7 +92,12 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
             DISPLAY_CONTROLS_KEY = mActivity.getString(R.string.settings_controls_display_key);
             SWIPE_GESTURES_KEY = mActivity.getString(R.string.settings_controls_swipe_key);
             SWIPE_GESTURES_ENTRIES = mActivity.getResources().getStringArray(R.array.settings_controls_swipe_entries);
+            CONTROLS_TAB_NAME = mActivity.getString(R.string.dialog_settings_controls_title);
+            TEXT_TAB_NAME = mActivity.getString(R.string.dialog_settings_text_title);
         }
+
+        addTab(CONTROLS_TAB_NAME, R.layout.vnsettings_dialog_controls, null);
+        addTab(TEXT_TAB_NAME, R.layout.vnsettings_dialog_text, null);
 
         mDisplayControlsChkbx = (CheckBox)mTabHost.findViewById(DISPLAY_CONTROLS_ID);
         mSwipeGesturesSpinner = (Spinner)mTabHost.findViewById(SWIPE_GESTURES_ID);
