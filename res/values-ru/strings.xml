@@ -22,9 +22,9 @@
 
     <string name="settings_controls_cate">Управление</string>
     <string name="settings_controls_display_summary">Скрывает кнопки, пока пользователь не проведет по экрану, чтобы отобразить их.</string>
-    <string name="settings_controls_display_title">Провести по экрану</string>
+    <string name="settings_controls_display_title">Провести по экрану, чтобы отобразить кнопки.</string>
     <string name="settings_controls_swipe_summary">Жест чтобы отобразить кнопки, когда они спрятаны.</string>
-    <string name="settings_controls_swipe_title"></string>
+    <string name="settings_controls_swipe_title">Провести по экрану</string>
 
     <string name="settings_folder_cate">Папка</string>
     <string name="settings_folder_default_summary">Выберите местоположение папки по умолчанию для чтения визуальных романов.</string>
@@ -56,6 +56,8 @@
         <item>Проведите по экрану слева</item>
         <item>Проведите по экрану справа</item>
     </string-array>
+    <string name="dialog_settings_controls_display_title">Провести по экрану</string>
+    <string name="dialog_settings_controls_swipe_title"></string>
 
     <string name="dialog_settings_text_upscaling">Установите масштабирование текста</string>
     <string name="dialog_settings_text_upscaling_scale">Масштаб текста:</string>
