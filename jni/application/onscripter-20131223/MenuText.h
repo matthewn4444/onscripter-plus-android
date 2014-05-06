@@ -1,6 +1,8 @@
 #ifndef __MENUTEXT_H__
 #define __MENUTEXT_H__
 
+#include "MenuText_UTF8.h"
+
 // English Menu Text
 #define ENGLISH_MSG_SAVE_EXIST "`%s%s    Date %s/%s    Time %s:%s"
 #define ENGLISH_MSG_SAVE_EMPTY "`%s%s    ------------------------"
@@ -49,7 +51,7 @@
 class MenuTextBase
 {
 public:
-    enum Language { JAPANESE, ENGLISH, KOREAN };
+    enum Language { JAPANESE, ENGLISH, KOREAN, RUSSIAN };
 
     MenuTextBase(const Language &lang) {
         language = lang;
@@ -139,5 +141,6 @@ protected:
 lazyMenuLangMake(EnglishMenu, ENGLISH)
 lazyMenuLangMake(JapaneseMenu, JAPANESE)
 lazyMenuLangMake(KoreanMenu, KOREAN)
+lazyMenuLangMake(RussianMenu, RUSSIAN)
 
 #endif // __MENUTEXT_H__
