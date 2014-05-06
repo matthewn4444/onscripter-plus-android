@@ -282,7 +282,7 @@ bool ONScripter::executeSystemLoad()
     flush( refreshMode() );
         
     bool nofile_flag;
-    char *buffer = new char[ strlen( save_item_name ) + 31 + 1 ];
+    char *buffer = new char[ 256 ];
 
     SaveFileInfo save_file_info;
     for ( unsigned int i=1 ; i<=num_save_file ; i++ ){
