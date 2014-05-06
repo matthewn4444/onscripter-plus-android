@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="directory_back">(Назад)</string>
+    <string name="dialog_quit_button">Выход</string>
+
+    <!-- Messages -->
+    <string name="message_cannot_find_internal_storage">Не найдена внутренняя память, что-то пошло не так!</string>
+    <string name="message_loading_fonts">Загрузка шрифтов&#8230;</string>
+    <string name="message_asset_not_found">Не удалось найти файл шрифта по умолчанию в папке assets!</string>
+    <string name="message_private_dir_not_found">Не удалось найти папку private!</string>
+    <string name="message_internal_write_error">Не удалось записать файл шрифта во внутреннею память!</string>
+    <string name="message_read_font_error">Не удалось загрузить шрифт!</string>
+
+    <!-- ActionBar -->
+    <string name="menu_action_settings">Настройки</string>
+    <string name="menu_action_change_folder">Сменить папку</string>
+
+    <!-- Settings -->
+    <string name="settings_render_cate">Видео настройки</string>
+    <string name="settings_render_font_outline_summary">Отображает контур для каждого символа для удобства чтения.</string>
+    <string name="settings_render_font_outline_title">Отображение контура шрифта</string>
+
+    <string name="settings_controls_cate">Управление</string>
+    <string name="settings_controls_display_summary">Скрывает кнопки, пока пользователь не проведет по экрану, чтобы отобразить их.</string>
+    <string name="settings_controls_display_title">Провести по экрану</string>
+    <string name="settings_controls_swipe_summary">Жест чтобы отобразить кнопки, когда они спрятаны.</string>
+    <string name="settings_controls_swipe_title"></string>
+
+    <string name="settings_folder_cate">Папка</string>
+    <string name="settings_folder_default_summary">Выберите местоположение папки по умолчанию для чтения визуальных романов.</string>
+    <string name="settings_folder_default_title">Выберите папку по умолчанию</string>
+
+    <string name="settings_about_cate">О программе</string>
+    <string name="settings_about_author_header">Автор:</string>
+    <string name="settings_about_og_author_header">Studio O.G.A.:</string>
+    <string name="settings_about_version_header">Version:</string>
+    <string name="settings_about_github_header">Website:</string>
+    <string name="settings_about_summary">Это приложение бесплатно и с открытым исходным кодом. Если вы планируете использовать код, пожалуйста, укажите Studio Oga Ogapee и Matthew Ng.</string>
+    <string name="settings_about_thanks_text">Благодаря Studio O.G.A. Ogapee (первый автор) возможно запустить это приложение.</string>
+
+    <string name="settings_about_change_log_title">Посмотреть журнал изменений</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_folder_title">Выберите папку</string>
+    <string name="dialog_select_button_text">Выбрать</string>
+    <string name="dialog_sd_card_text">Перейти к SD Card</string>
+    <string name="dialog_interal_storage_text">Перейти к внутренней памяти</string>
+    <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
+    <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
+
+    <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_global">Глобальные настройки управления</string>
+    <string name="settings_controls_swipe_default_entry">Проведите с двух сторон</string>
+    <string-array name="settings_controls_swipe_entries">
+        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>Проведите по экрану слева</item>
+        <item>Проведите по экрану справа</item>
+    </string-array>
+
+    <string name="dialog_settings_text_upscaling">Установите масштабирование текста</string>
+    <string name="dialog_settings_text_upscaling_scale">Масштаб текста:</string>
+    <string name="dialog_settings_text_upscaling_text">Русский 日本語</string>
+</resources>
