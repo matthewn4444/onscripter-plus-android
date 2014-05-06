@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">온스크립터 플러스</string>
 
-    <bool name="render_font_outline">true</bool>
     <string name="directory_back">(뒤로가기)</string>
     <string name="dialog_quit_button">종료</string>
 
