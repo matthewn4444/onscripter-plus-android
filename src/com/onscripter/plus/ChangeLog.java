@@ -76,6 +76,14 @@ public class ChangeLog {
                     setChangeLogTimestamp();
                 }
             });
+            b.setNegativeButton("No Ads",
+                    new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showAppInMarket("com.onscripter.pluspro");
+                    setChangeLogTimestamp();
+                }
+            });
 
             LinearLayout layout = new LinearLayout(mCtx);
             layout.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
