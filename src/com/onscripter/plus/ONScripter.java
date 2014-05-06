@@ -18,14 +18,19 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.FrameLayout.LayoutParams;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
@@ -82,6 +87,9 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
     private native int nativeGetHeight();
     private native void nativeSetSentenceFontScale(double scale);
     public native int nativeGetDialogFontSize();
+
+    private AdView mAdView;
+    private int mAdViewHeight;
 
     Runnable mHideControlsRunnable = new Runnable() {
         @Override
@@ -166,7 +174,31 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         mDisplayWidth = disp.getWidth();
         mDisplayHeight = disp.getHeight();
 
+        // Only show ads on tablet devices
+        if (getResources().getBoolean(R.bool.isTablet)) {
+            mDisplayHeight -= attachAds();
+        }
+
         runSDLApp();
+    }
+
+    private int attachAds() {
+        // Create the ad and attach it to the content
+        mAdView = new AdView(this);
+        mAdView.setAdSize(AdSize.BANNER);
+        mAdView.setAdUnitId(getString(R.string.admob_key));
+
+        FrameLayout.LayoutParams params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+        mAdView.setLayoutParams(params);
+
+        ViewGroup content = (ViewGroup)findViewById(android.R.id.content);
+        content.addView(mAdView);
+
+        // Request the ads
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+        return AdSize.BANNER.getHeightInPixels(this);
     }
 
     private void updateControls(int mode, boolean flag) {
@@ -377,6 +409,9 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
                 ad.pause();
             }
         }
+        if (mAdView != null) {
+            mAdView.pause();
+        }
 	}
 
 	@Override
@@ -397,6 +432,9 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             if (ad != null) {
                 ad.resume();
             }
+        }
+        if (mAdView != null) {
+            mAdView.resume();
         }
 	}
 
@@ -421,6 +459,9 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             if (ad != null) {
                 ad.destroy();
             }
+        }
+        if (mAdView != null) {
+            mAdView.destroy();
         }
 	}
 

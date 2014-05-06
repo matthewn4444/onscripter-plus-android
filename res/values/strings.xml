@@ -9,6 +9,7 @@
     <string name="author">Matthew Ng</string>
     <string name="email">matthewn4444@gmail.com</string>
 
+    <bool name="isTablet">false</bool>
     <bool name="render_font_outline">true</bool>
     <string name="directory_back">(Back)</string>
     <string name="dialog_quit_button">Quit</string>
