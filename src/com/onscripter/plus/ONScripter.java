@@ -29,6 +29,7 @@ import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -90,6 +91,8 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 
     private AdView mAdView;
     private int mAdViewHeight;
+    private InterstitialAdHelper mInterstitialHelper;
+    static final private double LEAVE_GAME_INTERSTITIAL_AD_PERCENT = 60;
 
     Runnable mHideControlsRunnable = new Runnable() {
         @Override
@@ -178,6 +181,15 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         if (getResources().getBoolean(R.bool.isTablet)) {
             mDisplayHeight -= attachAds();
         }
+        mInterstitialHelper = new InterstitialAdHelper(this, LEAVE_GAME_INTERSTITIAL_AD_PERCENT);
+        mInterstitialHelper.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
+                finish();
+            }
+        });
 
         runSDLApp();
     }
@@ -316,6 +328,18 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         switch(v.getId()) {
         case R.id.controls_quit_button:
             removeHideControlsTimer();
+            if (mInterstitialHelper.show()) {
+                if( mGLView != null ) {
+                    mGLView.onPause();
+                }
+                if( mAudioThread != null ) {
+                    mAudioThread.onPause();
+                }
+                if (mAdView != null) {
+                    mAdView.pause();
+                }
+                return;
+            }
             mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             refreshTimer = false;
             finish();

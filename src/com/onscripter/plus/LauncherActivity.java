@@ -35,6 +35,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
@@ -59,6 +60,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private ChangeLog mChangeLog;
 
     private AdView mAdView;
+    private InterstitialAdHelper mInterHelper;
+    private Bundle mStartONScripterBundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,6 +164,19 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         // Request the ads
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        // Initialize the Interstitial ads
+        mInterHelper = new InterstitialAdHelper(this);
+        mInterHelper.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+
+                // Closed before starting ONScripter, so we should launch ONScripter now
+                goToActivity(ONScripter.class, mStartONScripterBundle);
+                mStartONScripterBundle = null;
+            }
+        });
     }
 
     @Override
@@ -417,6 +433,10 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
         }
         b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
+        if (mInterHelper.show()) {
+            mStartONScripterBundle = b;
+            return;
+        }
         goToActivity(ONScripter.class, b);
     }
 
