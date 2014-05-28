@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="bugsense_key">INPUT_BUGSENSE_KEY</string>
+    <string name="admob_key">ADMOB_BANNER_KEY</string>
+    <string name="admob_interstitial_key">ADMOB_INTERSTITAL_KEY</string>
 </resources>
