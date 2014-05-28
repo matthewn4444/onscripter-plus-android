@@ -280,7 +280,6 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             removeHideControlsTimer();
             mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             refreshTimer = false;
-            finish();
             break;
         case R.id.controls_change_speed_button:
             mGLView.nativeKey( KeyEvent.KEYCODE_O, 1 );
