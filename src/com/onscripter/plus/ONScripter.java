@@ -186,8 +186,8 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             @Override
             public void onAdClosed() {
                 super.onAdClosed();
+                findViewById(android.R.id.content).setVisibility(View.GONE);
                 mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
-                finish();
             }
         });
 
