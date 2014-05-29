@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">온스크립터 플러스</string>
+    <string name="app_name">온스크립터 플러스 (광고 무료)</string>
 
     <string name="directory_back">(뒤로가기)</string>
     <string name="dialog_quit_button">종료</string>
