@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
         <item>v버전 1.1.6,2014년 5월 7일</item>
