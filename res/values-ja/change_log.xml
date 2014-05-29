@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="change_log_dialog_title">変更</string>
+    <string-array name="change_log">
+        <item>vバージョン 1.1.7,2014年5月29日</item>
+        <item>＋日本のメニュー</item>
+    </string-array>
+</resources>

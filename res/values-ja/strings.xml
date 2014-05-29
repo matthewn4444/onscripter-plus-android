@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="directory_back">(バック)</string>
+    <string name="dialog_quit_button">やめる</string>
+
+    <!-- Messages -->
+    <string name="message_loading_fonts">フォントをロードします&#8230;</string>
+    <string name="message_asset_not_found">default.ttf　が見つかりません！</string>
+    <string name="message_private_dir_not_found">ディレクトリが見つかりません！</string>
+    <string name="message_internal_write_error">内蔵メモリにフォントを移動できません！</string>
+    <string name="message_read_font_error">フォントを読めません！</string>
+
+    <!-- ActionBar -->
+    <string name="menu_action_settings">設定</string>
+    <string name="menu_action_change_folder">フォルダを変更する</string>
+
+    <!-- Settings -->
+    <string name="settings_render_cate">レンダリング</string>
+    <string name="settings_render_font_outline_summary">文字を読みやすく輪郭を描きます。</string>
+    <string name="settings_render_font_outline_title">文字の輪郭を描画する。</string>
+
+    <string name="settings_controls_cate">コントロール</string>
+    <string name="settings_controls_display_summary">スワイプするまでボタンを非表示。</string>
+    <string name="settings_controls_display_title">ボタンを表示するジェスチャー</string>
+    <string name="settings_controls_swipe_summary">ジェスチャーに隠されたボタンを取り上げます。</string>
+    <string name="settings_controls_swipe_title">スワイプジェスチャー</string>
+
+    <string name="settings_folder_cate">フォルダ</string>
+    <string name="settings_folder_default_summary">ゲームが含まれているデフォルトのフォルダを設定します。</string>
+    <string name="settings_folder_default_title">デフォルトフォルダの設定</string>
+
+    <string name="settings_about_cate">アバウト</string>
+    <string name="settings_about_author_header">著者:</string>
+    <string name="settings_about_version_header">バージョン:</string>
+    <string name="settings_about_github_header">ウェブサイト:</string>
+    <string name="settings_about_summary">このアプリケーションのソースは無料です。もしこのコードを使用したい場合は、Studio OGA OgapeeとMatthew Ngとの下さるください。</string>
+    <string name="settings_about_thanks_text">Studio O.G.A. Ogapee（オリジナル製作）には、アプリケーションのソースを提供したことに対して感謝の意を表します。</string>
+
+    <string name="settings_about_change_log_title">変更</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
+    <string name="dialog_select_button_text">選択</string>
+    <string name="dialog_sd_card_text">SDカードへ</string>
+    <string name="dialog_interal_storage_text">内蔵メモリーへ</string>
+    
+    <string name="dialog_button_rate">このアプリを評価！</string>
+
+    <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_title">コントロール</string>
+    <string name="dialog_settings_text_title">文字</string>
+
+    <string name="dialog_settings_controls_global">この設定は、すべてのゲームでデフォルトとして設定されます。</string>
+    <string name="settings_controls_swipe_default_entry">両側から押し</string>
+    <string-array name="settings_controls_swipe_entries">
+        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>左から押し</item>
+        <item>右から押し</item>
+    </string-array>
+    <string name="dialog_settings_controls_display_title">ボタンを表示するジェスチャー</string>
+    <string name="dialog_settings_controls_swipe_title">スワイプジェスチャー</string>
+
+    <string name="dialog_settings_text_upscaling">文字サイズを固定します。</string>
+    <string name="dialog_settings_text_upscaling_scale">文字サイズ:</string>
+    <string name="dialog_settings_text_upscaling_text">日本語</string>
+</resources>
