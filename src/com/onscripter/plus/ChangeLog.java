@@ -76,7 +76,7 @@ public class ChangeLog {
                     setChangeLogTimestamp();
                 }
             });
-            b.setNegativeButton("No Ads",
+            b.setNegativeButton(R.string.change_log_no_ads,
                     new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

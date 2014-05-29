@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="change_log_no_ads">No Ads</string>
     <dimen name="change_log_padding">10dp</dimen>
     <string name="change_log_key">change.log.pref.key</string>
     <string name="change_log_dialog_title">Recent Changes</string>
