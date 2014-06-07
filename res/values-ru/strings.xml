@@ -13,6 +13,7 @@
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>
+    <string name="menu_action_remove_ads">Удалить объявления</string>
     <string name="menu_action_change_folder">Сменить папку</string>
 
     <!-- Settings -->

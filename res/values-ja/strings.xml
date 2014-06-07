@@ -12,6 +12,7 @@
 
     <!-- ActionBar -->
     <string name="menu_action_settings">設定</string>
+    <string name="menu_action_remove_ads">広告を削除</string>
     <string name="menu_action_change_folder">フォルダを変更する</string>
 
     <!-- Settings -->

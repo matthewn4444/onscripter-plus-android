@@ -6,10 +6,4 @@
         android:orderInCategory="99"
         android:icon="@drawable/ic_menu_change_folder"
         android:title="@string/menu_action_change_folder"/>
-    <item 
-        android:id="@+id/action_settings"
-        android:showAsAction="always"
-        android:orderInCategory="100"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/menu_action_settings"/>
 </menu>

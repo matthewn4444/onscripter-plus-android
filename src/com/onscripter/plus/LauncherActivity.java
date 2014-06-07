@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -259,6 +260,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        MenuInflater inflater = getSupportMenuInflater();
+       inflater.inflate(R.menu.main_menu, menu);
        inflater.inflate(R.menu.menu_launcher, menu);
        return super.onCreateOptionsMenu(menu);
     }
@@ -272,6 +274,14 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             break;
         case R.id.action_change_folder:
             mDirBrowse.show(mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null));
+            break;
+        case R.id.action_remove_ads:
+            final String packageName = getApplicationContext().getPackageName() + "pro";
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
+            }
             break;
         default:
             return super.onOptionsItemSelected(item);

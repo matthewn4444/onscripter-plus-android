@@ -48,6 +48,7 @@
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
+    <string name="menu_action_remove_ads">Remove Ads</string>
     <string name="menu_action_change_folder">Change Folder</string>
 
     <!-- Settings -->
