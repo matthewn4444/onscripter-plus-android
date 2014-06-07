@@ -17,7 +17,7 @@
            android:value="@integer/google_play_services_version" />
         <activity android:name="com.onscripter.plus.LauncherActivity"
                   android:label="@string/app_name"
-                  android:configChanges="orientation|keyboardHidden">
+                  android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -27,11 +27,11 @@
                   android:label="@string/app_name"
                   android:theme="@style/Theme.Sherlock.NoActionBar"
                   android:screenOrientation="landscape"
-                  android:configChanges="orientation|keyboardHidden">
+                  android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
         <activity android:name="com.onscripter.plus.Settings"
                   android:label="@string/app_name"
-                  android:configChanges="orientation|keyboardHidden">
+                  android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
 
         <!-- Ads -->
