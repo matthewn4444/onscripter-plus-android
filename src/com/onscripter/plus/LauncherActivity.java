@@ -154,6 +154,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mAdView.setLayoutParams(params);
 
         ViewGroup content = (ViewGroup)findViewById(android.R.id.content);
+        content.setBackgroundColor(Color.BLACK);
         content.addView(mAdView);
 
         // Update the listview's height to allow space for ad
