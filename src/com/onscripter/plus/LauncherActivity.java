@@ -35,12 +35,12 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
+import com.onscripter.plus.InterstitialAdHelper.AdListener;
 
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
@@ -170,8 +170,8 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mInterHelper = new InterstitialAdHelper(this);
         mInterHelper.setAdListener(new AdListener() {
             @Override
-            public void onAdClosed() {
-                super.onAdClosed();
+            public void onAdDismiss() {
+                super.onAdDismiss();
 
                 // Closed before starting ONScripter, so we should launch ONScripter now
                 goToActivity(ONScripter.class, mStartONScripterBundle);

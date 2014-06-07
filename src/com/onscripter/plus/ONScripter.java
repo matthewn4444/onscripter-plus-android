@@ -29,10 +29,10 @@ import android.widget.FrameLayout;
 import android.widget.FrameLayout.LayoutParams;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.onscripter.plus.InterstitialAdHelper.AdListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
@@ -184,8 +184,8 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         mInterstitialHelper = new InterstitialAdHelper(this, LEAVE_GAME_INTERSTITIAL_AD_PERCENT);
         mInterstitialHelper.setAdListener(new AdListener() {
             @Override
-            public void onAdClosed() {
-                super.onAdClosed();
+            public void onAdDismiss() {
+                super.onAdDismiss();
                 findViewById(android.R.id.content).setVisibility(View.GONE);
                 mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             }

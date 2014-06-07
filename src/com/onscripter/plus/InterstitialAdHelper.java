@@ -2,24 +2,34 @@ package com.onscripter.plus;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import android.content.Context;
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 
-import com.google.android.gms.ads.AdListener;
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 
 public class InterstitialAdHelper {
-    private final Context mCtx;
+    private final Activity mAct;
     private InterstitialAd mAd;
     private AdListener mListener;
     private int mMissedTimes;
+    private FrameLayout mOverlay;
     private final SharedPreferences mPrefs;
     private final boolean mShowIntermittantAd;
+    private Timer mCancelTimer;
+    private boolean mCancel = false;
 
     // Constants to decide whether to show the InterstitialAds now or later
     //      Notice how the first time and next time after seeing an ad, the
@@ -45,13 +55,15 @@ public class InterstitialAdHelper {
     static final private int TIME_NOT_USED_24_HOURS_VALUE = 30;
     static final private String PREF_LAST_DATE_SEEN_AD = "InterstitialAdHelper.last.date.seen.ad";
 
+    static final private int TIMEOUT = 4000;
+
     /**
      * This constructor will run the intermittent simple algorithm given above
      * when to show the ads.
      * @param c
      */
-    public InterstitialAdHelper(Context c) {
-        this(c, 0);
+    public InterstitialAdHelper(Activity a) {
+        this(a, 0);
     }
 
     /**
@@ -59,9 +71,9 @@ public class InterstitialAdHelper {
      * @param c
      * @param flatPercent
      */
-    public InterstitialAdHelper(Context c, double flatPercent) {
-        mCtx = c;
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(mCtx);
+    public InterstitialAdHelper(Activity a, double flatPercent) {
+        mAct = a;
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(mAct);
         mShowIntermittantAd = flatPercent == 0;
         double percentage = mShowIntermittantAd ? calculateIntermittentShowAd() : flatPercent;
         if (shouldShowAd(percentage)) {
@@ -84,28 +96,86 @@ public class InterstitialAdHelper {
      * @return has shown or not
      */
     public boolean show() {
-        boolean willShow = mAd != null && mAd.isLoaded();
-        if (willShow) {
-            if (mShowIntermittantAd) {
-                // Showing the ad, now set it back to 0 missed times
-                mPrefs.edit().putInt(PREF_NUM_TIMES_MISSED_AD, 0).commit();
+        if (mAd == null || mCancel) {
+            incrementMissedAd();
+            return false;
+        }
+        if (mAd.isLoaded()) {
+            internalShow();
+        } else {
+            if (!mCancel) {
+                attachOverlay();
+                mCancelTimer = new Timer();
+                mCancelTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // Cancel after timeout error
+                        mCancel = true;
+                        removeOverlay();
+                        if (mListener != null) {
+                            mListener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
+                            mListener.onAdDismiss();
+                        }
+                    }
+                }, TIMEOUT);
+            } else {
+                incrementMissedAd();
             }
+        }
+        return true;
+    }
 
-            if (mListener != null) {
-                mAd.setAdListener(mListener);
-            }
-            mAd.show();
-        } else if (mShowIntermittantAd) {
+    private void incrementMissedAd() {
+        if (mShowIntermittantAd) {
             // Didn't see the ad, now we have to increment it
             mPrefs.edit().putInt(PREF_NUM_TIMES_MISSED_AD, ++mMissedTimes).commit();
         }
-        return willShow;
+    }
+
+    private void internalShow() {
+        if (mShowIntermittantAd) {
+            // Showing the ad, now set it back to 0 missed times
+            mPrefs.edit().putInt(PREF_NUM_TIMES_MISSED_AD, 0).commit();
+        }
+        mAd.show();
+    }
+
+    private void attachOverlay() {
+        // Not ready yet, cover the entire app with black till ad is loaded
+        FrameLayout fl = (FrameLayout)mAct.findViewById(android.R.id.content);
+        mOverlay = new FrameLayout(mAct);
+        mOverlay.setBackgroundColor(Color.BLACK);
+        fl.addView(mOverlay);
+        if (mAct instanceof SherlockActivity) {
+            ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
+            if (bar != null) {
+                bar.hide();
+            }
+        } else if (mAct.getActionBar() != null) {
+            mAct.getActionBar().hide();
+        }
+        mAct.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
+
+    private void removeOverlay() {
+        if (mOverlay != null) {
+            ((ViewGroup)mOverlay.getParent()).removeView(mOverlay);
+            mAct.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            if (mAct instanceof SherlockActivity) {
+                ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
+                if (bar != null) {
+                    bar.show();
+                }
+            } else if (mAct.getActionBar() != null) {
+                mAct.getActionBar().show();
+            }
+        }
     }
 
     private long getInstallationDateMilliseconds() {
         try {
-            ApplicationInfo appInfo = mCtx.getPackageManager()
-                    .getApplicationInfo(mCtx.getPackageName(), 0);
+            ApplicationInfo appInfo = mAct.getPackageManager()
+                    .getApplicationInfo(mAct.getPackageName(), 0);
             String appFile = appInfo.sourceDir;
             return new File(appFile).lastModified();
         } catch (NameNotFoundException e) {
@@ -147,12 +217,63 @@ public class InterstitialAdHelper {
     }
 
     private void buildAd() {
-        mAd = new InterstitialAd(mCtx);
-        mAd.setAdUnitId(mCtx.getString(R.string.admob_interstitial_key));
+        mAd = new InterstitialAd(mAct);
+        mAd.setAdUnitId(mAct.getString(R.string.admob_interstitial_key));
         final AdRequest adRequest = new AdRequest.Builder().build();
         mAd.loadAd(adRequest);
-        if (mListener != null) {
-            mAd.setAdListener(mListener);
+
+        mAd.setAdListener(new com.google.android.gms.ads.AdListener() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                removeOverlay();
+                if (mListener != null) {
+                    mListener.onAdClosed();
+                    mListener.onAdDismiss();
+                }
+            }
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                super.onAdFailedToLoad(errorCode);
+                removeOverlay();
+                mCancel = true;
+                if (!mCancel && mCancelTimer != null) {
+                    mCancelTimer.cancel();
+                }
+                if (mListener != null) {
+                    mListener.onAdFailedToLoad(errorCode);
+                    if (mOverlay != null) {
+                        // Show when overlay is shown
+                        mListener.onAdDismiss();
+                    }
+                }
+            }
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                if (!mCancel && mCancelTimer != null) {
+                    mCancelTimer.cancel();
+                }
+                if (mListener != null) {
+                    mListener.onAdLoaded();
+                }
+                // Waited for the ad to load
+                if (mOverlay != null) {
+                    internalShow();
+                }
+            }
+            @Override
+            public void onAdOpened() {
+                super.onAdOpened();
+                if (mListener != null) {
+                    mListener.onAdOpened();
+                }
+            }
+        });
+    }
+
+    public static class AdListener extends com.google.android.gms.ads.AdListener {
+        public void onAdDismiss() {
         }
     }
 }
