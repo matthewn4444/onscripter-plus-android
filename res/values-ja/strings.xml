@@ -38,6 +38,14 @@
 
     <string name="settings_about_change_log_title">変更</string>
 
+    <string name="settings_appearance_cate">外観</string>
+    <string name="settings_theme_title">テーマ</string>
+    <string name="settings_theme_default_entry">白</string>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_default_entry</item>
+        <item>黒</item>
+    </string-array>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
     <string name="dialog_select_button_text">選択</string>

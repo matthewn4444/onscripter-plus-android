@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory android:title="@string/settings_appearance_cate">
+        <com.onscripter.plus.ListPreferencePlus android:title="@string/settings_theme_title"
+            android:key="@string/settings_theme_key"
+            android:entries="@array/settings_theme_entries"
+            android:entryValues="@array/settings_theme_values"
+            android:defaultValue="@string/settings_theme_default_value"/>
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_render_cate">
         <CheckBoxPreference
             android:defaultValue="@bool/render_font_outline"

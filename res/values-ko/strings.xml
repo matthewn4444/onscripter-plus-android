@@ -42,6 +42,14 @@
 
     <string name="settings_about_change_log_title">변경사항</string>
 
+    <string name="settings_appearance_cate">외관</string>
+    <string name="settings_theme_title">테마</string>
+    <string name="settings_theme_default_entry">화이트</string>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_default_entry</item>
+        <item>검정</item>
+    </string-array>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">폴더 고르기</string>
     <string name="dialog_select_button_text">선택</string>
