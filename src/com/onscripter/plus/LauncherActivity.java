@@ -316,7 +316,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
 
             // Change in theme
             String theme = mPrefs.getString(SETTINGS_THEME_KEY, "");
-            if (!mCurrentThemeResult.equals(theme)) {
+            if (!theme.equals(mCurrentThemeResult)) {
                 finish();
                 goToActivity(this.getClass());
             }
