@@ -15,4 +15,9 @@
             <enum name="right_side" value="1"/>
         </attr>
     </declare-styleable>
+
+    <!-- Theme Images Dependent -->
+    <attr name="folderUpImage" format="reference"></attr>
+    <attr name="fileImage" format="reference"></attr>
+    <attr name="folderImage" format="reference"></attr>
 </resources>

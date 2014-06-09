@@ -41,6 +41,14 @@
 
     <string name="settings_about_change_log_title">Посмотреть журнал изменений</string>
 
+    <string name="settings_appearance_cate">внешний вид</string>
+    <string name="settings_theme_title">тема</string>
+    <string name="settings_theme_default_entry">белый</string>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_default_entry</item>
+        <item>черный</item>
+    </string-array>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Выберите папку</string>
     <string name="dialog_select_button_text">Выбрать</string>

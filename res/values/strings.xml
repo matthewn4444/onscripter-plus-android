@@ -82,6 +82,20 @@
     <string name="settings_about_change_log_title">View Change Log</string>
     <string name="settings_about_change_log_key">settings.about.change.log.key</string>
 
+    <string name="settings_appearance_cate">Appearance</string>
+    <string name="settings_theme_key">settings.theme.key</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_theme_default_entry">White</string>
+    <string name="settings_theme_default_value">0</string>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_default_entry</item>
+        <item>Black</item>
+    </string-array>
+    <string-array name="settings_theme_values">
+        <item>@string/settings_theme_default_value</item>
+        <item>1</item>
+    </string-array>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_select_button_text">Select</string>

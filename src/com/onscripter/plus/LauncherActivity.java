@@ -50,6 +50,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     public static String DEFAULT_FONT_PATH = null;
     public static String DEFAULT_FONT_FILE = null;
     public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
+    public static String SETTINGS_THEME_KEY = null;
     private static File DEFAULT_LOCATION;
     private static String FONTS_FOLDER = null;
 
@@ -58,6 +59,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private FontFileCopyTask mCopyTask = null;
     private FolderBrowserDialogWrapper mDirBrowse = null;
     private SharedPreferences mPrefs = null;
+    private String mCurrentThemeResult;
     private ChangeLog mChangeLog;
 
     private AdView mAdView;
@@ -70,8 +72,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         if (!isDebug()) {
             BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
         }
-        mDirBrowse = new FolderBrowserDialogWrapper(this);
-        mDialog = new AlertDialog.Builder(this);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Set all static values
@@ -87,9 +87,18 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             }
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
             SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
+            SETTINGS_THEME_KEY = getString(R.string.settings_theme_key);
             DEFAULT_LOCATION = Environment2.getExternalSDCardDirectory() != null ?
                     Environment2.getExternalSDCardDirectory() : Environment.getExternalStorageDirectory();
         }
+
+        // Set themee
+        String defaultThemeName = getString(R.string.settings_theme_default_value);
+        String themeName = mPrefs.getString(SETTINGS_THEME_KEY, defaultThemeName);
+        setTheme(themeName.equals(defaultThemeName) ? R.style.Theme_Light : R.style.Theme_Dark);
+
+        mDirBrowse = new FolderBrowserDialogWrapper(this);
+        mDialog = new AlertDialog.Builder(this);
 
         File directory = null;
         String lastDirectory = null;
@@ -123,7 +132,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mAdapter.onlyShowFolders(true);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
-        listView.setBackgroundColor(Color.WHITE);
         setContentView(listView);
 
         // Copy the font file if it does not exist yet
@@ -260,7 +268,6 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        MenuInflater inflater = getSupportMenuInflater();
-       inflater.inflate(R.menu.main_menu, menu);
        inflater.inflate(R.menu.menu_launcher, menu);
        return super.onCreateOptionsMenu(menu);
     }
@@ -270,6 +277,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         switch(item.getItemId()) {
         case R.id.action_settings:
             Intent i = new Intent(this, Settings.class);
+            mCurrentThemeResult = mPrefs.getString(SETTINGS_THEME_KEY, null);
             startActivityForResult(i, REQUEST_CODE_SETTINGS);
             break;
         case R.id.action_change_folder:
@@ -305,6 +313,13 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         case REQUEST_CODE_SETTINGS:
             String path = mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null);
             setPath(path);
+
+            // Change in theme
+            String theme = mPrefs.getString(SETTINGS_THEME_KEY, "");
+            if (!mCurrentThemeResult.equals(theme)) {
+                finish();
+                goToActivity(this.getClass());
+            }
             break;
         }
     }

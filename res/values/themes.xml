@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Light" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+        <item name="android:listViewStyle">@style/ListViewStyle.Light</item>
+        <item name="folderUpImage">@drawable/ic_folder_up_light</item>
+        <item name="fileImage">@drawable/ic_file_light</item>
+        <item name="folderImage">@drawable/ic_folder_light</item>
+    </style>
+    <style name="Theme.Dark" parent="@style/Theme.Sherlock">
+        <item name="android:listViewStyle">@style/ListViewStyle.Dark</item>
+        <item name="folderUpImage">@drawable/ic_folder_up_dark</item>
+        <item name="fileImage">@drawable/ic_file_dark</item>
+        <item name="folderImage">@drawable/ic_folder_dark</item>
+    </style>
+
+    <style name="ListViewStyle.Light" parent="android:style/Widget.ListView">
+        <item name="android:background">@color/abs__background_holo_light</item>
+        <item name="android:divider">@drawable/light_divider</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+    <style name="ListViewStyle.Dark" parent="android:style/Widget.ListView">
+        <item name="android:divider">@drawable/dark_divider</item>
+        <item name="android:dividerHeight">1dp</item>
+    </style>
+</resources>

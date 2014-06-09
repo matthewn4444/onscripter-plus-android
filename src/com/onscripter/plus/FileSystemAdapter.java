@@ -9,6 +9,7 @@ import java.util.Comparator;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ImageView;
@@ -113,10 +114,15 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         if (BackString == null) {
             BackString = context.getString(R.string.directory_back);
             BackFileListItem = new FileListItem(LIST_ITEM_TYPE.BACK, BackString);
-            IconBackDrawable = context.getResources().getDrawable(R.drawable.ic_folder_up);
-            IconFileDrawable = context.getResources().getDrawable(R.drawable.ic_file);
-            IconFolderDrawable = context.getResources().getDrawable(R.drawable.ic_folder);
         }
+
+        int[] attrs = new int[] { R.attr.folderUpImage, R.attr.fileImage, R.attr.folderImage };
+        TypedArray ta = context.obtainStyledAttributes(attrs);
+        IconBackDrawable = ta.getDrawable(0);
+        IconFileDrawable = ta.getDrawable(1);
+        IconFolderDrawable = ta.getDrawable(2);
+        ta.recycle();
+
         mTypeParser = parser;
         refresh();
     }
