@@ -141,34 +141,46 @@ public class InterstitialAdHelper {
     }
 
     private void attachOverlay() {
-        // Not ready yet, cover the entire app with black till ad is loaded
-        FrameLayout fl = (FrameLayout)mAct.findViewById(android.R.id.content);
-        mOverlay = new FrameLayout(mAct);
-        mOverlay.setBackgroundColor(Color.BLACK);
-        fl.addView(mOverlay);
-        if (mAct instanceof SherlockActivity) {
-            ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
-            if (bar != null) {
-                bar.hide();
+        mAct.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // Not ready yet, cover the entire app with black till ad is loaded
+                FrameLayout fl = (FrameLayout)mAct.findViewById(android.R.id.content);
+                mOverlay = new FrameLayout(mAct);
+                mOverlay.setBackgroundColor(Color.BLACK);
+                fl.addView(mOverlay);
+                if (mAct instanceof SherlockActivity) {
+                    ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
+                    if (bar != null) {
+                        bar.hide();
+                    }
+                } else if (mAct.getActionBar() != null) {
+                    mAct.getActionBar().hide();
+                }
+                mAct.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
-        } else if (mAct.getActionBar() != null) {
-            mAct.getActionBar().hide();
-        }
-        mAct.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        });
     }
 
     private void removeOverlay() {
         if (mOverlay != null) {
-            ((ViewGroup)mOverlay.getParent()).removeView(mOverlay);
-            mAct.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            if (mAct instanceof SherlockActivity) {
-                ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
-                if (bar != null) {
-                    bar.show();
+            mAct.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if ((ViewGroup)mOverlay.getParent() != null) {
+                        ((ViewGroup)mOverlay.getParent()).removeView(mOverlay);
+                    }
+                    mAct.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    if (mAct instanceof SherlockActivity) {
+                        ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
+                        if (bar != null) {
+                            bar.show();
+                        }
+                    } else if (mAct.getActionBar() != null) {
+                        mAct.getActionBar().show();
+                    }
                 }
-            } else if (mAct.getActionBar() != null) {
-                mAct.getActionBar().show();
-            }
+            });
         }
     }
 
