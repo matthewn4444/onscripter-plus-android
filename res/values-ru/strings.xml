@@ -63,9 +63,8 @@
     <string name="dialog_settings_text_title">Текст</string>
 
     <string name="dialog_settings_controls_global">Глобальные настройки управления</string>
-    <string name="settings_controls_swipe_default_entry">Проведите с двух сторон</string>
     <string-array name="settings_controls_swipe_entries">
-        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>Проведите с двух сторон</item>
         <item>Проведите по экрану слева</item>
         <item>Проведите по экрану справа</item>
     </string-array>

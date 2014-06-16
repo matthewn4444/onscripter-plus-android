@@ -59,9 +59,8 @@
     <string name="dialog_settings_text_title">文字</string>
 
     <string name="dialog_settings_controls_global">この設定は、すべてのゲームでデフォルトとして設定されます。</string>
-    <string name="settings_controls_swipe_default_entry">両側から押し</string>
     <string-array name="settings_controls_swipe_entries">
-        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>両側から押し</item>
         <item>左から押し</item>
         <item>右から押し</item>
     </string-array>

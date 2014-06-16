@@ -43,7 +43,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
     private static UpdateHandler sHandler;
     private static String DISPLAY_CONTROLS_KEY;
     private static String SWIPE_GESTURES_KEY;
-    private static String[] SWIPE_GESTURES_ENTRIES;
+    private static String[] SWIPE_GESTURES_VALUES;
 
     private VNSettingsDialog mDialog;
     private FrameLayout mGameLayout;
@@ -178,7 +178,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         if (DISPLAY_CONTROLS_KEY == null) {
             DISPLAY_CONTROLS_KEY = getString(R.string.settings_controls_display_key);
             SWIPE_GESTURES_KEY = getString(R.string.settings_controls_swipe_key);
-            SWIPE_GESTURES_ENTRIES = getResources().getStringArray(R.array.settings_controls_swipe_entries);
+            SWIPE_GESTURES_VALUES = getResources().getStringArray(R.array.settings_controls_swipe_values);
         }
         boolean allowBezelControls = mPrefs.getBoolean(DISPLAY_CONTROLS_KEY, false);
         if (allowBezelControls) {
@@ -193,16 +193,16 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         if (allowBezelControls) {
             int index = -1;
             String gestureValue = mPrefs.getString(SWIPE_GESTURES_KEY,
-                    getString(R.string.settings_controls_swipe_default_entry));
-            for (int i = 0; i < SWIPE_GESTURES_ENTRIES.length; i++) {
-                if (gestureValue.equals(SWIPE_GESTURES_ENTRIES[i])) {
+                    getString(R.string.settings_controls_swipe_default_value));
+            for (int i = 0; i < SWIPE_GESTURES_VALUES.length; i++) {
+                if (gestureValue.equals(SWIPE_GESTURES_VALUES[i])) {
                     index = i;
                     break;
                 }
             }
             // If it did not find the correct value, we will default to 0
             if (index == -1) {
-                mPrefs.edit().putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_ENTRIES[0]).commit();
+                mPrefs.edit().putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_VALUES[0]).commit();
                 index = 0;
             }
             switch(index) {
