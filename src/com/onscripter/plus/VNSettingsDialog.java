@@ -53,7 +53,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
     private static String SWIPE_GESTURES_KEY;
 
     // Preference values
-    private static String[] SWIPE_GESTURES_ENTRIES;
+    private static String[] SWIPE_GESTURES_VALUES;
 
     // Settings view elements
     private final CheckBox mDisplayControlsChkbx;
@@ -97,7 +97,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         if (DISPLAY_CONTROLS_KEY == null) {
             DISPLAY_CONTROLS_KEY = mActivity.getString(R.string.settings_controls_display_key);
             SWIPE_GESTURES_KEY = mActivity.getString(R.string.settings_controls_swipe_key);
-            SWIPE_GESTURES_ENTRIES = mActivity.getResources().getStringArray(R.array.settings_controls_swipe_entries);
+            SWIPE_GESTURES_VALUES = mActivity.getResources().getStringArray(R.array.settings_controls_swipe_values);
             CONTROLS_TAB_NAME = mActivity.getString(R.string.dialog_settings_controls_title);
             TEXT_TAB_NAME = mActivity.getString(R.string.dialog_settings_text_title);
         }
@@ -156,9 +156,9 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         // Swipe spinner
         int index = -1;
         String gestureValue = mPrefs.getString(SWIPE_GESTURES_KEY,
-                mActivity.getString(R.string.settings_controls_swipe_default_entry));
-        for (int i = 0; i < SWIPE_GESTURES_ENTRIES.length; i++) {
-            if (gestureValue.equals(SWIPE_GESTURES_ENTRIES[i])) {
+                mActivity.getString(R.string.settings_controls_swipe_default_value));
+        for (int i = 0; i < SWIPE_GESTURES_VALUES.length; i++) {
+            if (gestureValue.equals(SWIPE_GESTURES_VALUES[i])) {
                 index = i;
                 break;
             }
@@ -174,7 +174,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
     private void savePreferences() {
         Editor editor = mPrefs.edit();
         editor.putBoolean(DISPLAY_CONTROLS_KEY, mDisplayControlsChkbx.isChecked());
-        editor.putString(SWIPE_GESTURES_KEY, mSwipeGesturesSpinner.getSelectedItem().toString());
+        editor.putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_VALUES[mSwipeGesturesSpinner.getSelectedItemPosition()]);
         editor.commit();
     }
 

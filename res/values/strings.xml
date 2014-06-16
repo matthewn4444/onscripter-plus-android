@@ -112,11 +112,16 @@
     <string name="dialog_settings_text_title">Text</string>
 
     <string name="dialog_settings_controls_global">These control settings are set globally.</string>
-    <string name="settings_controls_swipe_default_entry">Swipe from both sides</string>
     <string-array name="settings_controls_swipe_entries">
-        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>Swipe from both sides</item>
         <item>Swipe from left</item>
         <item>Swipe from right</item>
+    </string-array>
+    <string name="settings_controls_swipe_default_value">0</string>
+    <string-array name="settings_controls_swipe_values">
+        <item>@string/settings_controls_swipe_default_value</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
     <string name="dialog_settings_controls_display_title">Swipe to Show Controls</string>
     <string name="dialog_settings_controls_swipe_title">Swipe Gesture</string>

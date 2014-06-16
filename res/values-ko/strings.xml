@@ -62,9 +62,8 @@
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_global">이 설정은 모든 게임에서 기본으로 설정됩니다.</string>
-    <string name="settings_controls_swipe_default_entry">양쪽에서 밀기</string>
     <string-array name="settings_controls_swipe_entries">
-        <item>@string/settings_controls_swipe_default_entry</item>
+        <item>양쪽에서 밀기</item>
         <item>왼쪽에서 밀기</item>
         <item>오른쪽에서 밀기</item>
     </string-array>
