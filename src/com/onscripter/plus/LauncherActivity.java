@@ -65,6 +65,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     private AdView mAdView;
     private InterstitialAdHelper mInterHelper;
     private Bundle mStartONScripterBundle;
+    private boolean mJustLaunched = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,6 +145,20 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         createDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
         attachAds(listView);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        long numOfGames = mAdapter.getCount() - (mAdapter.isBackButtonShown() ? 1 : 0);
+        Analytics.startLauncher(this, numOfGames, mJustLaunched);
+        mJustLaunched = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Analytics.stop(this);
     }
 
     @Override

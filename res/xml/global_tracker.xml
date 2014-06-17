@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ga_logLevel">verbose</string>
+
+    <integer name="ga_dispatchPeriod">30</integer>
+
+    <screenName name="com.onscripter.plus.LauncherActivity">
+        Launcher
+    </screenName>
+    <screenName name="com.onscripter.plus.ONScripter">
+        Game
+    </screenName>
+</resources>

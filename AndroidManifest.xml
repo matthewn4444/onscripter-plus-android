@@ -38,5 +38,9 @@
        <activity
                   android:name="com.google.android.gms.ads.AdActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+
+        <!-- Google Analytics Version v4 needs this value for easy tracking -->
+        <meta-data android:name="com.google.android.gms.analytics.globalConfigResource"
+            android:resource="@xml/global_tracker" />
     </application>
 </manifest> 

@@ -32,6 +32,8 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.onscripter.plus.Analytics.BUTTON;
+import com.onscripter.plus.Analytics.CHANGE;
 import com.onscripter.plus.InterstitialAdHelper.AdListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
@@ -327,6 +329,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
         boolean refreshTimer = true;
         switch(v.getId()) {
         case R.id.controls_quit_button:
+            Analytics.buttonEvent(BUTTON.BACK);
             removeHideControlsTimer();
             if (mInterstitialHelper.show()) {
                 if( mGLView != null ) {
@@ -344,18 +347,22 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             refreshTimer = false;
             break;
         case R.id.controls_change_speed_button:
+            Analytics.buttonEvent(BUTTON.CHANGE_SPEED);
             mGLView.nativeKey( KeyEvent.KEYCODE_O, 1 );
             mGLView.nativeKey( KeyEvent.KEYCODE_O, 0 );
             break;
         case R.id.controls_skip_button:
+            Analytics.buttonEvent(BUTTON.SKIP);
             mGLView.nativeKey( KeyEvent.KEYCODE_S, 1 );
             mGLView.nativeKey( KeyEvent.KEYCODE_S, 0 );
             break;
         case R.id.controls_auto_button:
+            Analytics.buttonEvent(BUTTON.AUTO);
             mGLView.nativeKey( KeyEvent.KEYCODE_A, 1 );
             mGLView.nativeKey( KeyEvent.KEYCODE_A, 0 );
             break;
         case R.id.controls_settings_button:
+            Analytics.buttonEvent(BUTTON.SETTINGS);
             removeHideControlsTimer();
             mDialog.show();
             refreshTimer = false;
@@ -462,12 +469,19 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	}
 
 	@Override
+	protected void onStart() {
+	    super.onStart();
+	    Analytics.startONScripter(this, true);
+	}
+
+	@Override
 	protected void onStop()
 	{
 		super.onStop();
 		if( mGLView != null ) {
             mGLView.onStop();
         }
+		Analytics.stop(this);
 	}
 
 	@Override
@@ -495,6 +509,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	    nativeSetSentenceFontScale(scaleFactor);
 	    mVNPrefs.putFloat(DIALOG_FONT_SCALE_KEY, (float) scaleFactor);
 	    mVNPrefs.commit();
+	    Analytics.changeEvent(CHANGE.TEXT_SCALE, Math.round(scaleFactor * 100));
     }
 
     @Override

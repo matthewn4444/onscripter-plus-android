@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ga_trackingId">UA-39733898-3</string>
+
+    <string name="ga_sampleFrequency">100.0</string>
+
+    <bool name="ga_autoActivityTracking">true</bool>
+
+    <integer name="ga_sessionTimeout">-1</integer>
+
+    <bool name="ga_reportUncaughtExceptions">true</bool>  
+
+    <!-- The screen names that will appear in reports -->
+    <screenName name="com.onscripter.plus.LauncherActivity">
+        Launcher
+    </screenName>
+    <screenName name="com.onscripter.plus.ONScripter">
+        Game
+    </screenName>
+</resources>
