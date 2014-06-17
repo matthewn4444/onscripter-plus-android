@@ -191,7 +191,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         mAdView.loadAd(adRequest);
 
         // Initialize the Interstitial ads
-        mInterHelper = new InterstitialAdHelper(this);
+        mInterHelper = new InterstitialAdHelper(this, 100);
         mInterHelper.setAdListener(new AdListener() {
             @Override
             public void onAdDismiss() {

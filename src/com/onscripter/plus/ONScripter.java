@@ -94,7 +94,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
     private AdView mAdView;
     private int mAdViewHeight;
     private InterstitialAdHelper mInterstitialHelper;
-    static final private double LEAVE_GAME_INTERSTITIAL_AD_PERCENT = 60;
+    static final private double LEAVE_GAME_INTERSTITIAL_AD_PERCENT = 100;
 
     Runnable mHideControlsRunnable = new Runnable() {
         @Override

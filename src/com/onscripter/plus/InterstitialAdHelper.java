@@ -76,9 +76,13 @@ public class InterstitialAdHelper {
         mAct = a;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mAct);
         mShowIntermittantAd = flatPercent == 0;
-        double percentage = mShowIntermittantAd ? calculateIntermittentShowAd() : flatPercent;
-        if (shouldShowAd(percentage)) {
+        if (flatPercent >= 100) {
             buildAd();
+        } else {
+            double percentage = mShowIntermittantAd ? calculateIntermittentShowAd() : flatPercent;
+            if (shouldShowAd(percentage)) {
+                buildAd();
+            }
         }
     }
 
