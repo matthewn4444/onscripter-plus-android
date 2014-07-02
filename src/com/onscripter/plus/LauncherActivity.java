@@ -143,7 +143,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
         }
 
         createDirectoryBrowserDialog();
-        mChangeLog = new ChangeLog(this);
+        //mChangeLog = new ChangeLog(this);
         attachAds(listView);
     }
 
