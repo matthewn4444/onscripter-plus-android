@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="admob_key">ca-app-pub-7827835196460106/7286598875</string>
+    <string name="admob_interstitial_key">ca-app-pub-7827835196460106/5549926473</string>
+    <string name="bugsense_key">cccddad4</string>
+</resources>

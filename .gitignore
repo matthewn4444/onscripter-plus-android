@@ -22,6 +22,3 @@ local.properties
 
 # CDT-specific
 .cproject
-
-#Ignored personal files
-hidden_strings.xml
