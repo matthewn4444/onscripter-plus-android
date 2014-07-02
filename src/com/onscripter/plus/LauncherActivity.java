@@ -118,6 +118,12 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
             }
         } else {
             directory = new File(lastDirectory);
+            if (!directory.exists()) {
+                directory = getStartingDirectory();
+                if (directory == null) {
+                    return;
+                }
+            }
         }
 
         // Set up the listView and the adapter
