@@ -46,6 +46,7 @@
     <string name="message_private_dir_not_found">Could not find private directory!</string>
     <string name="message_internal_write_error">Could not write font file to internal storage!</string>
     <string name="message_read_font_error">Could not read font!</string>
+    <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>

@@ -10,6 +10,7 @@
     <string name="message_private_dir_not_found">Не удалось найти папку private!</string>
     <string name="message_internal_write_error">Не удалось записать файл шрифта во внутреннею память!</string>
     <string name="message_read_font_error">Не удалось загрузить шрифт!</string>
+    <string name="message_cannot_write_pref">Внутренняя память заполнена и не может спасти.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>

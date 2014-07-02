@@ -3,6 +3,8 @@ package com.onscripter.plus;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -414,11 +416,19 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	}
 
 	@Override
-    public void onLoadVNPref(boolean successful) {
+    public void onLoadVNPref(Result result) {
 	    // Load scale factor
         double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
         mDialog.setFontScalingFactor(scaleFactor);
         nativeSetSentenceFontScale(scaleFactor);
+
+        if (result == Result.NO_MEMORY) {
+            AlertDialog.Builder dialog = new Builder(this);
+            dialog.setTitle(getString(R.string.app_name));
+            dialog.setMessage(R.string.message_cannot_write_pref);
+            dialog.setPositiveButton(android.R.string.ok, null);
+            dialog.show();
+        }
     }
 
 	@Override

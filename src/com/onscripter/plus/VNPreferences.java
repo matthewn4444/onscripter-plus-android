@@ -14,6 +14,7 @@ import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.os.AsyncTask;
+import android.os.StatFs;
 import android.util.Log;
 import android.util.Xml;
 
@@ -41,7 +42,9 @@ public class VNPreferences {
     private OnLoadVNPrefListener mListener;
 
     public interface OnLoadVNPrefListener {
-        public void onLoadVNPref(boolean successful);
+        public static enum Result { NO_ISSUES, CANCELLED, NO_MEMORY };
+
+        public void onLoadVNPref(OnLoadVNPrefListener.Result returnVal);
     }
 
     public VNPreferences(String path) {
@@ -245,12 +248,12 @@ public class VNPreferences {
             if (!load()) {
                 Log.e(TAG, "Failed to load preferences from file. Will revert to default values");
                 if (mListener != null) {
-                    mListener.onLoadVNPref(false);
+                    mListener.onLoadVNPref(OnLoadVNPrefListener.Result.CANCELLED);
                 }
                 return false;
             }
             if (mListener != null) {
-                mListener.onLoadVNPref(true);
+                mListener.onLoadVNPref(OnLoadVNPrefListener.Result.NO_ISSUES);
             }
         }
         return true;
@@ -345,7 +348,7 @@ public class VNPreferences {
         }
     }
 
-    private class LoadSaveSettingsTask extends AsyncTask<Void, Void, Void> {
+    private class LoadSaveSettingsTask extends AsyncTask<Void, Void, OnLoadVNPrefListener.Result> {
         public static final int LOAD_TASK = 1;
         public static final int SAVE_TASK = 2;
 
@@ -360,13 +363,19 @@ public class VNPreferences {
         }
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected OnLoadVNPrefListener.Result doInBackground(Void... params) {
             switch (mTaskCode) {
             case LOAD_TASK:
                 load();
                 break;
             case SAVE_TASK:
-                if (!mData.isEmpty()) {
+                // Check for space left
+                StatFs stat = new StatFs(mPath);
+                long bytesAvailable = (long)stat.getBlockSize() *(long)stat.getBlockCount();
+                long megAvailable = bytesAvailable / 1048576;
+                if (megAvailable == 0) {
+                    return OnLoadVNPrefListener.Result.NO_MEMORY;
+                } else if (!mData.isEmpty()) {
                     synchronized (mReadWriteLock) {
                         File file = new File(mPath + "/" + PREF_FILE_NAME);
                         final byte[] newLine = System.getProperty("line.separator").getBytes();
@@ -383,7 +392,7 @@ public class VNPreferences {
 
                             for (Entry<String, Property> entry : mData.entrySet()) {
                                 if (isCancelled()) {
-                                    return null;
+                                    return OnLoadVNPrefListener.Result.CANCELLED;
                                 }
                                 os.write(entry.getValue().toXMLLine().getBytes());
                                 os.write(newLine);
@@ -409,23 +418,23 @@ public class VNPreferences {
                 }
                 break;
             }
-            return null;
+            return OnLoadVNPrefListener.Result.NO_ISSUES;
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
             if (mListener != null && mTaskCode == LOAD_TASK) {
-                mListener.onLoadVNPref(false);
+                mListener.onLoadVNPref(OnLoadVNPrefListener.Result.CANCELLED);
             }
             mTask = null;
         }
 
         @Override
-        protected void onPostExecute(Void result) {
+        protected void onPostExecute(OnLoadVNPrefListener.Result result) {
             super.onPostExecute(result);
             if (mListener != null && mTaskCode == LOAD_TASK) {
-                mListener.onLoadVNPref(true);
+                mListener.onLoadVNPref(OnLoadVNPrefListener.Result.NO_ISSUES);
             }
             mTask = null;
         }
