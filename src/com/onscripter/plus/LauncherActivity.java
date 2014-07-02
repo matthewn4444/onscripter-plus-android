@@ -150,8 +150,7 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     @Override
     protected void onStart() {
         super.onStart();
-        long numOfGames = mAdapter.getCount() - (mAdapter.isBackButtonShown() ? 1 : 0);
-        Analytics.startLauncher(this, numOfGames, mJustLaunched);
+        Analytics.start(this, mJustLaunched);
         mJustLaunched = false;
     }
 
@@ -159,6 +158,37 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     protected void onStop() {
         super.onStop();
         Analytics.stop(this);
+    }
+
+    protected void sendAnalyticsActivityEnd() {
+        final File currentDir = mAdapter.getCurrentDirectory();
+
+        // Adblocker used
+        Analytics.sendAdblockerUsed(this);
+
+        // Send if wifi is enabled
+        Analytics.sendWifiEnabledEvent(this);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // Get the current theme
+                String theme = mPrefs.getString(SETTINGS_THEME_KEY, "");
+                String defaultThemeName = getString(R.string.settings_theme_default_value);
+                final boolean isWhite = theme.equals("") || theme.equals(defaultThemeName);
+                Analytics.sendLauncherTheme(isWhite);
+
+                // Count number of games in current directory
+                File[] files = currentDir.listFiles();
+                long n = 0;
+                for (File file : files) {
+                    if (isDirectoryONScripterGame(file)) {
+                        n++;
+                    }
+                }
+                Analytics.sendNumberOfGames(n);
+            }
+        }).start();
     }
 
     @Override
@@ -376,6 +406,11 @@ public class LauncherActivity extends SherlockActivity implements AdapterView.On
     }
 
     protected void goToActivity(Class<?> cls, Bundle bundle) {
+        // Send all the events before we move on to ONScripter
+        if (cls.equals(ONScripter.class)) {
+            sendAnalyticsActivityEnd();
+        }
+
         Intent i = new Intent(this, cls);
         if (bundle != null) {
             i.putExtras(bundle);

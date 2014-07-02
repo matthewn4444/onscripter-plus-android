@@ -94,6 +94,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
     private AdView mAdView;
     private int mAdViewHeight;
     private InterstitialAdHelper mInterstitialHelper;
+    private long mSessionStart;
     static final private double LEAVE_GAME_INTERSTITIAL_AD_PERCENT = 100;
 
     Runnable mHideControlsRunnable = new Runnable() {
@@ -192,6 +193,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
                 mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
             }
         });
+        mSessionStart = System.currentTimeMillis();
 
         runSDLApp();
     }
@@ -471,7 +473,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 	@Override
 	protected void onStart() {
 	    super.onStart();
-	    Analytics.startONScripter(this, true);
+	    Analytics.start(this);
 	}
 
 	@Override
@@ -482,6 +484,16 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             mGLView.onStop();
         }
 		Analytics.stop(this);
+
+		// Adblocker used
+        Analytics.sendAdblockerUsed(this);
+
+        // Send if wifi is enabled
+        Analytics.sendWifiEnabledEvent(this);
+
+        // Send session time
+        long sessionTime = Math.round((System.currentTimeMillis() - mSessionStart) / 1000.0);
+        Analytics.sendSessionLength(this, sessionTime);
 	}
 
 	@Override
