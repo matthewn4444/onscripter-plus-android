@@ -346,10 +346,12 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
 
 	@Override
     public void onLoadVNPref(Result result) {
-	    // Load scale factor
-        double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
-        mDialog.setFontScalingFactor(scaleFactor);
-        nativeSetSentenceFontScale(scaleFactor);
+        if (result == Result.NO_ISSUES) {
+	        // Load scale factor
+	        double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
+	        mDialog.setFontScalingFactor(scaleFactor);
+	        nativeSetSentenceFontScale(scaleFactor);
+        }
 
         if (result == Result.NO_MEMORY) {
             AlertDialog.Builder dialog = new Builder(this);
