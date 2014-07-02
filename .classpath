@@ -11,5 +11,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="lib" path="libs/appflood-admob-2.21.jar"/>
+	<classpathentry kind="lib" path="libs/inmobi/InMobi-4.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/inmobi/libadapterinmobi.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
