@@ -138,7 +138,7 @@ public class ChangeLog {
     private void setChangeLogTimestamp() {
         Editor editor = mPref.edit();
         editor.putLong(PREF_KEY, Calendar.getInstance().getTimeInMillis());
-        editor.commit();
+        editor.apply();
     }
 
     private void buildContents() {
