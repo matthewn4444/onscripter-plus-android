@@ -1,4 +1,4 @@
-package com.onscripter.plus;
+package com.onscripter.plus.ads;
 
 import java.io.File;
 import java.util.Calendar;
@@ -20,6 +20,8 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
+import com.onscripter.plus.Adblocker;
+import com.onscripter.plus.R;
 
 public class InterstitialAdHelper {
     private final Activity mAct;

@@ -41,7 +41,8 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
-import com.onscripter.plus.InterstitialAdHelper.AdListener;
+import com.onscripter.plus.ads.InterstitialAdHelper;
+import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
 public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {

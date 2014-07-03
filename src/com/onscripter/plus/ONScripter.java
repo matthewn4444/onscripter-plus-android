@@ -36,9 +36,10 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.plus.Analytics.BUTTON;
 import com.onscripter.plus.Analytics.CHANGE;
-import com.onscripter.plus.InterstitialAdHelper.AdListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
+import com.onscripter.plus.ads.InterstitialAdHelper;
+import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
 public class ONScripter extends Activity implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener
 {
