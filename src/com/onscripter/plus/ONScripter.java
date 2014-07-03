@@ -338,7 +338,7 @@ public class ONScripter extends Activity implements OnClickListener, OnDismissLi
             removeHideControlsTimer();
             if (mInterstitialHelper.show()) {
                 if( mGLView != null ) {
-                    mGLView.onPause();
+                    mGLView.onStop();
                 }
                 if( mAudioThread != null ) {
                     mAudioThread.onPause();

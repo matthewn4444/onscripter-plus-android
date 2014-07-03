@@ -11,5 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="/google-play-services_lib/libs/google-play-services.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="libs/mobilecore_V0.9.4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
