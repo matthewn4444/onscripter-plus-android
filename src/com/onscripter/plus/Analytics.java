@@ -8,6 +8,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.res.XmlResourceParser;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -115,6 +116,11 @@ public final class Analytics {
     synchronized static void initTrackers(Context ctx) {
         if (sTrackers.isEmpty()) {
             GoogleAnalytics analytics = GoogleAnalytics.getInstance(ctx);
+
+            // For debug mode, do not send any analytics
+            if ((ctx.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+                analytics.setDryRun(true);
+            }
             for (TrackerType type : TrackerType.values()) {
                 switch(type) {
                     case APP_TRACKER:
