@@ -1,7 +1,7 @@
 package com.onscripter.plus.ads;
 
 import android.app.Activity;
-import android.content.Context;
+import android.util.Log;
 
 import com.google.ads.mediation.MediationAdRequest;
 import com.google.ads.mediation.customevent.CustomEventInterstitial;
@@ -9,22 +9,15 @@ import com.google.ads.mediation.customevent.CustomEventInterstitialListener;
 import com.ironsource.mobilcore.CallbackResponse;
 import com.ironsource.mobilcore.MobileCore;
 import com.ironsource.mobilcore.MobileCore.AD_UNITS;
-import com.ironsource.mobilcore.MobileCore.LOG_TYPE;
 import com.ironsource.mobilcore.OnReadyListener;
 
 public class MCAdMobPlugin implements CustomEventInterstitial {
     private CustomEventInterstitialListener mAdMobListener;
     private Activity mActivity;
 
-    private static boolean mForceShow = false;
+    private static String MCAdMobPluginTag = "MobileCorePlugin";
 
-    public static void init(Context context, String devHash, LOG_TYPE logLevel, AD_UNITS adUnits) {
-        try {
-            MobileCore.init(context, devHash, logLevel, adUnits);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    private static boolean mForceShow = false;
 
     @Override
     public void requestInterstitialAd(
@@ -33,6 +26,20 @@ public class MCAdMobPlugin implements CustomEventInterstitial {
             MediationAdRequest mediationAdRequest, Object object) {
         mActivity = activity;
         mAdMobListener = adMobListener;
+        Log.d(MCAdMobPluginTag, "Requesting interstitial from mobileCore");
+
+        // Set the init here to avoid dependence of init at the activity level
+        if (serverParameter == null || serverParameter.equals("")) {
+            Log.d(MCAdMobPluginTag, "The developer hash from admob is empty, please set it correctly!");
+            adMobListener.onFailedToReceiveAd();
+            return;
+        }
+        try {
+            MobileCore.init(activity, serverParameter, MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.OFFERWALL);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mAdMobListener.onFailedToReceiveAd();
+        }
 
         MobileCore.setOfferwallReadyListener(new OnReadyListener() {
             @Override
@@ -59,6 +66,7 @@ public class MCAdMobPlugin implements CustomEventInterstitial {
             }, mForceShow);
         } catch (Exception e) {
             mAdMobListener.onFailedToReceiveAd();
+            Log.d(MCAdMobPluginTag, "Failed to receive ad from mobileCore");
         }
     }
 

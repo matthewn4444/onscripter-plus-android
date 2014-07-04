@@ -20,7 +20,6 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
-import com.ironsource.mobilcore.MobileCore;
 import com.onscripter.plus.Adblocker;
 import com.onscripter.plus.R;
 
@@ -102,9 +101,6 @@ public class InterstitialAdHelper {
                 }
             }
         }).start();
-
-        // Initiate plugins
-        MCAdMobPlugin.init(a, a.getString(R.string.mobilecore_hash), MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.OFFERWALL);
     }
 
     /**
