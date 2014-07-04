@@ -331,6 +331,14 @@ public class InterstitialAdHelper {
                     mListener.onAdOpened();
                 }
             }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+                if (mListener != null) {
+                    mListener.onAdLeftApplication();
+                }
+            }
         });
     }
 
