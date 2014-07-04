@@ -13,5 +13,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="lib" path="libs/mobilecore_V0.9.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/chartboost.jar" sourcepath="libs/chartboost.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/InMobi-4.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/libadapterinmobi.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

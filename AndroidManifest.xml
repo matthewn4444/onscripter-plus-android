@@ -3,7 +3,6 @@
       package="com.onscripter.plus"
       android:versionCode="22"
       android:versionName="1.1.9">
-
       <uses-sdk android:minSdkVersion="9"
         android:targetSdkVersion="18"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
@@ -11,7 +10,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <application android:label="@string/app_name" android:icon="@drawable/icon"
         android:theme="@style/Theme.Light"
         android:allowBackup="true">
@@ -35,12 +35,10 @@
                   android:label="@string/app_name"
                   android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
-
         <!-- Ads -->
        <activity
             android:name="com.google.android.gms.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-
         <!-- AppFlood -->
         <activity
             android:name="com.appflood.AFFullScreenActivity"
@@ -48,18 +46,15 @@
             android:theme="@android:style/Theme.Translucent"
             android:launchMode="singleTask">
             </activity>
-
         <activity
             android:name="com.appflood.mraid.MraidBrowserActivity"
             android:configChanges="keyboardHidden"
             android:launchMode="singleTask"
             android:theme="@android:style/Theme.Translucent">
             </activity>
-
         <activity
             android:name="com.google.ads.AdActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-
         <receiver
             android:name="com.appflood.AFReferralReceiver"
             android:exported="true">
@@ -67,9 +62,11 @@
                 <action android:name="com.android.vending.INSTALL_REFERRER"/>
            </intent-filter>
         </receiver>
-
+        <!-- InMobi -->
+        <activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|smallestScreenSize|screenSize" />
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
         <meta-data android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/global_tracker" />
     </application>
-</manifest> 
+</manifest>
