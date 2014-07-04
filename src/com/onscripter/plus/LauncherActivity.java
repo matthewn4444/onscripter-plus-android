@@ -31,7 +31,6 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -44,7 +43,7 @@ import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 import com.onscripter.plus.ads.InterstitialAdHelper;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
-public class LauncherActivity extends SherlockActivity implements AdapterView.OnItemClickListener, CustomFileTypeParser
+public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
     private static final int REQUEST_CODE_SETTINGS = 1;
     private static final String LAST_DIRECTORY = "last_directory_key";

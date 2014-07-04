@@ -2,7 +2,6 @@ package com.onscripter.plus;
 
 import java.lang.ref.WeakReference;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -41,7 +40,7 @@ import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 import com.onscripter.plus.ads.InterstitialAdHelper;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
-public class ONScripter extends Activity implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener
+public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
