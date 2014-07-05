@@ -57,6 +57,7 @@
     <string name="dialog_interal_storage_text">Перейти к внутренней памяти</string>
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
+    <string name="dialog_please_wait">Пожалуйста, подождите&#8230;</string>
 
     <string name="dialog_button_rate">Оцените приложение</string>
 

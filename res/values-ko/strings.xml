@@ -58,6 +58,7 @@
     <string name="dialog_sd_card_text">SD 카드로 가기</string>
     <string name="dialog_interal_storage_text">내장 메모리로 가기</string>
     <string name="dialog_ext_not_found"></string>
+    <string name="dialog_please_wait">기다려주십시오&#8230;</string>
 
     <string name="dialog_button_rate">이 앱을 평가!</string>
 
