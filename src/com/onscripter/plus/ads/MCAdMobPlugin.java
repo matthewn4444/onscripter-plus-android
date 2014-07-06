@@ -18,6 +18,37 @@ public class MCAdMobPlugin implements CustomEventInterstitial {
     private static String MCAdMobPluginTag = "MobileCorePlugin";
 
     private static boolean mForceShow = false;
+    private static boolean sShowStickeez = false;
+
+    public static void eventuallyShowStickeez(final Activity activity, String devHash) {
+        MobileCore.init(activity, devHash, MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.OFFERWALL, MobileCore.AD_UNITS.STICKEEZ);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (MobileCore.isStickeeReady()) {
+                    MobileCore.showStickee(activity);
+                } else {
+                    MobileCore.setStickeezReadyListener(new OnReadyListener() {
+                        @Override
+                        public void onReady(AD_UNITS adUnit) {
+                            if (adUnit.equals(MobileCore.AD_UNITS.STICKEEZ)) {
+                                MobileCore.showStickee(activity);
+                            }
+                        }
+                    });
+                }
+
+            }
+        }).start();
+        sShowStickeez = true;
+    }
+
+    public static void hideStickeez() {
+        if (sShowStickeez && MobileCore.isStickeeShowing()) {
+            MobileCore.hideStickee();
+            sShowStickeez = false;
+        }
+    }
 
     @Override
     public void requestInterstitialAd(
@@ -35,7 +66,7 @@ public class MCAdMobPlugin implements CustomEventInterstitial {
             return;
         }
         try {
-            MobileCore.init(activity, serverParameter, MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.OFFERWALL);
+            MobileCore.init(activity, serverParameter, MobileCore.LOG_TYPE.PRODUCTION, MobileCore.AD_UNITS.OFFERWALL, MobileCore.AD_UNITS.STICKEEZ);
         } catch (Exception e) {
             e.printStackTrace();
             mAdMobListener.onFailedToReceiveAd();
