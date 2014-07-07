@@ -167,7 +167,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mSwipeGesturesSpinner.setSelection(index);
 
         // Update the text upscaling font size
-        mFontPreviewSize = mActivity.nativeGetDialogFontSize();
+        mFontPreviewSize = mActivity.getGameFontSize();
         updateUpscalingNumber();
     }
 
@@ -219,7 +219,7 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
     @Override
     public void onTabChanged(String tabId) {
         if (tabId.equals(TEXT_TAB_NAME)) {
-            mFontPreviewSize = mActivity.nativeGetDialogFontSize();
+            mFontPreviewSize = mActivity.getGameFontSize();
             updateUpscalingNumber();
         }
     }
