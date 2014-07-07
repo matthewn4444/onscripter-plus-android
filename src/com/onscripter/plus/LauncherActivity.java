@@ -145,7 +145,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 Editor editor = mPrefs.edit();
                 String path = mDirBrowse.getResultDirectory().getPath();
                 editor.putString(SETTINGS_FOLDER_DEFAULT_KEY, path);
-                editor.commit();
+                editor.apply();
                 setPath(path);
             }
         });
@@ -161,13 +161,13 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             File onsDefaultDir = new File(Environment.getExternalStorageDirectory() + "/ons");
             if (onsDefaultDir.exists()) {
                 path = onsDefaultDir.getPath();
-                mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).commit();
+                mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).apply();
             } else if (Environment2.hasExternalSDCard()) {
                 // Check to see if there is a <extSdCard storage>/ons
                 onsDefaultDir = new File(Environment2.getExternalSDCardDirectory() + "/ons");
                 if (onsDefaultDir.exists()) {
                     path = onsDefaultDir.getPath();
-                    mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).commit();
+                    mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, path).apply();
                 }
             }
         }
@@ -177,7 +177,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             directory = new File(path);
         } else {
             directory = DEFAULT_LOCATION;
-            mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, DEFAULT_LOCATION.getPath()).commit();
+            mPrefs.edit().putString(SETTINGS_FOLDER_DEFAULT_KEY, DEFAULT_LOCATION.getPath()).apply();
         }
         if (!directory.exists()){
             showError(getString(R.string.message_cannot_find_internal_storage));

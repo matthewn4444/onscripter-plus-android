@@ -163,7 +163,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             }
             // If it did not find the correct value, we will default to 0
             if (index == -1) {
-                mPrefs.edit().putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_VALUES[0]).commit();
+                mPrefs.edit().putString(SWIPE_GESTURES_KEY, SWIPE_GESTURES_VALUES[0]).apply();
                 index = 0;
             }
             switch(index) {
