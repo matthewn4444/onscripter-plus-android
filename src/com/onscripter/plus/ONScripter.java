@@ -1,23 +1,15 @@
 package com.onscripter.plus;
 
-import java.lang.ref.WeakReference;
-
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Display;
-import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,23 +17,19 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
+import com.onscripter.ONScripterView;
+import com.onscripter.ONScripterView.OnUpdateControlListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
-public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener
+public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, OnUpdateControlListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
     public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
 
-    private static final int MSG_AUTO_MODE = 1;
-    private static final int MSG_SKIP_MODE = 2;
-
-    private static int BEZEL_SWIPE_DISTANCE = 0;
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
-    private static int CONTROL_LAYOUT_WIDTH = 0;
 
-    private static UpdateHandler sHandler;
     private static String DISPLAY_CONTROLS_KEY;
     private static String SWIPE_GESTURES_KEY;
     private static String[] SWIPE_GESTURES_VALUES;
@@ -59,27 +47,18 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private ImageButton2 mMouseScrollUpButton;
     private ImageButton2 mMouseScrollDownButton;
 
-    private int mScreenWidth, mScreenHeight, mGameWidth, mGameHeight, mDisplayWidth, mDisplayHeight;
-    private boolean mIsLandscape = true;
+    private int mDisplayWidth, mDisplayHeight, mGameHeight;
 
     private String mCurrentDirectory;
     private boolean mUseDefaultFont;
     private SharedPreferences mPrefs;
     private VNPreferences mVNPrefs;
 
-    private GestureDetector mGestureScanner;
     private boolean mAllowLeftBezelSwipe;
     private boolean mAllowRightBezelSwipe;
     private Handler mHideControlsHandler;
 
-    private DemoGLSurfaceView mGLView = null;
-    private AudioThread mAudioThread = null;
-    private PowerManager.WakeLock mWakelock = null;
-    private native int nativeInitJavaCallbacks();
-    private native int nativeGetWidth();
-    private native int nativeGetHeight();
-    private native void nativeSetSentenceFontScale(double scale);
-    public native int nativeGetDialogFontSize();
+    private ONScripterView mGame;
 
     Runnable mHideControlsRunnable = new Runnable() {
         @Override
@@ -87,21 +66,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             hideControls();
         }
     };
-
-    static class UpdateHandler extends Handler {
-        private final WeakReference<ONScripter> mActivity;
-        UpdateHandler(ONScripter activity) {
-            mActivity = new WeakReference<ONScripter>(activity);
-        }
-        @Override
-        public void handleMessage(Message msg)
-        {
-             ONScripter activity = mActivity.get();
-             if (activity != null) {
-                 activity.updateControls(msg.what, (Boolean)msg.obj);
-             }
-        }
-    }
 
     /** Called when the activity is first created. */
     @Override
@@ -116,8 +80,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Setup layout
-        View layout = getLayoutInflater().inflate(R.layout.onscripter, null);
-        setContentView(layout);
+        setContentView(R.layout.onscripter);
         mGameLayout = (FrameLayout)findViewById(R.id.game_wrapper);
         mLeftLayout = (TwoStateLayout)findViewById(R.id.left_menu);
         mRightLayout = (TwoStateLayout)findViewById(R.id.right_menu);
@@ -142,7 +105,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mDialog.setOnDimissListener(this);
 
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        CONTROL_LAYOUT_WIDTH = mLeftLayout.getLayoutParams().width;
         updateControlPreferences();
 
         mVNPrefs = new VNPreferences(mCurrentDirectory);
@@ -153,7 +115,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
         mLeftLayout.setOnSideMovedListener(this);
 
-        sHandler = new UpdateHandler(this);
         mHideControlsHandler = new Handler();
 
         // Get the dimensions of the screen
@@ -164,15 +125,14 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         runSDLApp();
     }
 
-    private void updateControls(int mode, boolean flag) {
-        switch(mode) {
-        case MSG_AUTO_MODE:
-            mAutoButton.setSelected(flag);
-            break;
-        case MSG_SKIP_MODE:
-            mSkipButton.setSelected(flag);
-            break;
-        }
+    @Override
+    public void autoStateChanged(boolean selected) {
+        mAutoButton.setSelected(selected);
+    }
+
+    @Override
+    public void skipStateChanged(boolean selected) {
+        mSkipButton.setSelected(selected);
     }
 
     private void updateControlPreferences() {
@@ -230,47 +190,43 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     private void runSDLApp() {
-        nativeInitJavaCallbacks();
+        boolean shouldRenderOutline = mPrefs.getBoolean(getString(R.string.settings_render_font_outline_key),
+                getResources().getBoolean(R.bool.render_font_outline));
 
-        mAudioThread = new AudioThread(this);
         if (mUseDefaultFont) {
-            mGLView = new DemoGLSurfaceView(this, mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH);
+            mGame = new ONScripterView(this, mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
         } else {
-            mGLView = new DemoGLSurfaceView(this, mCurrentDirectory);
+            mGame = new ONScripterView(this, mCurrentDirectory, null, shouldRenderOutline);
         }
-        mGLView.setFocusableInTouchMode(true);
-        mGLView.setFocusable(true);
-        mGLView.requestFocus();
+        mGame.setOnUpdateControlListener(this);
 
-        mGameWidth = nativeGetWidth();
-        mGameHeight = nativeGetHeight();
+        int gameWidth = mGame.getGameWidth();
+        mGameHeight = mGame.getGameHeight();
 
-        mScreenWidth = mDisplayWidth;
-        mScreenHeight = mDisplayHeight;
-        mIsLandscape = true;
-        if (mDisplayWidth * mGameHeight >= mDisplayHeight * mGameWidth){
-            mScreenWidth = (mDisplayHeight*mGameWidth/mGameHeight) & (~0x01); // to be 2 bytes aligned
+        int screenWidth = mDisplayWidth;
+        int screenHeight = mDisplayHeight;
+        if (mDisplayWidth * mGameHeight >= mDisplayHeight * gameWidth){
+            screenWidth = (mDisplayHeight*gameWidth/mGameHeight) & (~0x01); // to be 2 bytes aligned
         }
         else{
-            mIsLandscape = false;
-            mScreenHeight = mDisplayWidth*mGameHeight/mGameWidth;
+            screenHeight = mDisplayWidth*mGameHeight/gameWidth;
         }
 
         android.view.ViewGroup.LayoutParams l = mGameLayout.getLayoutParams();
-        l.width = mScreenWidth;
-        l.height = mScreenHeight;
+        l.width = screenWidth;
+        l.height = screenHeight;
         mGameLayout.setLayoutParams(l);
-        mGameLayout.addView(mGLView);
+        mGameLayout.addView(mGame);
 
-        if (mWakelock == null){
-            PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-            mWakelock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "ONScripter");
-            mWakelock.acquire();
-        }
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     public int getGameHeight() {
         return mGameHeight;
+    }
+
+    public int getGameFontSize() {
+        return mGame.getGameFontSize();
     }
 
     @Override
@@ -279,20 +235,17 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         switch(v.getId()) {
         case R.id.controls_quit_button:
             removeHideControlsTimer();
-            mGLView.nativeKey( KeyEvent.KEYCODE_MENU, 2 ); // send SDL_QUIT
+            mGame.exitApp();
             refreshTimer = false;
             break;
         case R.id.controls_change_speed_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_O, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_O, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_O);
             break;
         case R.id.controls_skip_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_S, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_S, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_S);
             break;
         case R.id.controls_auto_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_A, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_A, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_A);
             break;
         case R.id.controls_settings_button:
             removeHideControlsTimer();
@@ -300,16 +253,13 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             refreshTimer = false;
             break;
         case R.id.controls_rclick_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_BACK, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_BACK, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_BACK);
             break;
         case R.id.controls_scroll_up_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_LEFT, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_LEFT, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_DPAD_LEFT);
             break;
         case R.id.controls_scroll_down_button:
-            mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 1 );
-            mGLView.nativeKey( KeyEvent.KEYCODE_DPAD_RIGHT, 0 );
+            mGame.sendNativeKeyPress(KeyEvent.KEYCODE_DPAD_RIGHT);
             break;
         default:
             return;
@@ -319,37 +269,13 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-    public static void receiveMessageFromNDK(int mode, boolean flag) {
-        if (sHandler != null) {
-            Message msg = new Message();
-            msg.obj = flag;
-            msg.what = mode;
-            sHandler.sendMessage(msg);
-        }
-    }
-
-	public void playVideo(char[] filename){
-		try{
-			String filename2 = "file:/" + mCurrentDirectory + "/" + new String(filename);
-			filename2 = filename2.replace('\\', '/');
-			Log.v("ONS", "playVideo: " + filename2);
-			Uri uri = Uri.parse(filename2);
-			Intent i = new Intent(Intent.ACTION_VIEW);
-			i.setDataAndType(uri, "video/*");
-			startActivityForResult(i, -1);
-		}
-		catch(Exception e){
-			Log.e("ONS", "playVideo error:  " + e.getClass().getName());
-		}
-	}
-
-	@Override
+    @Override
     public void onLoadVNPref(Result result) {
         if (result == Result.NO_ISSUES) {
-	        // Load scale factor
-	        double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
-	        mDialog.setFontScalingFactor(scaleFactor);
-	        nativeSetSentenceFontScale(scaleFactor);
+            // Load scale factor
+            double scaleFactor = mVNPrefs.getFloat(DIALOG_FONT_SCALE_KEY, 1);
+            mDialog.setFontScalingFactor(scaleFactor);
+            mGame.setFontScaling(scaleFactor);
         }
 
         if (result == Result.NO_MEMORY) {
@@ -361,62 +287,49 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-	@Override
-	protected void onPause()
-	{
-		// TODO: if application pauses it's screen is messed up
-		if( mWakelock != null ) {
-            mWakelock.release();
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        if( mGame != null ) {
+            mGame.onPause();
         }
-		super.onPause();
-		if( mGLView != null ) {
-            mGLView.onPause();
-        }
-		if( mAudioThread != null ) {
-            mAudioThread.onPause();
-        }
-	}
+    }
 
-	@Override
-	protected void onResume()
-	{
-		if( mWakelock != null && !mWakelock.isHeld() ) {
-            mWakelock.acquire();
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        if( mGame != null ) {
+            mGame.onResume();
         }
-		super.onResume();
-		if( mGLView != null ) {
-            mGLView.onResume();
-        }
-		if( mAudioThread != null ) {
-            mAudioThread.onResume();
-        }
-	}
+    }
 
-	@Override
-	protected void onStop()
-	{
-		super.onStop();
-		if( mGLView != null ) {
-            mGLView.onStop();
+    @Override
+    protected void onStop()
+    {
+        super.onStop();
+        if( mGame != null ) {
+            mGame.onStop();
         }
-	}
+    }
 
-	@Override
-	protected void onDestroy()
-	{
-		if( mGLView != null ) {
-            mGLView.exitApp();
+    @Override
+    protected void onDestroy()
+    {
+        if( mGame != null ) {
+            mGame.exitApp();
         }
-		super.onDestroy();
-	}
+        super.onDestroy();
+    }
 
-	@Override
+    @Override
     public void onDismiss(DialogInterface dialog) {
-	    updateControlPreferences();
-	    double scaleFactor = mDialog.getFontScalingFactor();
-	    nativeSetSentenceFontScale(scaleFactor);
-	    mVNPrefs.putFloat(DIALOG_FONT_SCALE_KEY, (float) scaleFactor);
-	    mVNPrefs.commit();
+        updateControlPreferences();
+        double scaleFactor = mDialog.getFontScalingFactor();
+        mGame.setFontScaling(scaleFactor);
+        mVNPrefs.putFloat(DIALOG_FONT_SCALE_KEY, (float) scaleFactor);
+        mVNPrefs.commit();
     }
 
     @Override
@@ -430,50 +343,37 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-	private void hideControls() {
-	    hideControls(true);
-	}
-
-	private void showControls() {
-	    showControls(true);
+    private void hideControls() {
+        hideControls(true);
     }
 
-	private void hideControls(boolean animate) {
-	    mLeftLayout.moveLeft(animate);
-	    mRightLayout.moveRight(animate);
-	}
+    private void showControls() {
+        showControls(true);
+    }
 
-	private void showControls(boolean animate) {
-	    mLeftLayout.moveRight(animate);
+    private void hideControls(boolean animate) {
+        mLeftLayout.moveLeft(animate);
+        mRightLayout.moveRight(animate);
+    }
+
+    private void showControls(boolean animate) {
+        mLeftLayout.moveRight(animate);
         mRightLayout.moveLeft(animate);
-	}
+    }
 
-	private void removeHideControlsTimer() {
-	    if (mAllowRightBezelSwipe || mAllowLeftBezelSwipe) {
-	        mHideControlsHandler.removeCallbacks(mHideControlsRunnable);
-	    }
-	}
+    private void removeHideControlsTimer() {
+        if (mAllowRightBezelSwipe || mAllowLeftBezelSwipe) {
+            mHideControlsHandler.removeCallbacks(mHideControlsRunnable);
+        }
+    }
 
-	private void refreshHideControlsTimer() {
-	    if (mAllowRightBezelSwipe || mAllowLeftBezelSwipe) {
-	        removeHideControlsTimer();
-	        if (HIDE_CONTROLS_TIMEOUT_SECONDS == 0) {
-	            HIDE_CONTROLS_TIMEOUT_SECONDS = getResources().getInteger(R.integer.hide_controls_timeout_seconds);
-	        }
+    private void refreshHideControlsTimer() {
+        if (mAllowRightBezelSwipe || mAllowLeftBezelSwipe) {
+            removeHideControlsTimer();
+            if (HIDE_CONTROLS_TIMEOUT_SECONDS == 0) {
+                HIDE_CONTROLS_TIMEOUT_SECONDS = getResources().getInteger(R.integer.hide_controls_timeout_seconds);
+            }
             mHideControlsHandler.postDelayed(mHideControlsRunnable, 1000 * HIDE_CONTROLS_TIMEOUT_SECONDS);
         }
-	}
-
-	static {
-		System.loadLibrary("mad");
-		System.loadLibrary("bz2");
-		System.loadLibrary("tremor");
-		System.loadLibrary("lua");
-		System.loadLibrary("sdl");
-		System.loadLibrary("sdl_mixer");
-		System.loadLibrary("sdl_image");
-		System.loadLibrary("sdl_ttf");
-		System.loadLibrary("application");
-		System.loadLibrary("sdl_main");
-	}
+    }
 }

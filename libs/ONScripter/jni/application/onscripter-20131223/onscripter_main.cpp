@@ -120,19 +120,19 @@ extern "C"
 #define JAVA_EXPORT_NAME(name) JAVA_EXPORT_NAME1(name,SDL_JAVA_PACKAGE_PATH)
 
 JNIEXPORT jint JNICALL 
-JAVA_EXPORT_NAME(ONScripter_nativeGetWidth) ( JNIEnv*  env, jobject thiz )
+JAVA_EXPORT_NAME(ONScripterView_nativeGetWidth) ( JNIEnv*  env, jobject thiz )
 {
 	return ons.getWidth();
 }
 
 JNIEXPORT jint JNICALL 
-JAVA_EXPORT_NAME(ONScripter_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
+JAVA_EXPORT_NAME(ONScripterView_nativeGetHeight) ( JNIEnv*  env, jobject thiz )
 {
 	return ons.getHeight();
 }
 
-JNIEXPORT jint JNICALL
-JAVA_EXPORT_NAME(ONScripter_nativeSetSentenceFontScale) ( JNIEnv*  env, jobject thiz, double scale )
+JNIEXPORT void JNICALL
+JAVA_EXPORT_NAME(ONScripterView_nativeSetSentenceFontScale) ( JNIEnv*  env, jobject thiz, double scale )
 {
 	if (ONScripter::Sentence_font_scale != scale) {
 		ONScripter::Sentence_font_scale = scale;
@@ -140,12 +140,12 @@ JAVA_EXPORT_NAME(ONScripter_nativeSetSentenceFontScale) ( JNIEnv*  env, jobject 
 	}
 }
 
-JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
+JNIEXPORT void JNICALL JAVA_EXPORT_NAME(ONScripterView_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
 {
     ONScripter::setJavaEnv(jniEnv, thiz);
 }
 
-JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripter_nativeGetDialogFontSize) (JNIEnv * jniEnv, jobject thiz)
+JNIEXPORT jint JNICALL JAVA_EXPORT_NAME(ONScripterView_nativeGetDialogFontSize) (JNIEnv * jniEnv, jobject thiz)
 {
     return ons.getSentenceFontSize();
 }
