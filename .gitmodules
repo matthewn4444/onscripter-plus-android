@@ -1,0 +1,3 @@
+[submodule "libs/VPlayer_lib"]
+	path = libs/VPlayer_lib
+	url = git@github.com:matthewn4444/VPlayer_lib.git
