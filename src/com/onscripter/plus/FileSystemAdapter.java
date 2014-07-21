@@ -272,6 +272,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     public void addLowerBoundFile(File path) {
         if (path != null && path.exists()) {
             mLowerBoundFiles.add(path);
+            refresh();
         }
     }
 
