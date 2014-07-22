@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ONScripter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/actionbarsherlock"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/VPlayer_library"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

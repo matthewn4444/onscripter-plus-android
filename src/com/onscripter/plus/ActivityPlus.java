@@ -1,8 +1,9 @@
 package com.onscripter.plus;
 
-import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
 
-public abstract class ActivityPlus extends SherlockActivity {
+
+public abstract class ActivityPlus extends SherlockFragmentActivity {
 
     private OnLifeCycleListener mListener;
 
