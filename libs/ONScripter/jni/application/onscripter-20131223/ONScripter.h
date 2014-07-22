@@ -95,7 +95,7 @@ public:
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
         JavaONScripter = jniEnv->NewGlobalRef(thiz);
         JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
-        JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([C)V");
+        JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
     }
 
@@ -470,7 +470,7 @@ private:
         }
     }
 
-    void playVideoAndroid(const char *filename);
+    void playVideoAndroid(const char *filename, bool click_flag, bool loop_flag);
 #endif
     void setInternalAutoMode(bool enabled);
     void setInternalSkipMode(bool enabled);

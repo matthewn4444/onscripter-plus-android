@@ -28,7 +28,7 @@
 #endif
 
 #ifdef ANDROID
-void ONScripter::playVideoAndroid(const char *filename)
+void ONScripter::playVideoAndroid(const char *filename, bool click_flag, bool loop_flag)
 {
     JNIEnv * jniEnv = NULL;
     JNI_VM->AttachCurrentThread(&jniEnv, NULL);
@@ -43,7 +43,7 @@ void ONScripter::playVideoAndroid(const char *filename)
         jc[i] = filename[i];
     jcharArray jca = jniEnv->NewCharArray(strlen(filename));
     jniEnv->SetCharArrayRegion(jca, 0, strlen(filename), jc);
-    jniEnv->CallIntMethod( JavaONScripter, JavaPlayVideo, jca );
+    jniEnv->CallIntMethod( JavaONScripter, JavaPlayVideo, jca, click_flag, loop_flag );
     delete[] jc;
 }
 #endif
@@ -223,7 +223,7 @@ int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
     }
 
 #ifdef ANDROID
-    playVideoAndroid(filename);
+    playVideoAndroid(filename, click_flag, loop_flag);
     return 0;
 #endif
 
@@ -302,7 +302,7 @@ int ONScripter::playAVI( const char *filename, bool click_flag )
     }
 
 #ifdef ANDROID
-    playVideoAndroid(filename);
+    playVideoAndroid(filename, click_flag, false);
     return 0;
 #endif
 

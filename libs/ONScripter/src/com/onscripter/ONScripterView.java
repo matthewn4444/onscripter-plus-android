@@ -1,10 +1,9 @@
 package com.onscripter;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -69,11 +68,12 @@ public class ONScripterView extends DemoGLSurfaceView {
     /** Receive State Updates from Native Code */
     private static UpdateHandler sHandler;
 
-    private OnUpdateControlListener mListener;
+    private ONScripterEventListener mListener;
 
-    public interface OnUpdateControlListener {
+    public interface ONScripterEventListener {
         public void autoStateChanged(boolean selected);
         public void skipStateChanged(boolean selected);
+        public void videoRequested(String filename, boolean clickToSkip, boolean shouldLoop);
     }
 
     static class UpdateHandler extends Handler {
@@ -113,7 +113,7 @@ public class ONScripterView extends DemoGLSurfaceView {
         }
     }
 
-    public void setOnUpdateControlListener(OnUpdateControlListener listener) {
+    public void setONScripterEventListener(ONScripterEventListener listener) {
         mListener = listener;
     }
 
@@ -152,18 +152,14 @@ public class ONScripterView extends DemoGLSurfaceView {
         nativeSetSentenceFontScale(scaleFactor);
     }
 
-    public void playVideo(char[] filename){
-        try{
-            String filename2 = "file:/" + mCurrentDirectory + "/" + new String(filename);
-            filename2 = filename2.replace('\\', '/');
-            Log.v("ONS", "playVideo: " + filename2);
-            Uri uri = Uri.parse(filename2);
-            Intent i = new Intent(Intent.ACTION_VIEW);
-            i.setDataAndType(uri, "video/*");
-            mActivity.startActivityForResult(i, -1);
-        }
-        catch(Exception e){
-            Log.e("ONS", "playVideo error:  " + e.getClass().getName());
+    public void playVideo(char[] filename, boolean clickToSkip, boolean shouldLoop){
+        if (mListener != null) {
+            File video = new File(mCurrentDirectory + "/" + new String(filename));
+            if (video.exists() && video.canRead()) {
+                mListener.videoRequested(video.getAbsolutePath(), clickToSkip, shouldLoop);
+            } else {
+                Log.e("ONScripterView", "Cannot play video because it either does not exist or cannot be read. File: " + video.getPath());
+            }
         }
     }
 

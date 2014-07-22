@@ -10,6 +10,8 @@ import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -24,8 +26,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
-import com.onscripter.ONScripterView;
-import com.onscripter.ONScripterView.OnUpdateControlListener;
+import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.onscripter.plus.Analytics.BUTTON;
 import com.onscripter.plus.Analytics.CHANGE;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
@@ -33,7 +34,7 @@ import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 import com.onscripter.plus.ads.InterstitialAdHelper;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
-public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, OnUpdateControlListener
+public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
@@ -46,7 +47,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private static String[] SWIPE_GESTURES_VALUES;
 
     private VNSettingsDialog mDialog;
-    private FrameLayout mGameLayout;
     private TwoStateLayout mLeftLayout;
     private TwoStateLayout mRightLayout;
     private ImageButton2 mBackButton;
@@ -58,7 +58,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private ImageButton2 mMouseScrollUpButton;
     private ImageButton2 mMouseScrollDownButton;
 
-    private int mDisplayWidth, mDisplayHeight, mGameHeight;
+    private int mDisplayHeight, mGameHeight;
 
     private String mCurrentDirectory;
     private boolean mUseDefaultFont;
@@ -69,7 +69,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private boolean mAllowRightBezelSwipe;
     private Handler mHideControlsHandler;
 
-    private ONScripterView mGame;
+    private ONScripterGame mGame;
 
     private AdView mAdView;
     private InterstitialAdHelper mInterstitialHelper;
@@ -100,7 +100,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
         // Setup layout
         setContentView(R.layout.onscripter);
-        mGameLayout = (FrameLayout)findViewById(R.id.game_wrapper);
         mLeftLayout = (TwoStateLayout)findViewById(R.id.left_menu);
         mRightLayout = (TwoStateLayout)findViewById(R.id.right_menu);
         mBackButton = (ImageButton2)findViewById(R.id.controls_quit_button);
@@ -138,7 +137,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
         // Get the dimensions of the screen
         Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        mDisplayWidth = disp.getWidth();
         mDisplayHeight = disp.getHeight();
 
         // Only show ads on tablet devices
@@ -187,6 +185,10 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     @Override
     public void skipStateChanged(boolean selected) {
         mSkipButton.setSelected(selected);
+    }
+
+    @Override
+    public void videoRequested(final String filename, final boolean clickToSkip, final boolean shouldLoop) {
     }
 
     private void updateControlPreferences() {
@@ -248,29 +250,19 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 getResources().getBoolean(R.bool.render_font_outline));
 
         if (mUseDefaultFont) {
-            mGame = new ONScripterView(this, mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
+            mGame = new ONScripterGame(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
         } else {
-            mGame = new ONScripterView(this, mCurrentDirectory, null, shouldRenderOutline);
-        }
-        mGame.setOnUpdateControlListener(this);
-
-        int gameWidth = mGame.getGameWidth();
-        mGameHeight = mGame.getGameHeight();
-
-        int screenWidth = mDisplayWidth;
-        int screenHeight = mDisplayHeight;
-        if (mDisplayWidth * mGameHeight >= mDisplayHeight * gameWidth){
-            screenWidth = (mDisplayHeight*gameWidth/mGameHeight) & (~0x01); // to be 2 bytes aligned
-        }
-        else{
-            screenHeight = mDisplayWidth*mGameHeight/gameWidth;
+            mGame = new ONScripterGame(mCurrentDirectory, null, shouldRenderOutline);
         }
 
-        android.view.ViewGroup.LayoutParams l = mGameLayout.getLayoutParams();
-        l.width = screenWidth;
-        l.height = screenHeight;
-        mGameLayout.setLayoutParams(l);
-        mGameLayout.addView(mGame);
+        // Attach the game fragment
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(R.id.game_wrapper, mGame);
+        transaction.commit();
+
+        mGame.setONScripterEventListener(this);
+        mGame.setBoundingHeight(mDisplayHeight);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
@@ -432,6 +424,16 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
         if (mAdView != null) {
             mAdView.destroy();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Do not allow back button when playing video, skip it otherwise
+        if (mGame.isVideoShown()) {
+            mGame.finishVideo();
+        } else {
+            super.onBackPressed();
         }
     }
 
