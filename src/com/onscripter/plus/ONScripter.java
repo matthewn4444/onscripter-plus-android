@@ -33,6 +33,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private static String DISPLAY_CONTROLS_KEY;
     private static String SWIPE_GESTURES_KEY;
     private static String[] SWIPE_GESTURES_VALUES;
+    private static String USE_EXTERNAL_VIDEO_KEY;
 
     private VNSettingsDialog mDialog;
     private TwoStateLayout mLeftLayout;
@@ -134,6 +135,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
     @Override
     public void videoRequested(final String filename, final boolean clickToSkip, final boolean shouldLoop) {
+        boolean shouldUseExternalVideo = mPrefs.getBoolean(USE_EXTERNAL_VIDEO_KEY, false);
+        mGame.useExternalVideo(shouldUseExternalVideo);
     }
 
     private void updateControlPreferences() {
@@ -141,6 +144,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             DISPLAY_CONTROLS_KEY = getString(R.string.settings_controls_display_key);
             SWIPE_GESTURES_KEY = getString(R.string.settings_controls_swipe_key);
             SWIPE_GESTURES_VALUES = getResources().getStringArray(R.array.settings_controls_swipe_values);
+            USE_EXTERNAL_VIDEO_KEY = getResources().getString(R.string.settings_external_video_key);
         }
         boolean allowBezelControls = mPrefs.getBoolean(DISPLAY_CONTROLS_KEY, false);
         if (allowBezelControls) {

@@ -51,6 +51,9 @@
         <item>검정</item>
     </string-array>
 
+    <string name="settings_video_cate">비디오</string>
+    <string name="settings_external_video_title">외부 비디오 플레이어를 사용</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">폴더 고르기</string>
     <string name="dialog_select_button_text">선택</string>
