@@ -98,6 +98,10 @@
         <item>1</item>
     </string-array>
 
+    <string name="settings_video_cate">Video</string>
+    <string name="settings_external_video_key">settings.external.video.key</string>
+    <string name="settings_external_video_title">Use External Video Player</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_select_button_text">Select</string>

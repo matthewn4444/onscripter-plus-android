@@ -48,6 +48,9 @@
         <item>黒</item>
     </string-array>
 
+    <string name="settings_video_cate">ビデオ</string>
+    <string name="settings_external_video_title">外部ビデオプレーヤーを使う</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
     <string name="dialog_select_button_text">選択</string>

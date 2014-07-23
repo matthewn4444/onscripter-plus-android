@@ -50,6 +50,9 @@
         <item>черный</item>
     </string-array>
 
+    <string name="settings_video_cate">видео</string>
+    <string name="settings_external_video_title">Используйте внешний видеоплеер</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Выберите папку</string>
     <string name="dialog_select_button_text">Выбрать</string>
