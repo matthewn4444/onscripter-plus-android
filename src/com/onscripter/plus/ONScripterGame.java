@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.vplayer.MediaStreamInfo;
@@ -33,6 +34,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     private final boolean mShouldRenderOutline;
     private int mBoundedSize = -1;
     private boolean mIsBoundedByHeight = true;
+    private String mVideoFilename = null;
 
     private final VPlayerListener mVideoListener = new VPlayerListener() {
         @Override
@@ -40,6 +42,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
                 MediaStreamInfo[] streams) {
             super.onMediaSourceLoaded(err, streams);
             if (err != null) {
+                BugSenseHandler.sendExceptionMessage("Video", mVideoFilename, err);
                 // Skip video if failed to open
                 Log.e("ONScripter", err.getMessage());
                 finishVideo();
@@ -198,6 +201,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
 
     @Override
     public void videoRequested(final String filename, final boolean clickToSkip, final boolean shouldLoop) {
+        mVideoFilename = filename;
         if (mListener != null) {
             mListener.videoRequested(filename, clickToSkip, shouldLoop);
         }
