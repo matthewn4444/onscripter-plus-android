@@ -1,6 +1,7 @@
 package com.onscripter.plus.ads;
 
 import java.io.File;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,6 +13,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -59,6 +61,8 @@ public class InterstitialAdHelper {
     static final private String PREF_LAST_DATE_SEEN_AD = "InterstitialAdHelper.last.date.seen.ad";
 
     static final private int TIMEOUT = 4000;
+
+    final UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
 
     /**
      * This constructor will run the intermittent simple algorithm given above
@@ -286,6 +290,19 @@ public class InterstitialAdHelper {
     }
 
     private void buildAd() {
+        Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler() {
+            @Override
+            public void uncaughtException(Thread thread, Throwable ex) {
+                if (thread.getName().startsWith("AdWorker")) {
+                    Log.w("ADMOB", "AdWorker thread thrown an exception.", ex);
+                } else if (defaultHandler != null) {
+                    defaultHandler.uncaughtException(thread, ex);
+                } else {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
         mAd = new InterstitialAd(mAct);
         mAd.setAdUnitId(mAct.getString(R.string.admob_interstitial_key));
         final AdRequest adRequest = new AdRequest.Builder().build();
