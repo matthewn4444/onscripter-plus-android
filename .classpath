@@ -12,11 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="/google-play-services_lib/libs/google-play-services.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry exported="true" kind="lib" path="libs/mobilecore_V0.9.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/chartboost.jar" sourcepath="libs/chartboost.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/InMobi-4.4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/libadapterinmobi.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/directtap_sdk_v1_1_1.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/ONScripter"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

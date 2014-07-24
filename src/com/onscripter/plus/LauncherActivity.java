@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Random;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -43,7 +42,6 @@ import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 import com.onscripter.plus.ads.InterstitialAdHelper;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
-import com.onscripter.plus.ads.MCAdMobPlugin;
 
 public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
@@ -240,11 +238,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 mStartONScripterBundle = null;
             }
         });
-
-        // Sometimes show the stickeez
-        if (new Random().nextBoolean()) {
-            MCAdMobPlugin.eventuallyShowStickeez(this, getString(R.string.mobilecore_hash));
-        }
     }
 
     @Override
@@ -522,7 +515,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
         }
         b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
-        MCAdMobPlugin.hideStickeez();
         if (mInterHelper.show()) {
             mStartONScripterBundle = b;
             return;
