@@ -74,19 +74,6 @@
         <activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|smallestScreenSize|screenSize" />
 
-        <!-- mobileCore -->
-        <service
-            android:name="com.ironsource.mobilcore.MobileCoreReport"
-            android:enabled="true"
-            android:exported="false"
-            android:process=":mcServiceProcess">
-        </service>
-        <receiver
-            android:name="com.ironsource.mobilcore.InstallationTracker"
-            android:enabled="true"
-            android:process=":installationTracker">
-        </receiver>
-
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
         <meta-data android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/global_tracker" />
