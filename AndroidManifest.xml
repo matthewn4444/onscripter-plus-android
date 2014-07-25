@@ -70,6 +70,12 @@
            </intent-filter>
         </receiver>
 
+        <!-- RevMob -->
+        <activity android:name="com.revmob.ads.fullscreen.FullscreenActivity"
+            android:theme="@android:style/Theme.Translucent"
+            android:configChanges="keyboardHidden|orientation">
+        </activity>
+
         <!-- InMobi -->
         <activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|smallestScreenSize|screenSize" />
