@@ -237,6 +237,14 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 goToActivity(ONScripter.class, mStartONScripterBundle);
                 mStartONScripterBundle = null;
             }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+
+                goToActivity(ONScripter.class, mStartONScripterBundle);
+                mStartONScripterBundle = null;
+            }
         });
     }
 

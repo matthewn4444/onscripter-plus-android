@@ -152,6 +152,13 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 findViewById(android.R.id.content).setVisibility(View.GONE);
                 mGame.exitApp();
             }
+
+            @Override
+            public void onAdLeftApplication() {
+                super.onAdLeftApplication();
+                findViewById(android.R.id.content).setVisibility(View.GONE);
+                mGame.exitApp();
+            }
         });
         mSessionStart = System.currentTimeMillis();
 
