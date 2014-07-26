@@ -17,5 +17,6 @@
 	<classpathentry exported="true" kind="lib" path="libs/nendAdapter-1.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/nendSDK-2.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/revmob-6.9.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/StartAppInApp-2.4.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

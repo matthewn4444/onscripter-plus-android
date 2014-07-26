@@ -70,6 +70,15 @@
            </intent-filter>
         </receiver>
 
+        <!-- Startapp -->
+
+        <activity android:name="com.startapp.android.publish.list3d.List3DActivity"
+          android:theme="@android:style/Theme" />
+
+        <activity android:name="com.startapp.android.publish.AppWallActivity"
+          android:theme="@android:style/Theme.Translucent"
+          android:configChanges="orientation|keyboardHidden|screenSize" />
+
         <!-- RevMob -->
         <activity android:name="com.revmob.ads.fullscreen.FullscreenActivity"
             android:theme="@android:style/Theme.Translucent"
