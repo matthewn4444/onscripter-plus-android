@@ -100,7 +100,7 @@ public class TwoStateLayout extends ViewGroup {
         int orientation = ta.getInt(R.styleable.TwoStateLayout_orientation, 0) == 0 ?
                 LinearLayout.VERTICAL : LinearLayout.HORIZONTAL;
         mLayout.setOrientation(orientation);
-        mLayout.setBackgroundColor(Color.BLACK);
+        mLayout.setBackgroundColor(Color.argb(170, 0, 0, 0));
 
         // This is hardcoded
         if (orientation == LinearLayout.VERTICAL) {

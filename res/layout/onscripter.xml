@@ -4,6 +4,11 @@
     android:layout_width="match_parent"
     android:background="@android:color/black"
     android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res/com.onscripter.plus">
+    <FrameLayout
+        android:id="@+id/game_wrapper"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal|top"/>
     <com.onscripter.plus.TwoStateLayout
         android:id="@+id/left_menu"
         style="@style/controls_menu_style"
@@ -53,9 +58,4 @@
             style="@style/controls_button_style"
             app:src="@drawable/menu_mouse_scroll_down"/>
     </com.onscripter.plus.TwoStateLayout>
-    <FrameLayout
-        android:id="@+id/game_wrapper"
-        android:layout_height="wrap_content" 
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal|top"/>
 </FrameLayout>
