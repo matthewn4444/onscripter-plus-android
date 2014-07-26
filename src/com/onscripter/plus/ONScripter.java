@@ -297,6 +297,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             removeHideControlsTimer();
             if (mInterstitialHelper.show()) {
                 if( mGame != null ) {
+                    mGame.finishVideo();
                     mGame.onStop();
                 }
                 if (mAdView != null) {
