@@ -25,7 +25,8 @@ public final class Analytics {
         CLICK("Click"),
         CHANGES("Changes"),
         LAUNCHER_STATE("Launcher State"),
-        GAME_STATE("Game State");
+        GAME_STATE("Game State"),
+        FEATURE("Feature");
 
         private final String mVal;
         private Category(final String s) {
@@ -43,7 +44,8 @@ public final class Analytics {
         NETWORK_CONNECTED("Network Connected"),
         THEME_USED("Theme Used"),
         ADBLOCKER_USED("Adblocker Used"),
-        ACTIVITY_FINISHED("Activity Finished");
+        ACTIVITY_FINISHED("Activity Finished"),
+        VIDEO_LAUNCHED("Video Launched");
 
         private final String mVal;
         private Action(final String s) {
@@ -236,6 +238,11 @@ public final class Analytics {
             }).start();
         }
     }
+
+    public static void sendVideoLaunched(String videoPath) {
+        send(Category.FEATURE, Action.VIDEO_LAUNCHED, videoPath);
+    }
+
 
     // Send hits
     public synchronized static void send(Category category, Action action, String label) {

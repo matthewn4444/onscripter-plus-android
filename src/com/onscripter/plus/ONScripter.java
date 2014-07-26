@@ -199,6 +199,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     public void videoRequested(final String filename, final boolean clickToSkip, final boolean shouldLoop) {
         boolean shouldUseExternalVideo = mPrefs.getBoolean(USE_EXTERNAL_VIDEO_KEY, false);
         mGame.useExternalVideo(shouldUseExternalVideo);
+
+        Analytics.sendVideoLaunched(filename);
     }
 
     private void updateControlPreferences() {
