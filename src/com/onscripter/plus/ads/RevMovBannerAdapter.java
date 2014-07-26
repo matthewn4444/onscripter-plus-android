@@ -2,6 +2,8 @@ package com.onscripter.plus.ads;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.google.ads.AdSize;
 import com.google.ads.mediation.MediationAdRequest;
@@ -31,6 +33,14 @@ public class RevMovBannerAdapter implements CustomEventBanner {
         @SuppressWarnings("deprecation")
         RevMob revmob = RevMob.start(activity, serverParameter);
         RevMobBanner banner = revmob.createBanner(activity);
+        banner.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onClick();
+                listener.onPresentScreen();
+                listener.onLeaveApplication();
+            }
+        });
         listener.onReceivedAd(banner);
     }
 
