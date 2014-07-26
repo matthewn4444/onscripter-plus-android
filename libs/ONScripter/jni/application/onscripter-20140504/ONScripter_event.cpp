@@ -2,7 +2,7 @@
  * 
  *  ONScripter_event.cpp - Event handler of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -238,8 +238,10 @@ void ONScripter::flushEventSub( SDL_Event &event )
         if ( music_play_loop_flag ||
              (cd_play_loop_flag && !cdaudio_flag ) ){
             stopBGM( true );
-            if (music_file_name)
+            if (music_file_name){
                 playSound(music_file_name, SOUND_MUSIC, true);
+                Mix_SetMusicPosition( music_loopback_offset );
+            }
             else
                 playCDAudio();
         }

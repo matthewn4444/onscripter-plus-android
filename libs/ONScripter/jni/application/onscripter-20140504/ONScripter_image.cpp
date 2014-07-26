@@ -2,7 +2,7 @@
  * 
  *  ONScripter_image.cpp - Image processing in ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -231,7 +231,7 @@ int ONScripter::resizeSurface( SDL_Surface *src, SDL_Surface *dst )
 void ONScripter::alphaBlend( SDL_Surface *mask_surface,
                                   int trans_mode, Uint32 mask_value, SDL_Rect *clip )
 {
-    SDL_Rect rect = {0, 0, screen_width, screen_height};
+    SDL_Rect rect = screen_rect;
     int i, j;
 
     /* ---------------------------------------- */
@@ -360,7 +360,10 @@ void ONScripter::alphaBlendText( SDL_Surface *dst_surface, SDL_Rect dst_rect,
 
     /* ---------------------------------------- */
     /* 2nd clipping */
-    SDL_Rect clip_rect = {0, 0, dst_surface->w, dst_surface->h};
+    SDL_Rect clip_rect;
+    clip_rect.x = clip_rect.y = 0;
+    clip_rect.w = dst_surface->w;
+    clip_rect.h = dst_surface->h;
     if ( AnimationInfo::doClipping( &dst_rect, &clip_rect, &clipped_rect ) ) return;
     
     x2 += clipped_rect.x;
@@ -481,7 +484,10 @@ void ONScripter::refreshSurface( SDL_Surface *surface, SDL_Rect *clip_src, int r
 {
     if (refresh_mode == REFRESH_NONE_MODE) return;
 
-    SDL_Rect clip = {0, 0, surface->w, surface->h};
+    SDL_Rect clip;
+    clip.x = clip.y = 0;
+    clip.w = surface->w;
+    clip.h = surface->h;
     if (clip_src) if ( AnimationInfo::doClipping( &clip, clip_src ) ) return;
 
     int i, top;
@@ -628,7 +634,10 @@ void ONScripter::createBackground()
 
         bg_info.fill(0, 0, 0, 0xff);
         if (anim.image_surface){
-            SDL_Rect src_rect = {0, 0, anim.image_surface->w, anim.image_surface->h};
+            SDL_Rect src_rect;
+            src_rect.x = src_rect.y = 0;
+            src_rect.w = anim.image_surface->w;
+            src_rect.h = anim.image_surface->h;
             SDL_Rect dst_rect = {0, 0};
             if (screen_width >= anim.image_surface->w){
                 dst_rect.x = (screen_width - anim.image_surface->w) / 2;

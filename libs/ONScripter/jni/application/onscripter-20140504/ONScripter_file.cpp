@@ -2,7 +2,7 @@
  *
  *  ONScripter_file.cpp - FILE I/O of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -152,7 +152,7 @@ void ONScripter::searchSaveFile( SaveFileInfo &save_file_info, int no )
 
 char *ONScripter::readSaveStrFromFile( int no )
 {
-    char filename[16];
+    char filename[32];
     sprintf( filename, "save%d.dat", no );
     size_t len = loadFileIOBuf( filename );
     if (len == 0){
@@ -170,7 +170,7 @@ char *ONScripter::readSaveStrFromFile( int no )
     len = len - p - 3;
     char *buf = new char[len+1];
     
-    int i;
+    unsigned int i;
     for (i=0 ; i<len ; i++)
         buf[i] = file_io_buf[p+i+1];
     buf[i] = 0;
@@ -180,7 +180,7 @@ char *ONScripter::readSaveStrFromFile( int no )
 
 int ONScripter::loadSaveFile( int no )
 {
-    char filename[16];
+    char filename[32];
     sprintf( filename, "save%d.dat", no );
     if (loadFileIOBuf( filename ) == 0){
         fprintf( stderr, "can't open save file %s\n", filename );
@@ -223,10 +223,10 @@ void ONScripter::saveMagicNumber( bool output_flag )
     writeChar( SAVEFILE_VERSION_MINOR, output_flag );
 }
 
-int ONScripter::saveSaveFile( int no, const char *savestr )
+int ONScripter::saveSaveFile( bool write_to_disk, int no, const char *savestr )
 {
     // make save data structure on memory
-    if (no < 0 || (saveon_flag && internal_saveon_flag)){
+    if (!write_to_disk || (saveon_flag && internal_saveon_flag)){
         file_io_buf_ptr = 0;
         saveMagicNumber( false );
         saveSaveFile2( false );
@@ -237,10 +237,10 @@ int ONScripter::saveSaveFile( int no, const char *savestr )
         memcpy(save_data_buf, file_io_buf, save_data_len);
     }
     
-    if ( no >= 0 ){
+    if (write_to_disk){
         saveAll();
 
-        char filename[16];
+        char filename[32];
         sprintf( filename, "save%d.dat", no );
         
         memcpy(file_io_buf, save_data_buf, save_data_len);

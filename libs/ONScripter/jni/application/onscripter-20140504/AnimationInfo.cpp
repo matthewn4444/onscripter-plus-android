@@ -2,7 +2,7 @@
  * 
  *  AnimationInfo.cpp - General image storage class of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -365,7 +365,11 @@ void AnimationInfo::blendOnSurface( SDL_Surface *dst_surface, int dst_x, int dst
 {
     if ( image_surface == NULL ) return;
     
-    SDL_Rect dst_rect = {dst_x, dst_y, pos.w, pos.h}, src_rect;
+    SDL_Rect dst_rect, src_rect;
+    dst_rect.x = dst_x;
+    dst_rect.y = dst_y;
+    dst_rect.w = pos.w;
+    dst_rect.h = pos.h;
     if ( doClipping( &dst_rect, &clip, &src_rect ) ) return;
 
     /* ---------------------------------------- */
@@ -548,7 +552,11 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
 {
     if (image_surface == NULL || surface == NULL) return;
     
-    SDL_Rect dst_rect = {dst_x, dst_y, surface->w, surface->h};
+    SDL_Rect dst_rect;
+    dst_rect.x = dst_x;
+    dst_rect.y = dst_y;
+    dst_rect.w = surface->w;
+    dst_rect.h = surface->h;
     if (rotate_flag){
         dst_rect.w = surface->h;
         dst_rect.h = surface->w;
@@ -567,7 +575,10 @@ void AnimationInfo::blendText( SDL_Surface *surface, int dst_x, int dst_y, SDL_C
     
     /* ---------------------------------------- */
     /* 2nd clipping */
-    SDL_Rect clip_rect = {0, 0, image_surface->w, image_surface->h};
+    SDL_Rect clip_rect;
+    clip_rect.x = clip_rect.y = 0;
+    clip_rect.w = image_surface->w;
+    clip_rect.h = image_surface->h;
     if ( doClipping( &dst_rect, &clip_rect, &clipped_rect ) ) return;
     
     src_rect.x += clipped_rect.x;
@@ -727,7 +738,10 @@ void AnimationInfo::copySurface( SDL_Surface *surface, SDL_Rect *src_rect, SDL_R
     SDL_Rect _dst_rect = {0, 0};
     if (dst_rect) _dst_rect = *dst_rect;
 
-    SDL_Rect _src_rect = {0, 0, surface->w, surface->h};
+    SDL_Rect _src_rect;
+    _src_rect.x = _src_rect.y = 0;
+    _src_rect.w = surface->w;
+    _src_rect.h = surface->h;
     if (src_rect) _src_rect = *src_rect;
 
     if (_src_rect.x >= surface->w) return;

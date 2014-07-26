@@ -2,7 +2,7 @@
  * 
  *  ONScripter_command.cpp - Command executer of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -967,7 +967,7 @@ int ONScripter::saveonCommand()
 
 int ONScripter::saveoffCommand()
 {
-    if (saveon_flag && internal_saveon_flag) saveSaveFile(-1);
+    if (saveon_flag && internal_saveon_flag) saveSaveFile(false);
     
     saveon_flag = false;
 
@@ -986,12 +986,8 @@ int ONScripter::savegameCommand()
     if (savegame2_flag)
         savestr = script_h.readStr();
 
-    if ( no < 0 )
-        errorAndExit("savegame: save number is less than 0.");
-    else{
-        if (saveon_flag && internal_saveon_flag) saveSaveFile(-1);
-        saveSaveFile( no, savestr ); 
-    }
+    if (saveon_flag && internal_saveon_flag) saveSaveFile(false);
+    saveSaveFile( true, no, savestr ); 
 
     return RET_CONTINUE;
 }
@@ -1065,7 +1061,7 @@ int ONScripter::resetCommand()
         script_h.getVariableData(i).reset(false);
 
     setCurrentLabel( "start" );
-    saveSaveFile(-1);
+    saveSaveFile(false);
     
     return RET_CONTINUE;
 }
@@ -1397,9 +1393,30 @@ int ONScripter::mp3Command()
     stopBGM( false );
 
     music_play_loop_flag = loop_flag;
+    music_loopback_offset = 0.0;
 
     const char *buf = script_h.readStr();
     if (buf[0] != '\0'){
+        if (buf[0]=='('){
+            buf++;
+            bool integer_flag = true;
+            double decimal = 0.1;
+            while (*buf != ')' && *buf != '\0'){
+                if (*buf >= '0' && *buf <= '9'){
+                    if (integer_flag)
+                        music_loopback_offset = music_loopback_offset*10.0 + *buf - '0';
+                    else{
+                        music_loopback_offset += decimal*(*buf - '0');
+                        decimal *= 0.1;
+                    }
+                }
+                else if (*buf == '.')
+                    integer_flag = false;
+                buf++;
+            }
+            if (*buf == ')') buf++;
+        }
+
         int tmp = music_volume;
         setStr(&music_file_name, buf);
 
@@ -1524,8 +1541,7 @@ int ONScripter::menu_windowCommand()
 #if !defined(PSP)
         if ( !SDL_WM_ToggleFullScreen( screen_surface ) ){
             screen_surface = SDL_SetVideoMode( screen_device_width, screen_device_height, screen_bpp, DEFAULT_VIDEO_SURFACE_FLAG );
-            SDL_Rect rect = {0, 0, screen_width, screen_height};
-            flushDirect( rect, refreshMode() );
+            flushDirect( screen_rect, refreshMode() );
         }
 #endif
         fullscreen_mode = false;
@@ -1540,13 +1556,24 @@ int ONScripter::menu_fullCommand()
 #if !defined(PSP)
         if ( !SDL_WM_ToggleFullScreen( screen_surface ) ){
             screen_surface = SDL_SetVideoMode( screen_device_width, screen_device_height, screen_bpp, DEFAULT_VIDEO_SURFACE_FLAG|SDL_FULLSCREEN );
-            SDL_Rect rect = {0, 0, screen_width, screen_height};
-            flushDirect( rect, refreshMode() );
+            flushDirect( screen_rect, refreshMode() );
         }
 #endif
         fullscreen_mode = true;
     }
 
+    return RET_CONTINUE;
+}
+
+int ONScripter::menu_click_pageCommand()
+{
+    skip_mode |= SKIP_TO_EOP;
+    return RET_CONTINUE;
+}
+
+int ONScripter::menu_click_defCommand()
+{
+    skip_mode &= ~SKIP_TO_EOP;
     return RET_CONTINUE;
 }
 
@@ -1778,9 +1805,6 @@ int ONScripter::locateCommand()
 int ONScripter::loadgameCommand()
 {
     int no = script_h.readInt();
-
-    if ( no < 0 )
-        errorAndExit( "loadgame: save number is less than 0." );
 
     int fadeout = mp3fadeout_duration;
     mp3fadeout_duration = 0; //don't use fadeout during a load
@@ -2726,7 +2750,10 @@ int ONScripter::dvCommand()
 
 int ONScripter::drawtextCommand()
 {
-    SDL_Rect clip = {0, 0, accumulation_surface->w, accumulation_surface->h};
+    SDL_Rect clip;
+    clip.x = clip.y = 0;
+    clip.w = accumulation_surface->w;
+    clip.h = accumulation_surface->h;
     text_info.blendOnSurface( accumulation_surface, 0, 0, clip );
     
     return RET_CONTINUE;
@@ -2757,8 +2784,7 @@ int ONScripter::drawsp3Command()
         ai->inv_mat[1][1] =  ai->mat[0][0] * 1000 / denom;
     }
 
-    SDL_Rect clip = {0, 0, screen_width, screen_height};
-    ai->blendOnSurface2( accumulation_surface, x, y, clip, alpha );
+    ai->blendOnSurface2( accumulation_surface, x, y, screen_rect, alpha );
     ai->setCell(old_cell_no);
 
     return RET_CONTINUE;
@@ -2780,8 +2806,7 @@ int ONScripter::drawsp2Command()
     ai->calcAffineMatrix();
     ai->setCell(cell_no);
 
-    SDL_Rect clip = {0, 0, screen_width, screen_height};
-    ai->blendOnSurface2( accumulation_surface, ai->pos.x, ai->pos.y, clip, alpha );
+    ai->blendOnSurface2( accumulation_surface, ai->pos.x, ai->pos.y, screen_rect, alpha );
 
     return RET_CONTINUE;
 }
@@ -2797,7 +2822,10 @@ int ONScripter::drawspCommand()
     AnimationInfo *ai = &sprite_info[sprite_no];
     int old_cell_no = ai->current_cell;
     ai->setCell(cell_no);
-    SDL_Rect clip = {0, 0, accumulation_surface->w, accumulation_surface->h};
+    SDL_Rect clip;
+    clip.x = clip.y = 0;
+    clip.w = accumulation_surface->w;
+    clip.h = accumulation_surface->h;
     ai->blendOnSurface( accumulation_surface, x, y, clip, alpha );
     ai->setCell(old_cell_no);
 
@@ -2824,7 +2852,10 @@ int ONScripter::drawclearCommand()
 
 int ONScripter::drawbgCommand()
 {
-    SDL_Rect clip = {0, 0, accumulation_surface->w, accumulation_surface->h};
+    SDL_Rect clip;
+    clip.x = clip.y = 0;
+    clip.w = accumulation_surface->w;
+    clip.h = accumulation_surface->h;
     bg_info.blendOnSurface( accumulation_surface, bg_info.pos.x, bg_info.pos.y, clip );
     
     return RET_CONTINUE;
@@ -2841,17 +2872,14 @@ int ONScripter::drawbg2Command()
     bi.rot     = script_h.readInt();
     bi.calcAffineMatrix();
 
-    SDL_Rect clip = {0, 0, screen_width, screen_height};
-    bi.blendOnSurface2( accumulation_surface, bi.pos.x, bi.pos.y,
-                        clip, 255 );
+    bi.blendOnSurface2( accumulation_surface, bi.pos.x, bi.pos.y, screen_rect, 255 );
 
     return RET_CONTINUE;
 }
 
 int ONScripter::drawCommand()
 {
-    SDL_Rect rect = {0, 0, screen_width, screen_height};
-    flushDirect( rect, REFRESH_NONE_MODE );
+    flushDirect( screen_rect, REFRESH_NONE_MODE );
     dirty_rect.clear();
     
     return RET_CONTINUE;
@@ -3182,7 +3210,7 @@ int ONScripter::btnwaitCommand()
     }
 
     if (is_exbtn_enabled && exbtn_d_button_link.exbtn_ctl[1]){
-        SDL_Rect check_src_rect = {0, 0, screen_width, screen_height};
+        SDL_Rect check_src_rect = screen_rect;
         if (is_exbtn_enabled) decodeExbtnControl( exbtn_d_button_link.exbtn_ctl[1], &check_src_rect );
     }
 
@@ -3406,8 +3434,8 @@ int ONScripter::brCommand()
 
 int ONScripter::bltCommand()
 {
-    int dx,dy,dw,dh;
-    int sx,sy,sw,sh;
+    Sint16 dx,dy,sx,sy;
+    Uint16 dw,dh,sw,sh;
 
     dx = script_h.readInt() * screen_ratio1 / screen_ratio2;
     dy = script_h.readInt() * screen_ratio1 / screen_ratio2;
@@ -3486,9 +3514,13 @@ int ONScripter::bltCommand()
         }
         SDL_UnlockSurface(btndef_info.image_surface);
         SDL_UnlockSurface(accumulation_surface);
-        
-        SDL_Rect dst_rect = {start_x, start_y, end_x-start_x, end_y-start_y};
-        flushDirect( (SDL_Rect&)dst_rect, REFRESH_NONE_MODE );
+
+        SDL_Rect dst_rect;
+        dst_rect.x = start_x;
+        dst_rect.y = start_y;
+        dst_rect.w = end_x-start_x;
+        dst_rect.h = end_y-start_y;
+        flushDirect( dst_rect, REFRESH_NONE_MODE );
     }
 
     return RET_CONTINUE;

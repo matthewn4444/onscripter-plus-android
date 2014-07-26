@@ -2,7 +2,7 @@
  *
  *  ScriptHandler.cpp - Script manipulation class
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -1045,7 +1045,7 @@ int ScriptHandler::readScript( char *path )
     char *p_script_buffer;
     current_script = p_script_buffer = script_buffer;
     
-    tmp_script_buf = new char[TMP_SCRIPT_BUF_LEN];
+    tmp_script_buf = new unsigned char[TMP_SCRIPT_BUF_LEN];
     if (encrypt_mode > 0){
         fseek( fp, 0, SEEK_SET );
         readScriptSub( fp, &p_script_buffer, encrypt_mode );
@@ -1139,10 +1139,11 @@ void ScriptHandler::detectKoreanText() {
 
 int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
 {
-    char magic[5] = {0x79, 0x57, 0x0d, 0x80, 0x04 };
+    unsigned char magic[5] = {0x79, 0x57, 0x0d, 0x80, 0x04 };
     int  magic_counter = 0;
     bool newline_flag = true;
     bool cr_flag = false;
+    bool newlabel_flag = false;
 
     if (encrypt_mode == 3 && !key_table_flag)
         errorAndExit("readScriptSub: the EXE file must be specified with --key-exe option.");
@@ -1157,7 +1158,7 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
             }
             count = 0;
         }
-        char ch = tmp_script_buf[count++];
+        unsigned char ch = tmp_script_buf[count++];
         if      ( encrypt_mode == 1 ) ch ^= 0x84;
         else if ( encrypt_mode == 2 ){
             ch = (ch ^ magic[magic_counter++]) & 0xff;
@@ -1173,7 +1174,13 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
             cr_flag = false;
         }
     
-        if ( ch == '*' && newline_flag ) num_of_labels++;
+        if ( ch == '*' && newline_flag && !newlabel_flag){
+            num_of_labels++;
+            newlabel_flag = true;
+        }
+        else
+            newlabel_flag = false;
+
         if ( ch == 0x0d ){
             cr_flag = true;
             continue;
@@ -1282,6 +1289,7 @@ int ScriptHandler::labelScript()
     while ( buf < script_buffer + script_buffer_length ){
         SKIP_SPACE( buf );
         if ( *buf == '*' ){
+            while (*(buf+1) == '*') buf++;
             setCurrent( buf );
             readLabel();
             label_info[ ++label_counter ].name = new char[ strlen(string_buffer) ];

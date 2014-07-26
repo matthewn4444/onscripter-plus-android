@@ -2,7 +2,7 @@
  * 
  *  nsaconv.cpp - Images in NSA archive are re-scaled to 320x240 size
  *
- *  Copyright (c) 2001-2010 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -52,7 +52,7 @@ void help()
 int main( int argc, char **argv )
 {
     NsaReader cSR;
-    int nsa_offset = 0;
+    unsigned int nsa_offset = 0;
     unsigned long length, offset = 0, buffer_length = 0;
     unsigned char *buffer = NULL, *rescaled_buffer = NULL;
     unsigned int i, count;

@@ -2,7 +2,7 @@
  * 
  *  ScriptHandler.h - Script manipulation class
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -340,7 +340,7 @@ private:
     char *save_dir;
     int  script_buffer_length;
     char *script_buffer;
-    char *tmp_script_buf;
+    unsigned char *tmp_script_buf;
     
     char *string_buffer; // update only be readToken
     int  string_counter;

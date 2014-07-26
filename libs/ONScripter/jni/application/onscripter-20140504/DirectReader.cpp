@@ -2,7 +2,7 @@
 /*
  *  DirectReader.cpp - Reader from independent files
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -46,7 +46,7 @@ extern int convUTF16ToUTF8( unsigned char dst[4], unsigned short src );
 #define N (1 << EI)  /* buffer size */
 #define F ((1 << EJ) + P)  /* lookahead buffer size */
 
-DirectReader::DirectReader( char *path, const unsigned char *key_table )
+DirectReader::DirectReader( const char *path, const unsigned char *key_table )
 {
     file_full_path = NULL;
     file_sub_path = NULL;
@@ -60,7 +60,8 @@ DirectReader::DirectReader( char *path, const unsigned char *key_table )
         memcpy( archive_path, path, strlen(path) + 1 );
     }
     else{
-        archive_path = "";
+        archive_path = new char[1];
+        archive_path[0] = 0;
     }
 
     int i;
@@ -232,7 +233,7 @@ unsigned long DirectReader::swapLong( unsigned long ch )
            ((ch & 0x0000ff00) <<  8) | ((ch & 0x000000ff) << 24);
 }
 
-int DirectReader::open( char *name )
+int DirectReader::open( const char *name )
 {
     return 0;
 }
