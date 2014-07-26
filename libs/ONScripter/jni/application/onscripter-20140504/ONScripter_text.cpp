@@ -2,7 +2,7 @@
  * 
  *  ONScripter_text.cpp - Text parser of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -524,7 +524,7 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 void ONScripter::enterTextDisplayMode(bool text_flag)
 {
     if (line_enter_status <= 1 && (!pretextgosub_label || saveon_flag) && internal_saveon_flag && text_flag){
-        saveSaveFile( -1 );
+        saveSaveFile(false);
         internal_saveon_flag = false;
     }
     
@@ -754,7 +754,7 @@ void ONScripter::endRuby(bool flush_flag, bool lookback_flag, SDL_Surface *surfa
 int ONScripter::textCommand()
 {
     if (line_enter_status <= 1 && (!pretextgosub_label || saveon_flag) && internal_saveon_flag){
-        saveSaveFile( -1 );
+        saveSaveFile(false);
         internal_saveon_flag = false;
     }
 

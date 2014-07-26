@@ -2,7 +2,7 @@
  *
  *  NsaReader.h - Reader from a NSA archive
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -31,10 +31,10 @@
 class NsaReader : public SarReader
 {
 public:
-    NsaReader( int nsa_offset=0, char *path=NULL, int archive_type=ARCHIVE_TYPE_NSA, const unsigned char *key_table=NULL );
+    NsaReader( unsigned int nsa_offset=0, char *path=NULL, int archive_type=ARCHIVE_TYPE_NSA, const unsigned char *key_table=NULL );
     ~NsaReader();
 
-    int open( char *nsa_path=NULL );
+    int open( const char *nsa_path=NULL );
     const char *getArchiveName() const;
     int getNumFiles();
     
@@ -42,7 +42,7 @@ public:
     size_t getFile( const char *file_name, unsigned char *buf, int *location=NULL );
     FileInfo getFileByIndex( unsigned int index );
 
-    int openForConvert( char *nsa_name, int archive_type=ARCHIVE_TYPE_NSA, int nsa_offset=0 );
+    int openForConvert( char *nsa_name, int archive_type=ARCHIVE_TYPE_NSA, unsigned int nsa_offset=0 );
     int writeHeader( FILE *fp, int archive_type=ARCHIVE_TYPE_NSA, int nsa_offset=0 );
     size_t putFile( FILE *fp, int no, size_t offset, size_t length, size_t original_length, int compression_type, bool modified_flag, unsigned char *buffer );
     

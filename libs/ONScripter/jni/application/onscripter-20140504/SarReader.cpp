@@ -2,7 +2,7 @@
  *
  *  SarReader.cpp - Reader from a SAR archive
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -28,7 +28,7 @@
 extern int psp_power_resume_number;
 #endif
 
-SarReader::SarReader( char *path, const unsigned char *key_table )
+SarReader::SarReader( const char *path, const unsigned char *key_table )
         :DirectReader( path, key_table )
 {
     root_archive_info = last_archive_info = &archive_info;
@@ -40,7 +40,7 @@ SarReader::~SarReader()
     close();
 }
 
-int SarReader::open( char *name )
+int SarReader::open( const char *name )
 {
     ArchiveInfo* info = new ArchiveInfo();
 
@@ -61,7 +61,7 @@ int SarReader::open( char *name )
     return 0;
 }
 
-void SarReader::readArchive( ArchiveInfo *ai, int archive_type, int offset )
+void SarReader::readArchive( ArchiveInfo *ai, int archive_type, unsigned int offset )
 {
     unsigned int i;
     

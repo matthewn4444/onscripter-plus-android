@@ -231,7 +231,7 @@ protected:
     char *archive_path;
     char *save_dir;
     char *nsa_path;
-    int nsa_offset;
+    unsigned int nsa_offset;
     bool globalon_flag;
     bool labellog_flag;
     bool filelog_flag;
@@ -266,6 +266,7 @@ protected:
     int screen_width, screen_height;
     int screen_device_width, screen_device_height;
     int device_width, device_height;
+    SDL_Rect screen_rect;
     int screen_bpp;
     char *version_str;
     int underline_value;

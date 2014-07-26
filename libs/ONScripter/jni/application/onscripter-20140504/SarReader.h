@@ -2,7 +2,7 @@
  *
  *  SarReader.h - Reader from a SAR archive
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -29,10 +29,10 @@
 class SarReader : public DirectReader
 {
 public:
-    SarReader( char *path=NULL, const unsigned char *key_table=NULL );
+    SarReader( const char *path=NULL, const unsigned char *key_table=NULL );
     ~SarReader();
 
-    int open( char *name=NULL );
+    int open( const char *name=NULL );
     int close();
     const char *getArchiveName() const;
     int getNumFiles();
@@ -49,7 +49,7 @@ protected:
     ArchiveInfo *root_archive_info, *last_archive_info;
     int num_of_sar_archives;
 
-    void readArchive( ArchiveInfo *ai, int archive_type = ARCHIVE_TYPE_SAR, int offset=0 );
+    void readArchive( ArchiveInfo *ai, int archive_type = ARCHIVE_TYPE_SAR, unsigned int offset=0 );
     int readArchiveSub( ArchiveInfo *ai, int archive_type = ARCHIVE_TYPE_SAR, bool check_size = true );
     int getIndexFromFile( ArchiveInfo *ai, const char *file_name );
     size_t getFileSub( ArchiveInfo *ai, const char *file_name, unsigned char *buf );

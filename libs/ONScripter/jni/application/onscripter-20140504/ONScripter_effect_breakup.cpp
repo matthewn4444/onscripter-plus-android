@@ -264,9 +264,11 @@ void ONScripter::effectBreakup( char *params, int duration )
     bool *msk_buf = breakup_cellforms;
 
     for (int n=0; n<n_cells; ++n) {
-        SDL_Rect rect = { breakup_cells[n].cell_x * BREAKUP_CELLWIDTH,
-                          breakup_cells[n].cell_y * BREAKUP_CELLWIDTH, 
-                          BREAKUP_CELLWIDTH, BREAKUP_CELLWIDTH };
+        SDL_Rect rect;
+        rect.x = breakup_cells[n].cell_x * BREAKUP_CELLWIDTH;
+        rect.y = breakup_cells[n].cell_y * BREAKUP_CELLWIDTH;
+        rect.w = BREAKUP_CELLWIDTH;
+        rect.h = BREAKUP_CELLWIDTH;
         breakup_cells[n].state += frame_diff;
         if (breakup_cells[n].state >= (BREAKUP_MOVE_FRAMES + BREAKUP_STILL_STATE)) {
             for (int i=0; i<BREAKUP_CELLWIDTH; ++i) {

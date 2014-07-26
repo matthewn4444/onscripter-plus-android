@@ -2,7 +2,7 @@
  * 
  *  ONScripter_effect.cpp - Effect executer of ONScripter
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -106,9 +106,8 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
     int i, amp;
     int width, width2;
     int height, height2;
-    SDL_Rect src_rect={0, 0, screen_width, screen_height};
-    SDL_Rect dst_rect={0, 0, screen_width, screen_height};
-    SDL_Rect quake_rect={0, 0, screen_width, screen_height};
+    SDL_Rect src_rect = screen_rect, dst_rect = screen_rect;
+    SDL_Rect quake_rect = screen_rect;
 
     /* ---------------------------------------- */
     /* Execute effect */

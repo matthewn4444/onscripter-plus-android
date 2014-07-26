@@ -2,7 +2,7 @@
  *
  *  BaseReader.h - Base class of archive reader
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -96,7 +96,7 @@ struct BaseReader
 
     virtual ~BaseReader(){};
     
-    virtual int open( char *name=NULL ) = 0;
+    virtual int open( const char *name=NULL ) = 0;
     virtual int close() = 0;
     
     virtual const char *getArchiveName() const = 0;

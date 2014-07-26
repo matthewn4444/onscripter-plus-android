@@ -2,7 +2,7 @@
  *
  *  ScriptParser_command.cpp - Define command executer of ONScripter
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -202,7 +202,10 @@ int ScriptParser::soundpressplginCommand()
 
 int ScriptParser::skipCommand()
 {
-    int line = current_label_info.start_line + current_line + script_h.readInt();
+    int val = script_h.readInt();
+    if (val == 0) val = 1;
+
+    int line = current_label_info.start_line + current_line + val;
 
     char *buf = script_h.getAddressByLine( line );
     current_label_info = script_h.getLabelByAddress( buf );
@@ -396,7 +399,7 @@ int ScriptParser::returnCommand()
     last_nest_info->next = NULL;
     
     if (textgosub_flag){
-        if (wait_script){
+        if (wait_script && label[0] != '*'){
             script_h.setCurrent(wait_script);
             return RET_CONTINUE;
         }

@@ -2,7 +2,7 @@
 /*
  *  DirectReader.h - Reader from independent files
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -32,10 +32,10 @@
 class DirectReader : public BaseReader
 {
 public:
-    DirectReader( char *path=NULL, const unsigned char *key_table=NULL );
+    DirectReader( const char *path=NULL, const unsigned char *key_table=NULL );
     ~DirectReader();
 
-    int open( char *name=NULL );
+    int open( const char *name=NULL );
     int close();
 
     const char *getArchiveName() const;

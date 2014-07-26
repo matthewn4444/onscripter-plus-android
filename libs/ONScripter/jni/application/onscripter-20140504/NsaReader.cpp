@@ -2,7 +2,7 @@
  *
  *  NsaReader.cpp - Reader from a NSA archive
  *
- *  Copyright (c) 2001-2012 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -26,7 +26,7 @@
 #define NSA_ARCHIVE_NAME "arc"
 #define NSA_ARCHIVE_NAME2 "arc%d"
 
-NsaReader::NsaReader( int nsa_offset, char *path, int archive_type, const unsigned char *key_table )
+NsaReader::NsaReader( unsigned int nsa_offset, char *path, int archive_type, const unsigned char *key_table )
         :SarReader( path, key_table )
 {
     sar_flag = true;
@@ -47,7 +47,7 @@ NsaReader::~NsaReader()
 {
 }
 
-int NsaReader::open( char *nsa_path )
+int NsaReader::open( const char *nsa_path )
 {
     int i;
     bool archive_found = false;
@@ -56,11 +56,10 @@ int NsaReader::open( char *nsa_path )
     if ( !SarReader::open( "arc.sar" ) ) return 0;
     
     sar_flag = false;
-    if ( !nsa_path ) nsa_path = "";
 
     if (archive_type & ARCHIVE_TYPE_NS2){
         for ( i=0 ; i<MAX_NS2_ARCHIVE ; i++ ){
-            sprintf( archive_name, "%s%02d.%s", nsa_path, i, ns2_archive_ext );
+            sprintf( archive_name, "%s%02d.%s", nsa_path?nsa_path:"", i, ns2_archive_ext );
             if ( ( archive_info_ns2[i].file_handle = fopen( archive_name, "rb" ) ) == NULL ) break;
         
             archive_found = true;
@@ -76,12 +75,12 @@ int NsaReader::open( char *nsa_path )
             ArchiveInfo *ai;
         
             if (i == -1){
-                sprintf( archive_name, "%s%s.%s", nsa_path, NSA_ARCHIVE_NAME, nsa_archive_ext );
+                sprintf( archive_name, "%s%s.%s", nsa_path?nsa_path:"", NSA_ARCHIVE_NAME, nsa_archive_ext );
                 ai = &archive_info;
             }
             else{
                 sprintf( archive_name2, NSA_ARCHIVE_NAME2, i+1 );
-                sprintf( archive_name, "%s%s.%s", nsa_path, archive_name2, nsa_archive_ext );
+                sprintf( archive_name, "%s%s.%s", nsa_path?nsa_path:"", archive_name2, nsa_archive_ext );
                 ai = &archive_info2[i];
             }
         
@@ -100,7 +99,7 @@ int NsaReader::open( char *nsa_path )
     return 0;
 }
 
-int NsaReader::openForConvert( char *nsa_name, int archive_type, int nsa_offset )
+int NsaReader::openForConvert( char *nsa_name, int archive_type, unsigned int nsa_offset )
 {
     sar_flag = false;
     if ( ( archive_info.file_handle = ::fopen( nsa_name, "rb" ) ) == NULL ){

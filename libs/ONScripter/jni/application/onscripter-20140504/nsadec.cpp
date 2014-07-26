@@ -2,7 +2,7 @@
  * 
  *  nsadec.cpp - NSA archive decoder
  *
- *  Copyright (c) 2001-2010 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -34,7 +34,7 @@ extern int errno;
 int main( int argc, char **argv )
 {
     NsaReader cNR;
-    int nsa_offset = 0;
+    unsigned int nsa_offset = 0;
     unsigned long length;
     unsigned char *buffer;
     char file_name[256], dir_name[256];
