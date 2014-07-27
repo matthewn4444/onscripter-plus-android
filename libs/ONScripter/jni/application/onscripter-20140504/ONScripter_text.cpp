@@ -369,9 +369,11 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
 
             text[0] = *str++;
             text[1] = *str++;
+#ifdef ENABLE_KOREAN
             if (IS_UTF8(text[0]) && !force_korean_text && !script_h.isKoreanMode()) {
                 text[2] = *str++;
             }
+#endif
             drawChar( text, info, false, false, surface, cache_info );
         }
         else if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
@@ -475,7 +477,11 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
             }
 #endif
             unsigned short index = (out_text[0] & 0xFF) << 8 ^ current_page->text[i+1] & 0xFF;
-            if (IS_TWO_BYTE(out_text[0]) || IS_KOR(index)){
+            if (IS_TWO_BYTE(out_text[0])
+#ifdef ENABLE_KOREAN
+                    || IS_KOR(index)
+#endif
+            ){
                 out_text[1] = current_page->text[i+1];
 
                 if ( checkLineBreak( current_page->text+i, &f_info ) )
@@ -1222,7 +1228,6 @@ bool ONScripter::processText()
                     current_page->add(' ');
                 }
             }
-
             if (!newLineEarly)
 #endif
             drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
