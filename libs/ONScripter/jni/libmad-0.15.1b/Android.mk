@@ -1,14 +1,29 @@
 LOCAL_PATH:= $(call my-dir)
+
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := mad
-LOCAL_ARM_MODE := arm
-LOCAL_CFLAGS += -DFPM_ARM -DASO_ZEROCHECK
-LOCAL_SRC_FILES := bit.c decoder.c \
-	fixed.c frame.c \
-	huffman.c layer12.c \
-	layer3.c minimad.c \
-	stream.c synth.c \
-	timer.c version.c
+LOCAL_SRC_FILES:= \
+	version.c \
+	fixed.c \
+	bit.c \
+	timer.c \
+	stream.c \
+	frame.c  \
+	synth.c \
+	decoder.c \
+	layer12.c \
+	layer3.c \
+	huffman.c
+
+LOCAL_SHARED_LIBRARIES :=
+
+LOCAL_MODULE:= libmad
+
+LOCAL_C_INCLUDES := \
+    $(LOCAL_PATH)/android
+
+LOCAL_CFLAGS := \
+    -DHAVE_CONFIG_H \
+    -DFPM_DEFAULT
 
 include $(BUILD_SHARED_LIBRARY)
