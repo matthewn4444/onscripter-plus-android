@@ -736,7 +736,9 @@ void ONScripter::flushDirect( SDL_Rect &rect, int refresh_mode )
     SDL_Rect dst_rect = rect;
     if (AnimationInfo::doClipping(&dst_rect, &screen_rect) || (dst_rect.w==0 && dst_rect.h==0)) return;
     SDL_BlitSurface( accumulation_surface, &dst_rect, screen_surface, &dst_rect );
-    SDL_UpdateRect( screen_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h );
+    if (dst_rect.w > 0 && dst_rect.h > 0) {
+        SDL_UpdateRect( screen_surface, dst_rect.x, dst_rect.y, dst_rect.w, dst_rect.h );
+    }
 #endif
 }
 
