@@ -508,7 +508,10 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 
                 // Scan the next characters till the next space and get the accumulated character advance (word width)
                 while(index < current_page->text_count) {
-                    TTF_GlyphMetrics( (TTF_Font*)f_info.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    advanced = 0;
+                    if (f_info.ttf_font[0]) {
+                        TTF_GlyphMetrics( (TTF_Font*)f_info.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    }
                     accum_advance += advanced;
                     if (script[index] == ' ') break;
                     index++;
@@ -914,7 +917,10 @@ bool ONScripter::processText()
                     // Check for the next space in new line after text and see if it fits in previous line
                     int advanced, accum_advance = 0;
                     while(next[i] != ' ') {
-                        TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i], NULL, NULL, NULL, NULL, &advanced );
+                        advanced = 0;
+                        if (sentence_font.ttf_font[0]) {
+                            TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i], NULL, NULL, NULL, NULL, &advanced );
+                        }
                         accum_advance += advanced;
                         i++;
                     }
@@ -926,7 +932,10 @@ bool ONScripter::processText()
                 // Check for the next space in new line and see if it fits in previous line
                 int i = 0, accum_advance = 0, advanced;
                 while(next[i + 1] != ' ') {
-                    TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i + 1], NULL, NULL, NULL, NULL, &advanced );
+                    advanced = 0;
+                    if (sentence_font.ttf_font[0]) {
+                        TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], next[i + 1], NULL, NULL, NULL, NULL, &advanced );
+                    }
                     accum_advance += advanced;
                     i++;
                 }
@@ -1205,7 +1214,10 @@ bool ONScripter::processText()
 
                 // Scan the next characters till the next space and get the accumulated character advance (word width)
                 while(script[index] != '\0') {
-                    TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    advanced = 0;
+                    if (sentence_font.ttf_font[0]) {
+                        TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
+                    }
                     accum_advance += advanced;
                     if (script[index] == ' ') break;
                     index++;
