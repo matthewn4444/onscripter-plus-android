@@ -43,6 +43,7 @@ union magic {
 };
 #endif 
 
+#if defined(__ARM_EABI__)		// Fix to compile on x86 and MIPS
 #if BYTE_ORDER==BIG_ENDIAN
 union magic {
   struct {
@@ -51,6 +52,7 @@ union magic {
   } halves;
   ogg_int64_t whole;
 };
+#endif
 #endif
 
 STIN ogg_int32_t MULT32(ogg_int32_t x, ogg_int32_t y) {
