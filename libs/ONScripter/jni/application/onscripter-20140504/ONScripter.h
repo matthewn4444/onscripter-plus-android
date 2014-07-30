@@ -94,7 +94,7 @@ public:
 
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
         JavaONScripter = jniEnv->NewGlobalRef(thiz);
-        JavaONScripterClass = jniEnv->GetObjectClass(JavaONScripter);
+        JavaONScripterClass = (jclass)jniEnv->NewGlobalRef(jniEnv->GetObjectClass(JavaONScripter));
         JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
     }
