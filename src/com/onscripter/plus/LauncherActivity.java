@@ -49,6 +49,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private static final String LAST_DIRECTORY = "last_directory_key";
     public static String DEFAULT_FONT_PATH = null;
     public static String DEFAULT_FONT_FILE = null;
+    public static String DEFAULT_FONT_FILE_NAME = null;
     public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
     public static String SETTINGS_THEME_KEY = null;
     private static File DEFAULT_LOCATION;
@@ -86,6 +87,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 // Seriously something bad happened
                 BugSenseHandler.sendException(e1);
             }
+            DEFAULT_FONT_FILE_NAME = getString(R.string.default_font_file);
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
             SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
             SETTINGS_THEME_KEY = getString(R.string.settings_theme_key);
@@ -499,7 +501,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
 
         if (isDirectoryONScripterGame(currentDir)) {
             // Use default font if there is none in the game folder
-            if (new File(currentDir + "/" + DEFAULT_FONT_FILE).exists()) {
+            if (new File(currentDir + "/" + DEFAULT_FONT_FILE_NAME).exists()) {
                 startONScripter(currentDir.getPath());
             } else {
                 if (mCopyTask != null) {    // Still copying, so wait till finished then run
