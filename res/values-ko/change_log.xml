@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.1.11,2014년 8월 1일</item>
+        <item>많은 버그를 고쳤다</item>
         <item>v버전 1.1.10,2014년 7월 26일</item>
         <item>+비디오 지원</item>
         <item>v버전 1.1.9,2014년 7월 2일</item>

@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">変更</string>
     <string-array name="change_log">
+        <item>vバージョン 1.1.11,2014年8月1日</item>
+        <item>たくさんバグを直した</item>
         <item>vバージョン 1.1.10,2014年7月26日</item>
         <item>＋ビデオのサポート</item>
         <item>vバージョン 1.1.9,2014年7月2日</item>
