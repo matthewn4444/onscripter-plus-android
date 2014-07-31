@@ -6,6 +6,9 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.11,8/1/2014</item>
+        <item>Fixes typemoon games (eg. Kagetsu Tohya)</item>
+        <item>Fixes bug that did not allow users to pick a custom font</item>
         <item>vVersion 1.1.10,7/26/2014</item>
         <item>Added video support</item>
         <item>Fixes controls for widescreen games</item>
