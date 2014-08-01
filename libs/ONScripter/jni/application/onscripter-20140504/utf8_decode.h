@@ -2,7 +2,7 @@
 #define __UTF8_DECODE_H__
 
 #define IS_UTF8(x) \
-    UTF8ByteLength(x) > 1
+    (bool)(UTF8ByteLength(x) > 1)
 
 // Get the 6-bit payload of the next continuation byte, else UTF8_ERROR
 #define CONT_BYTE(b) \
