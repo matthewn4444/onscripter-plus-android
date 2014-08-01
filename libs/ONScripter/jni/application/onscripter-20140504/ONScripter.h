@@ -796,6 +796,7 @@ private:
     bool checkLineBreak(const char *buf, FontInfo *fi);
     void processEOT();
     bool processText();
+    bool scanText();
 };
 
 #endif // __ONSCRIPTER_H__

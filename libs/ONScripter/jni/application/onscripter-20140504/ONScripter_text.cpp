@@ -42,6 +42,8 @@ extern unsigned short convSJIS2UTF16( unsigned short in );
 #define IS_TRANSLATION_REQUIRED(x)	\
         ( *(x) == (char)0x81 && *((x)+1) >= 0x41 && *((x)+1) <= 0x44 )
 
+bool allowUTF8TextRender = false;
+
 void ONScripter::shiftHalfPixelX(SDL_Surface *surface)
 {
     SDL_LockSurface( surface );
@@ -84,7 +86,7 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
 		unicode = convKOR2UTF16( index );
     } else
 #endif
-    if (IS_UTF8(text[0])){
+    if (IS_UTF8(text[0]) && allowUTF8TextRender){
         unicode = decodeUTF8Character(text, NULL);
     }
     else if (IS_TWO_BYTE(text[0])){
@@ -237,7 +239,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     info->old_xy[1] = info->y();
 
     char text2[3] = {text[0], 0, 0};
-    if (IS_UTF8(text[0])) {
+    if (IS_UTF8(text[0]) && allowUTF8TextRender) {
         text2[1] = text[1];
         text2[2] = text[2];
     } else if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
@@ -293,6 +295,23 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
 void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info )
 {
     int i;
+
+    // Scan string to allow UTF8 rendering or not; do not render it if there is Asian characters
+    allowUTF8TextRender = true;
+    i = 0;
+    while(i < strlen(str)) {
+        char c = str[i];
+        if (IS_UTF8(c)) {
+            i += UTF8ByteLength(c);
+        }
+        else if (IS_TWO_BYTE(c)) {
+            allowUTF8TextRender = false;
+            break;
+        }
+        else {
+            i++;
+        }
+    }
 
     int start_xy[2];
     start_xy[0] = info->xy[0];
@@ -370,7 +389,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             text[0] = *str++;
             text[1] = *str++;
 #ifdef ENABLE_KOREAN
-            if (IS_UTF8(text[0]) && !force_korean_text && !script_h.isKoreanMode()) {
+            if (IS_UTF8(text[0]) && allowUTF8TextRender && !force_korean_text && !script_h.isKoreanMode()) {
                 text[2] = *str++;
             }
 #endif
@@ -380,7 +399,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             info->newLine();
             str++;
         }
-        else if (IS_UTF8(*str)) {
+        else if (IS_UTF8(*str) && allowUTF8TextRender) {
             int numCharBytes = UTF8ByteLength(*str);
             for (int i = 0; i < numCharBytes; i++) {
                 text[i] = *str++;
@@ -436,6 +455,23 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 #ifdef ANDROID
     reassureSentenceFontSize();
 #endif
+
+    // Scan string to allow UTF8 rendering or not; do not render it if there is Asian characters
+    allowUTF8TextRender = true;
+    int i = 0;
+    while (i < current_page->text_count) {
+        char c = current_page->text[i];
+        if (IS_UTF8(c)) {
+            i += UTF8ByteLength(c);
+        }
+        else if (IS_TWO_BYTE(c)) {
+            allowUTF8TextRender = false;
+            break;
+        }
+        else {
+            i++;
+        }
+    }
 
     char out_text[3] = { '\0','\0','\0' };
     FontInfo f_info = sentence_font;
@@ -837,6 +873,7 @@ int ONScripter::textCommand()
     line_enter_status = 2;
     if (pagetag_flag) page_enter_status = 1;
 
+    scanText();
     while(processText());
 
     return RET_CONTINUE;
@@ -981,7 +1018,7 @@ bool ONScripter::processText()
         out_text[0] = script_h.getStringBuffer()[string_buffer_offset];
         out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
 
-        if (IS_UTF8(ch)) {
+        if (IS_UTF8(ch) && allowUTF8TextRender) {
             out_text[2] = script_h.getStringBuffer()[string_buffer_offset + 2];
         }
 
@@ -1010,7 +1047,7 @@ bool ONScripter::processText()
 
         num_chars_in_sentence++;
 
-        if (IS_UTF8(ch)) {
+        if (IS_UTF8(ch) && allowUTF8TextRender) {
             string_buffer_offset += UTF8ByteLength(ch);
         } else {
             string_buffer_offset += 2;
@@ -1199,7 +1236,7 @@ bool ONScripter::processText()
         }
         else if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
             // Handle UTF8
-            if (IS_UTF8(ch)) {
+            if (IS_UTF8(ch) && allowUTF8TextRender) {
                 out_text[1] = script_h.getStringBuffer()[string_buffer_offset + 1];
                 string_buffer_offset += UTF8ByteLength(ch) - 1;
             }
@@ -1263,6 +1300,110 @@ bool ONScripter::processText()
     }
 
     return false;
+}
+
+bool ONScripter::scanText()
+{
+    // Read the type of byte, check that UTF8 is needed only when there is no Asian characters
+    allowUTF8TextRender = true;
+    int offset = string_buffer_offset;
+    while(1) {
+        char out_text[3]= {'\0', '\0', '\0'};
+
+        while( (!(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) &&
+                script_h.getStringBuffer()[ offset ] == ' ') ||
+               script_h.getStringBuffer()[ offset ] == '\t' ) offset ++;
+
+        if (script_h.getStringBuffer()[offset] == 0x00){
+            break;
+        }
+
+        char ch = script_h.getStringBuffer()[offset];
+
+        if ( IS_TWO_BYTE(ch) ){
+            if (IS_UTF8(ch)) {
+                offset += UTF8ByteLength(ch);
+            } else {
+                // Found asian character, do not render UTF8
+                allowUTF8TextRender = false;
+                return false;
+            }
+            continue;
+        }
+        else if ( ch == '@' || ch == '\\' ){ // wait for click
+            break;
+        }
+        else if ( ch == '_' ){ // Ignore an immediate click wait
+            offset++;
+
+            int matched_len = script_h.checkClickstr(script_h.getStringBuffer() + offset, true);
+            if (matched_len > 0){
+                offset += matched_len;
+            }
+            continue;
+        }
+        else if ( ch == '!' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
+            offset++;
+            if ( script_h.getStringBuffer()[ offset ] == 's' ){
+                offset++;
+                if ( script_h.getStringBuffer()[ offset ] == 'd' ){
+                    offset++;
+                }
+                else{
+                    while( script_h.getStringBuffer()[ offset ] >= '0' &&
+                           script_h.getStringBuffer()[ offset ] <= '9' ){
+                        offset++;
+                    }
+                    while (script_h.getStringBuffer()[ offset ] == ' ' ||
+                           script_h.getStringBuffer()[ offset ] == '\t') offset++;
+                }
+            }
+            else if ( script_h.getStringBuffer()[ offset ] == 'w' ||
+                      script_h.getStringBuffer()[ offset ] == 'd' ){
+                offset++;
+                while( script_h.getStringBuffer()[ offset ] >= '0' &&
+                       script_h.getStringBuffer()[ offset ] <= '9' ){
+                    offset++;
+                }
+                while (script_h.getStringBuffer()[ offset ] == ' ' ||
+                       script_h.getStringBuffer()[ offset ] == '\t') offset++;
+            }
+            continue;
+        }
+        else if ( ch == '#' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
+            offset += 7;
+            continue;
+        }
+        else if ( ch == '(' && script_h.getCurrent()[0] != '`' && (!english_mode ||
+                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
+            offset++;
+            continue;
+        }
+        else if ( ch == '<' && (!english_mode ||
+                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
+            offset++;
+            continue;
+        }
+        else if ( ch == '>' && in_textbtn_flag && (!english_mode ||
+                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
+            offset++;
+            continue;
+        }
+        else{
+            if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
+                // Handle UTF8
+                if (IS_UTF8(ch)) {
+                    offset += UTF8ByteLength(ch) - 1;
+                }
+            }
+
+            if ( script_h.getStringBuffer()[ offset + 1 ] &&
+                 !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR))
+                offset++;
+            offset++;
+        }
+        return true;
+    }
 }
 
 
