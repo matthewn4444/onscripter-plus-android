@@ -55,6 +55,7 @@ public:
 #ifdef ANDROID
     int og_font_size_xy[2];
     int og_num_xy[2];
+    int spacing_xy[2];
     bool size_invalidated;
 #endif
 
@@ -90,6 +91,7 @@ public:
     void setRubyOnFlag(bool flag);
 #ifdef ANDROID
     void setFontParametersForScaling(int sizeX, int sizeY, double scale);
+    void setFontParametersForScaling(int sizeX, int sizeY, int spacingX, int spacingY, double scale);
     void updateFontScaling(double scale);
     void updateFontScaling(int numX, int numY, double scale);
 #endif
