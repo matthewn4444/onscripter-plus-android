@@ -221,7 +221,7 @@ public class TwoStateLayout extends ViewGroup {
     }
 
     private int getMaxBound() {
-        return 0;
+        return -1;
     }
 
     public void smoothScrollTo(int x) {
@@ -504,7 +504,7 @@ public class TwoStateLayout extends ViewGroup {
         // First time measuring needs to make the layout to the right
         if (mLayout.getWidth() == 0 && mIsOnRightSide) {
             int toX = - width;
-            scrollTo(toX, 0);
+            scrollTo(toX, getMaxBound());
         }
 
         final int contentWidth = getChildMeasureSpec(widthMeasureSpec, 0, width);
