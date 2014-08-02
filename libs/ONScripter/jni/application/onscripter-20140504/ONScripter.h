@@ -454,6 +454,10 @@ private:
         sentence_font.setFontParametersForScaling(sizeX, sizeY, Sentence_font_scale);
     }
 
+    void setSentenceFontParamters(int sizeX, int sizeY, int spacingX, int spacingY) {
+        sentence_font.setFontParametersForScaling(sizeX, sizeY, spacingX, spacingY, Sentence_font_scale);
+    }
+
     void updateSentenceFontSizes() {
         sentence_font.updateFontScaling(Sentence_font_scale);
     }

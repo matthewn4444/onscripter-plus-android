@@ -634,13 +634,19 @@ void ONScripter::setwindowCore()
     sentence_font.num_xy[0] = script_h.readInt();
     sentence_font.num_xy[1] = script_h.readInt();
 #if ANDROID
-    setSentenceFontParamters(script_h.readInt(), script_h.readInt());
+    int sizeX = script_h.readInt();
+    int sizeY = script_h.readInt();
+    int spaceX = script_h.readInt();
+    int spaceY = script_h.readInt();
+    setSentenceFontParamters(sizeX, sizeY, spaceX, spaceY);
+    sentence_font.pitch_xy[0] = spaceX + sentence_font.font_size_xy[0];
+    sentence_font.pitch_xy[1] = spaceY + sentence_font.font_size_xy[1];
 #else
     sentence_font.font_size_xy[0] = script_h.readInt();
     sentence_font.font_size_xy[1] = script_h.readInt();
-#endif
     sentence_font.pitch_xy[0] = script_h.readInt() + sentence_font.font_size_xy[0];
     sentence_font.pitch_xy[1] = script_h.readInt() + sentence_font.font_size_xy[1];
+#endif
     sentence_font.wait_time = script_h.readInt();
     sentence_font.is_bold = script_h.readInt()?true:false;
     sentence_font.is_shadow = script_h.readInt()?true:false;
