@@ -11,4 +11,4 @@ LOCAL_SRC_FILES := blocksort.c \
 	decompress.c \
 	bzlib.c
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)

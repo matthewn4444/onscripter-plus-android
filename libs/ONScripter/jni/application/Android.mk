@@ -43,7 +43,7 @@ EXT_OBJS = LUAHandler.o
 include $(LOCAL_PATH)/$(APP_SUBDIR)/Makefile.onscripter
 LOCAL_SRC_FILES := $(addprefix $(APP_SUBDIR)/,$(patsubst %.o, %.cpp, $(ONSCRIPTER_OBJS)))
 
-LOCAL_SHARED_LIBRARIES := sdl sdl_mixer sdl_image sdl_ttf lua bz2 mad tremor
+LOCAL_STATIC_LIBRARIES := sdl sdl_mixer sdl_image sdl_ttf lua bz2 mad tremor
 
 LOCAL_LDLIBS := -lGLESv1_CM -ldl -llog -lz -lGLESv1_CM
 

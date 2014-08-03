@@ -18,7 +18,8 @@ LOCAL_CPP_EXTENSION := .cpp
 
 LOCAL_SRC_FILES := sdl_main.c
 
-LOCAL_SHARED_LIBRARIES := sdl application
+LOCAL_STATIC_LIBRARIES := sdl
+LOCAL_SHARED_LIBRARIES := application
 LOCAL_LDLIBS := -llog
 
 include $(BUILD_SHARED_LIBRARY)

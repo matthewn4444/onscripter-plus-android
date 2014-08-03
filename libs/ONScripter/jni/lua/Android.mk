@@ -10,4 +10,4 @@ endif
 
 LOCAL_SRC_FILES := $(foreach F, src/*.c, $(addprefix $(dir $(F)),$(notdir $(wildcard $(LOCAL_PATH)/$(F)))))
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
