@@ -165,14 +165,7 @@ public class ONScripterView extends DemoGLSurfaceView {
 
     /** Load the libraries */
     static {
-        System.loadLibrary("mad");
-        System.loadLibrary("bz2");
-        System.loadLibrary("tremor");
-        System.loadLibrary("lua");
         System.loadLibrary("sdl");
-        System.loadLibrary("sdl_mixer");
-        System.loadLibrary("sdl_image");
-        System.loadLibrary("sdl_ttf");
         System.loadLibrary("application");
         System.loadLibrary("sdl_main");
     }
