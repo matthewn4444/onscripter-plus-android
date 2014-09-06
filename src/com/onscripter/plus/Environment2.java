@@ -20,6 +20,7 @@ public final class Environment2 {
         "/mnt/extsd",
         "/mnt/sdcard-ext",
         "/storage/sdcard1/",
+        "/storage/external_SD",
     };
     private static boolean HasScanned = false;
 
