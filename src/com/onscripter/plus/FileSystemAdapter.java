@@ -184,13 +184,12 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     }
 
     public File getFile(int index) {
-        if (isBackButtonShown()) {
-            if (index == 0) {   // Back button
-                return null;
-            }
-            index--;
-        }
         return mFileList[index];
+    }
+
+    @Override
+    public int getCount() {
+        return super.getCount() - (isBackButtonShown() ? 1 : 0);
     }
 
     public boolean refresh() {
