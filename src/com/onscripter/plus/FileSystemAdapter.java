@@ -183,13 +183,35 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         return mShowBackItem;
     }
 
+    /**
+     * Gets the file from the listview that the adapter is
+     * attached to. It will count 0 as the back button if
+     * it exists.
+     * @param index
+     * @return
+     */
     public File getFile(int index) {
+        if (isBackButtonShown()) {
+            if (index == 0) {   // Back button
+                return null;
+            }
+            index--;
+        }
         return mFileList[index];
     }
 
-    @Override
-    public int getCount() {
-        return super.getCount() - (isBackButtonShown() ? 1 : 0);
+    /**
+     * Gets the file that is in the list independent to whether
+     * there is a back button shown in the listview.
+     * @param index
+     * @return
+     */
+    public File getFileFromList(int index) {
+        return mFileList[index];
+    }
+
+    public int getSizeOfFileList() {
+        return getCount() - (isBackButtonShown() ? 1 : 0);
     }
 
     public boolean refresh() {
