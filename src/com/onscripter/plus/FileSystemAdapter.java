@@ -24,7 +24,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     private boolean mShowHidden;
     private boolean mOnlyShowFolders;
     private boolean mShowBackItem;
-    private File[] mFileList;
+    private FileListItem[] mFileList;
     private final FileSort mFileSorter = new FileSort();
     private TextView mBindedPath;
     private CustomFileTypeParser mTypeParser;
@@ -52,10 +52,18 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
     static class FileListItem {
         private final LIST_ITEM_TYPE mType;
         private final String mName;
+        private final File mFile;
 
         public FileListItem(LIST_ITEM_TYPE type, String name) {
             mType = type;
             mName = name;
+            mFile = null;
+        }
+
+        public FileListItem(LIST_ITEM_TYPE type, File file) {
+            mType = type;
+            mName = file.getName();
+            mFile = file;
         }
 
         public boolean isFile() {
@@ -73,11 +81,14 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         public String getName() {
             return mName;
         }
+        public File getFile() {
+            return mFile;
+        }
     }
 
-    static class FileSort implements Comparator<File>{
+    static class FileSort implements Comparator<FileListItem>{
         @Override
-        public int compare(File src, File target){
+        public int compare(FileListItem src, FileListItem target){
             return src.getName().compareTo(target.getName());
         }
     }
@@ -124,7 +135,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         ta.recycle();
 
         mTypeParser = parser;
-        refresh();
+        setCurrentDirectory(mCurrentDirectory);
     }
 
     public void bindPathToTextView(TextView textView) {
@@ -197,7 +208,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
             }
             index--;
         }
-        return mFileList[index];
+        return mFileList[index].getFile();
     }
 
     /**
@@ -207,48 +218,21 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
      * @return
      */
     public File getFileFromList(int index) {
-        return mFileList[index];
+        return mFileList[index].getFile();
     }
 
     public int getSizeOfFileList() {
         return getCount() - (isBackButtonShown() ? 1 : 0);
     }
 
-    public boolean refresh() {
-        File[] files = mCurrentDirectory.listFiles(new FileFilter() {      // TODO split this into file and folder
-            @Override
-            public boolean accept(File file) {
-                return (!mOnlyShowFolders && (!file.isHidden() || file.isHidden()
-                        && mShowHidden)) || file.isDirectory();
-            }
-        });
-        if (files == null) {
-            Toast.makeText(getContext(), "Unable to open folder because of permissions", Toast.LENGTH_SHORT).show();
-            return false;
-        }
+    public void refresh() {
         clear();
-        mFileList = files;
         if (mShowBackItem && !isDirectoryAtLowerBound()) {
             add(BackFileListItem);
         }
         Arrays.sort(mFileList, mFileSorter);
-        for (int i = 0; i < mFileList.length; i++) {
-            if (mTypeParser != null) {
-                LIST_ITEM_TYPE type = mTypeParser.onFileTypeParse(mFileList[i]);
-                add(new FileListItem(type, mFileList[i].getName()));
-            } else {
-                if (mFileList[i].isDirectory()) {
-                    add(new FileListItem(LIST_ITEM_TYPE.FOLDER, mFileList[i].getName()));
-                } else {
-                    add(new FileListItem(LIST_ITEM_TYPE.FILE, mFileList[i].getName()));
-                }
-            }
-        }
-        if (mBindedPath != null) {
-            mBindedPath.setText(mCurrentDirectory.getPath());
-        }
+        addAll(mFileList);
         notifyDataSetChanged();
-        return true;
     }
 
     public void setChildAsCurrent(int index) {
@@ -260,7 +244,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
             index--;
         }
         if (index < mFileList.length) {
-            setCurrentDirectory(mFileList[index]);
+            setCurrentDirectory(mFileList[index].getFile());
         }
     }
 
@@ -268,11 +252,41 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         if (currentDirectory.exists() && currentDirectory.isDirectory()) {
             File old = mCurrentDirectory;
             mCurrentDirectory = currentDirectory;
-            if (refresh()) {
-                return true;
-            } else {
+
+            // List the files and refresh interface
+            File[] files = mCurrentDirectory.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return (!mOnlyShowFolders && (!file.isHidden() || file.isHidden()
+                            && mShowHidden)) || file.isDirectory();
+                }
+            });
+            if (files == null) {
+                Toast.makeText(getContext(), "Unable to open folder because of permissions", Toast.LENGTH_SHORT).show();
                 mCurrentDirectory = old;
+                return false;
             }
+
+            // Build file list and set their types
+            FileListItem[] fileList = new FileListItem[files.length];
+            for (int i = 0; i < files.length; i++) {
+                if (mTypeParser != null) {
+                    LIST_ITEM_TYPE type = mTypeParser.onFileTypeParse(files[i]);
+                    fileList[i] = new FileListItem(type, files[i]);
+                } else {
+                    if (files[i].isDirectory()) {
+                        fileList[i] = new FileListItem(LIST_ITEM_TYPE.FOLDER, files[i]);
+                    } else {
+                        fileList[i] = new FileListItem(LIST_ITEM_TYPE.FILE, files[i]);
+                    }
+                }
+            }
+            mFileList = fileList;
+            refresh();
+            if (mBindedPath != null) {
+                mBindedPath.setText(mCurrentDirectory.getPath());
+            }
+            return true;
         }
         return false;
     }
@@ -281,13 +295,7 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         if (mCurrentDirectory.getParent() == null) {
             return false;
         }
-        File old = mCurrentDirectory;
-        mCurrentDirectory = mCurrentDirectory.getParentFile();
-        if (refresh()) {
-            return true;
-        }
-        mCurrentDirectory = old;
-        return false;
+        return setCurrentDirectory(mCurrentDirectory.getParentFile());
     }
 
     public void addLowerBoundFile(File path) {
