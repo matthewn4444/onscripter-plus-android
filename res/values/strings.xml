@@ -135,4 +135,7 @@
     <string name="dialog_settings_text_upscaling">Set the dialogue text upscaling.</string>
     <string name="dialog_settings_text_upscaling_scale">Scale Size:</string>
     <string name="dialog_settings_text_upscaling_text">English 日本語</string>
+
+    <!-- Game Pref Keys -->
+    <string name="game_pref_name">game_name_key</string>
 </resources>

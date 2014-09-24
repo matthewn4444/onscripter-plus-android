@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -18,6 +20,7 @@ import android.content.SharedPreferences.Editor;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -38,6 +41,7 @@ import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.onscripter.ONScripterView;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 import com.onscripter.plus.ads.InterstitialAdHelper;
@@ -52,6 +56,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     public static String DEFAULT_FONT_FILE_NAME = null;
     public static String SETTINGS_FOLDER_DEFAULT_KEY = null;
     public static String SETTINGS_THEME_KEY = null;
+    public static String GAME_PREF_NAME_KEY = null;
     private static File DEFAULT_LOCATION;
     private static String FONTS_FOLDER = null;
 
@@ -91,6 +96,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             DEFAULT_FONT_PATH = getFilesDir() + "/" + DEFAULT_FONT_FILE;
             SETTINGS_FOLDER_DEFAULT_KEY = getString(R.string.settings_folder_default_key);
             SETTINGS_THEME_KEY = getString(R.string.settings_theme_key);
+            GAME_PREF_NAME_KEY = getString(R.string.game_pref_name);
             DEFAULT_LOCATION = Environment2.getExternalSDCardDirectory() != null ?
                     Environment2.getExternalSDCardDirectory() : Environment.getExternalStorageDirectory();
         }
@@ -392,6 +398,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         } else {
             // Folder
             if (isDirectoryONScripterGame(file)) {
+                // Parse the information of the game in another thread
+                ParseGameInfoTask.queue(file.toString());
                 return LIST_ITEM_TYPE.FILE;
             } else {
                 return LIST_ITEM_TYPE.FOLDER;
@@ -630,5 +638,67 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
 
     private boolean isDebug() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
+    static class ParseGameInfoTask extends AsyncTask<Void, Void, Void> {
+        // Static Queue Management
+        private static Queue<String> sParseGameInfoTaskQueue = new LinkedList<String>();
+        private static boolean sIsJobRunning = false;
+        public static void queue(String gamePath) {
+            synchronized (sParseGameInfoTaskQueue) {
+                sParseGameInfoTaskQueue.add(gamePath);
+            }
+            runJob();
+        }
+        private static void runJob() {
+            String path = null;
+            synchronized (sParseGameInfoTaskQueue) {
+                if (sIsJobRunning || sParseGameInfoTaskQueue.isEmpty()) {
+                    return;
+                }
+                sIsJobRunning = true;
+                path = sParseGameInfoTaskQueue.poll();
+            }
+            new ParseGameInfoTask(path).execute();
+        }
+
+        // ParseGameInfoTask Class
+        private final String mGamePath;
+
+        public ParseGameInfoTask(String gamePath) {
+            mGamePath = gamePath;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (mGamePath != null) {
+                final VNPreferences pref = new VNPreferences(mGamePath);
+
+                // Get the name of game
+                String name = pref.getString(GAME_PREF_NAME_KEY, null);
+                if (name == null) {
+                    name = ONScripterView.getGameName(mGamePath);
+
+                    // If can't find the name, then we will use the file path
+                    if (name == null) {
+                        name = new File(mGamePath).getName();
+                    }
+
+                    // Save the name into the preferences
+                    pref.putString(GAME_PREF_NAME_KEY, name);
+                    pref.commit();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            synchronized (sParseGameInfoTaskQueue) {
+                sIsJobRunning = false;
+            }
+            runJob();
+        }
     }
 }
