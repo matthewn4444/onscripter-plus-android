@@ -682,6 +682,10 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                     // If can't find the name, then we will use the file path
                     if (name == null) {
                         name = new File(mGamePath).getName();
+                        Analytics.sendGameName("*" + name);
+                    } else {
+                        // Register this game once
+                        Analytics.sendGameName(name);
                     }
 
                     // Save the name into the preferences

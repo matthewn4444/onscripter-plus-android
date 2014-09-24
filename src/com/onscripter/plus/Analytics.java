@@ -26,7 +26,8 @@ public final class Analytics {
         CHANGES("Changes"),
         LAUNCHER_STATE("Launcher State"),
         GAME_STATE("Game State"),
-        FEATURE("Feature");
+        FEATURE("Feature"),
+        GAMES("Games");
 
         private final String mVal;
         private Category(final String s) {
@@ -45,7 +46,8 @@ public final class Analytics {
         THEME_USED("Theme Used"),
         ADBLOCKER_USED("Adblocker Used"),
         ACTIVITY_FINISHED("Activity Finished"),
-        VIDEO_LAUNCHED("Video Launched");
+        VIDEO_LAUNCHED("Video Launched"),
+        GAME_NAMES("Name of ONScripter Games");
 
         private final String mVal;
         private Action(final String s) {
@@ -243,6 +245,9 @@ public final class Analytics {
         send(Category.FEATURE, Action.VIDEO_LAUNCHED, videoPath);
     }
 
+    public static void sendGameName(String name) {
+        send(Category.GAMES, Action.GAME_NAMES, name);
+    }
 
     // Send hits
     public synchronized static void send(Category category, Action action, String label) {
