@@ -306,7 +306,7 @@ private:
     
     int  readScript(char *path);
 #ifdef ENABLE_KOREAN
-    void detectKoreanText();
+    static bool detectKoreanText(char* buffer, size_t size);
 #endif
     int  readScriptSub(FILE *fp, char **buf, int encrypt_mode);
     void readConfiguration();
