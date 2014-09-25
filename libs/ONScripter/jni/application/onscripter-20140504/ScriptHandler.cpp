@@ -990,7 +990,6 @@ ScriptHandler::VariableData &ScriptHandler::getVariableData(int no)
 
 // ----------------------------------------
 // Private methods
-
 int ScriptHandler::readScript( char *path )
 {
     archive_path = new char[strlen(path) + 1];
@@ -1068,72 +1067,112 @@ int ScriptHandler::readScript( char *path )
 
     script_buffer_length = p_script_buffer - script_buffer;
 #ifdef ENABLE_KOREAN
-    detectKoreanText();
+    korean_mode = detectKoreanText(script_buffer, script_buffer_length);
 #endif
     return 0;
 }
 
 #ifdef ENABLE_KOREAN
-void ScriptHandler::detectKoreanText() {
+// Korean mode depends if we can find only Korean text in the script, determines
+// whether or not to parse the script as Hangul text
+bool ScriptHandler::detectKoreanText(char* buffer, size_t size) {
+    // Must have 2000 Korean lines in the entire script
+    const unsigned int ValidateNumberOfKoreanLines = 2000;
+
+    // Each line will be considered Korean text if it has at least 5 characters
+    const unsigned int ValidateNumberOfCharPerLine = 5;
+
+    // If the script has less than 2000 dialog lines, at least 80% of them must be Korean
+    const double ShortScriptPercentKorLine = 0.8;
+
+    int possibleKorLines = 0;
+    int foundKorLines = 0;
+
     // Read the script buffer and find out if script contains at least two lines of Korean text
-    char* ptr = script_buffer;
-    korean_mode = false;
-    int found_korean_lines = 0;
-    for (int i = 0; (ptr - script_buffer) < script_buffer_length; i++) {
+    char* ptr = buffer;
+    int found_valid_korean_lines = 0;
+    for (int i = 0; (ptr - buffer) < size; i++) {
         SKIP_SPACE(ptr);
-        char c = *ptr;
+        char c = *ptr & 0xFF;
+        // Found comment, parse next line
         if (c == '*' || c == ';' || c == ':' || c == 0x0a) {
             // Move to next line
-            while(*ptr != 0x0a) ptr++;
+            while (*ptr != 0x0a) ptr++;
             ptr++;
             continue;
         }
 #ifdef ENABLE_1BYTE_CHAR
         // Guaranteed English characters
         else if (c == '`') {
-            return;
+            return false;
         }
 #endif
+        // End of the script
         else if (c == '\0') {
-            return;
-        } else if (c == '[') {
+            return false;
+        }
+        else if (c == '[') {
             // Skip the text inside the brackets
-            while(*ptr != ']') ptr++;
+            while (*ptr != ']') ptr++;
             ptr++;
             continue;
-        } else {
-            // Scan for Korean text
-            int korean_text_count = 0;
-            while(*ptr != 0x0a) {
-                if (korean_text_count >= 0) {
-                    char nextC = *(ptr + 1);
-                    if (nextC == '\0' || nextC == '\\') {
-                        korean_text_count = -1;
-                    } else if (*ptr == '\\') {
-                    } else {
-                        unsigned short index = (*ptr & 0xFF) << 8 ^ nextC & 0xFF;
-                        if (!IS_KOR(index)) {
+        }
+        else {
+            // Scan for Korean text only if next character is Korean, else next line
+            unsigned short index = (*ptr & 0xFF) << 8 ^ *(ptr + 1)& 0xFF;
+            if (IS_KOR(index)) {
+                int korean_text_count = 0;
+                while (*ptr != 0x0a) {
+                    unsigned short byte = (*ptr) & 0xFF;
+                    if (korean_text_count >= 0) {
+                        char nextC = *(ptr + 1);
+                        // Korean 2 Byte characters: the 2nd byte is not valid, skip
+                        if (nextC == '\0' || nextC == '\\') {
                             korean_text_count = -1;
-                        } else {
+                        }
+                        else if (byte >= 0 && byte < 0x80) {
+                            // Skip all 1-Byte characters
+                        }
+                        else {
+                            index = byte << 8 ^ nextC & 0xFF;
+
                             // Found korean text
-                            korean_text_count++;
-                            ptr++;
+                            if (IS_KOR(index)) {
+                                korean_text_count++;
+                                ptr++;
+                            }
+                            // Detected non-Korean character, move to next line
+                            else {
+                                korean_text_count = -1;
+                            }
+                        }
+                    }
+                    ptr++;
+                }
+                ptr++;
+
+                // See if we have gotten 2 lines of Korean text in the script
+                if (korean_text_count > 0) {
+                    foundKorLines++;
+                    if (korean_text_count > ValidateNumberOfCharPerLine) {
+                        found_valid_korean_lines++;
+                        if (found_valid_korean_lines > ValidateNumberOfKoreanLines) {
+                            return true;
                         }
                     }
                 }
-                ptr++;
+                possibleKorLines++;
             }
-            ptr++;
-            // See if we have gotten 2 lines of Korean text in the script
-            if (korean_text_count > 0) {
-                found_korean_lines++;
-                if (found_korean_lines >= 2) {
-                    korean_mode = true;
-                    return;
-                }
+            // Line does not start with Korean characters, skip line
+            else {
+                while (*ptr != 0x0a) ptr++;
+                ptr++;
             }
         }
     }
+
+    // In case the script has less than 2000 dialogs, 80% must be Korean
+    return foundKorLines > 1 && foundKorLines >= possibleKorLines * ShortScriptPercentKorLine;
 }
 #endif
 
