@@ -263,9 +263,9 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 getResources().getBoolean(R.bool.render_font_outline));
 
         if (mUseDefaultFont) {
-            mGame = new ONScripterGame(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
         } else {
-            mGame = new ONScripterGame(mCurrentDirectory, null, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, null, shouldRenderOutline);
         }
 
         // Attach the game fragment
