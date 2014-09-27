@@ -28,11 +28,13 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     private boolean mUseExternalVideo;
 
     // Values set after fragment is created
-    private final String mGameDirectory;
-    private final String mFontPath;
-    private final boolean mShouldRenderOutline;
     private int mBoundedSize = -1;
     private boolean mIsBoundedByHeight = true;
+
+    // Fragment bundle keys
+    private static final String GameDirectoryKey = "game.directory.key";
+    private static final String FontPathKey = "font.path.key";
+    private static final String RenderOutlineKey = "render.outline.key";
 
     private final VPlayerListener mVideoListener = new VPlayerListener() {
         @Override
@@ -63,17 +65,26 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
         }
     };
 
-    public ONScripterGame(String gameDirectory, String fontPath, boolean shouldRenderOutline) {
-        mGameDirectory = gameDirectory;
-        mFontPath = fontPath;
-        mShouldRenderOutline = shouldRenderOutline;
+    public static ONScripterGame newInstance(String gameDirectory, String fontPath, boolean shouldRenderOutline) {
+        ONScripterGame frag = new ONScripterGame();
+        Bundle args = new Bundle();
+        args.putString(GameDirectoryKey, gameDirectory);
+        args.putString(FontPathKey, fontPath);
+        args.putBoolean(RenderOutlineKey, shouldRenderOutline);
+        frag.setArguments(args);
+        return frag;
+    }
+
+    public ONScripterGame() {
         mUseExternalVideo = false;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        mGame = new ONScripterView(getActivity(), mGameDirectory, mFontPath, mShouldRenderOutline);
+        Bundle b = getArguments();
+        mGame = new ONScripterView(getActivity(), b.getString(GameDirectoryKey),
+                b.getString(FontPathKey), b.getBoolean(RenderOutlineKey));
         mGame.setONScripterEventListener(this);
         mGameLayout = new FrameLayout(getActivity());
         mGameLayout.addView(mGame);
