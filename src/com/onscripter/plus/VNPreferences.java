@@ -370,7 +370,7 @@ public class VNPreferences {
                 long megAvailable = bytesAvailable / 1048576;
                 if (megAvailable == 0) {
                     return OnLoadVNPrefListener.Result.NO_MEMORY;
-                } else if (!mData.isEmpty()) {
+                } else if (mData != null && !mData.isEmpty()) {
                     synchronized (mReadWriteLock) {
                         File file = new File(mPath + "/" + PREF_FILE_NAME);
                         final byte[] newLine = System.getProperty("line.separator").getBytes();
