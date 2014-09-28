@@ -61,6 +61,8 @@
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">새로운 폴더</string>
 
+    <string name="dialog_button_rate">이 앱을 평가!</string>
+
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_global">이 설정은 모든 게임에서 기본으로 설정됩니다.</string>
     <string-array name="settings_controls_swipe_entries">
