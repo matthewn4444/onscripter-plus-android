@@ -53,8 +53,6 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
     <string name="dialog_select_button_text">選択</string>
-    <string name="dialog_sd_card_text">SDカードへ</string>
-    <string name="dialog_interal_storage_text">内蔵メモリーへ</string>
     
     <string name="dialog_button_rate">このアプリを評価！</string>
 

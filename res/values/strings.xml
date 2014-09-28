@@ -103,8 +103,6 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_select_button_text">Select</string>
-    <string name="dialog_sd_card_text">Go to SD Card</string>
-    <string name="dialog_interal_storage_text">Go to Phone</string>
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     

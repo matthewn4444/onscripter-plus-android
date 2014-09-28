@@ -34,12 +34,12 @@
             android:layout_gravity="right"
             android:gravity="right"
             android:layout_width="0dp">
-            <Button
+            <ImageButton
                 android:id="@+id/toggleLocation"
                 android:layout_width="wrap_content"
                 android:gravity="center"
-                android:text="@string/dialog_sd_card_text"
                 android:layout_gravity="right"
+                android:src="@drawable/ic_action_sd_storage"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
