@@ -41,6 +41,13 @@
                 android:layout_gravity="right"
                 android:src="@drawable/ic_action_sd_storage"
                 android:layout_height="wrap_content"/>
+            <ImageButton
+                android:id="@+id/newFolder"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="right"
+                android:src="@drawable/ic_action_new"
+                android:layout_height="wrap_content"/>
         </LinearLayout>
     </LinearLayout>
     <ListView

@@ -13,6 +13,7 @@
     <string name="message_internal_write_error">내장 메모리로 폰트를 옮길 수 없습니다!</string>
     <string name="message_read_font_error">폰트를 읽을 수 없습니다!</string>
     <string name="message_cannot_write_pref">내장 메모리가 가득 찼습니다. 저장할 수 없습니다</string>
+    <string name="message_folder_exists">다른 폴더 이름을 선택하십시오</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">설정</string>
@@ -60,6 +61,7 @@
     <string name="dialog_select_button_text">선택</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_please_wait">기다려주십시오&#8230;</string>
+    <string name="dialog_create_new_folder">새로운 폴더</string>
 
     <string name="dialog_button_rate">이 앱을 평가!</string>
 

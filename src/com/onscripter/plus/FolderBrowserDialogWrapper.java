@@ -3,11 +3,13 @@ package com.onscripter.plus;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.os.Environment;
+import android.text.method.TextKeyListener;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -31,8 +34,12 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private final Context mCtx;
     private final TextView mPathText;
     private final ImageButton mTogglePath;
+    private final ImageButton mNewFolderButton;
     private final TextView mExternalNotFoundText;
+    private final String mStartingDirectory;
+    private final boolean mAccessExtStorage;
     private Dialog mDialog;
+    private Dialog mNewFolderDialog;
     private boolean isInInternalStorage;
 
     // Files
@@ -42,7 +49,21 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private static File ExternalStorage;
 
     public FolderBrowserDialogWrapper(Context context) {
+        this(context, null, true, true);
+    }
+
+    public FolderBrowserDialogWrapper(Context context, String startDirectory) {
+        this(context, startDirectory, true, true);
+    }
+
+    public FolderBrowserDialogWrapper(Context context, boolean accessExternalStorage, boolean ableToMakeFolders) {
+        this(context, null, accessExternalStorage, ableToMakeFolders);
+    }
+
+    public FolderBrowserDialogWrapper(Context context, String startDirectory, boolean accessExternalStorage, boolean ableToMakeFolders) {
         mCtx = context;
+        mStartingDirectory = startDirectory;
+        mAccessExtStorage = accessExternalStorage;
 
         // Inflate the dialog
         LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
@@ -51,6 +72,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         mPathText = (TextView) mLayout.findViewById(R.id.path);
         mExternalNotFoundText = (TextView) mLayout.findViewById(R.id.extNotFound);
         mTogglePath = (ImageButton) mLayout.findViewById(R.id.toggleLocation);
+        mNewFolderButton = (ImageButton) mLayout.findViewById(R.id.newFolder);
         mListView.setOnItemClickListener(this);
         mTogglePath.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,6 +80,41 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
                 toggleGotoButton();
             }
         });
+        if (ableToMakeFolders) {
+            mNewFolderButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    final EditText input = new EditText(mCtx);
+                    if (mNewFolderDialog == null) {
+                        mNewFolderDialog = new AlertDialog.Builder(mCtx)
+                            .setTitle(R.string.dialog_create_new_folder)
+                            .setView(input)
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    // Folder is created
+                                    String name = input.getText().toString();
+                                    if (input.length() > 0) {
+                                        TextKeyListener.clear(input.getText());
+                                    }
+                                    if (mAdapter.fileExists(name)) {
+                                        Toast.makeText(mCtx, R.string.message_folder_exists, Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        mAdapter.makeDirectory(name);
+                                    }
+                                }
+                            }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                }
+                            }).create();
+                    }
+                    mNewFolderDialog.show();
+                }
+            });
+        } else {
+            mNewFolderButton.setVisibility(View.GONE);
+        }
 
         // Force dialog to max height
         WindowManager window = (WindowManager)mCtx.getSystemService(Context.WINDOW_SERVICE);
@@ -101,24 +158,26 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         }
         // Detect if External sdcard is available, if not then remove the sdcard button and adjust the layout
         final LinearLayout.LayoutParams textLayout = (LinearLayout.LayoutParams) mPathText.getLayoutParams();
-        if (ExternalStorage != null) {
-            ((View)mTogglePath.getParent()).setVisibility(View.VISIBLE);
-            textLayout.weight = 6f;
-        } else {
+        if (ExternalStorage == null || !mAccessExtStorage) {
             ((View)mTogglePath.getParent()).setVisibility(View.GONE);
-            textLayout.weight = 10f;
+        } else {
+            ((View)mTogglePath.getParent()).setVisibility(View.VISIBLE);
         }
         mPathText.setLayoutParams(textLayout);
 
         // Open default location from preference, if cannot find, then open storage
         File openDir;
-        if (path != null) {
-            openDir = new File(path);
-            if (!openDir.exists()) {
+        if (mStartingDirectory != null) {
+            openDir = new File(mStartingDirectory);
+        } else {
+            if (path != null) {
+                openDir = new File(path);
+                if (!openDir.exists()) {
+                    openDir = InternalStorage;
+                }
+            } else {
                 openDir = InternalStorage;
             }
-        } else {
-            openDir = InternalStorage;
         }
 
         // Detect where the current directory is either from internal or external storage
@@ -126,6 +185,10 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
             isInInternalStorage = true;
             mCurrentExternalPath = ExternalStorage;
         } else {
+            if (!mAccessExtStorage) {
+                throw new IllegalStateException(
+                        "Cannot set the default location to external sd card when you have no access to it.");
+            }
             isInInternalStorage = false;
             mCurrentInternalPath = InternalStorage;
             mTogglePath.setImageResource(R.drawable.ic_action_phone);

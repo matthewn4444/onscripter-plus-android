@@ -47,6 +47,7 @@
     <string name="message_internal_write_error">Could not write font file to internal storage!</string>
     <string name="message_read_font_error">Could not read font!</string>
     <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
+    <string name="message_folder_exists">Folder already exists, create a new one.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -108,7 +109,8 @@
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     <string name="dialog_please_wait">Please wait&#8230;</string>
-    
+    <string name="dialog_create_new_folder">Create new folder</string>
+
     <string name="dialog_button_rate">Rate this App!</string>
 
     <!-- Settings Control Display -->

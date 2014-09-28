@@ -11,6 +11,7 @@
     <string name="message_internal_write_error">Не удалось записать файл шрифта во внутреннею память!</string>
     <string name="message_read_font_error">Не удалось загрузить шрифт!</string>
     <string name="message_cannot_write_pref">Внутренняя память заполнена и не может спасти.</string>
+    <string name="message_folder_exists">Пожалуйста, выберите другое имя</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>
@@ -59,6 +60,7 @@
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
     <string name="dialog_please_wait">Пожалуйста, подождите&#8230;</string>
+    <string name="dialog_create_new_folder">Создать новую папку</string>
 
     <string name="dialog_button_rate">Оцените приложение</string>
 
