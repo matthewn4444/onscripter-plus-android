@@ -84,7 +84,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         String themeName = mPrefs.getString(SETTINGS_THEME_KEY, defaultThemeName);
         setTheme(themeName.equals(defaultThemeName) ? R.style.Theme_Light : R.style.Theme_Dark);
 
-        mDirBrowse = new FolderBrowserDialogWrapper(this);
+        mDirBrowse = new FolderBrowserDialogWrapper(this, true, false);
         mDialog = new AlertDialog.Builder(this);
 
         File directory = null;
