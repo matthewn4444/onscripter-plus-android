@@ -298,6 +298,19 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         return setCurrentDirectory(mCurrentDirectory.getParentFile());
     }
 
+    public boolean fileExists(String name) {
+        return new File(mCurrentDirectory + "/" + name).exists();
+
+    }
+
+    public boolean makeDirectory(String name) {
+        boolean success =  new File(mCurrentDirectory + "/" + name).mkdir();
+        if (success) {
+            setCurrentDirectory(mCurrentDirectory);
+        }
+        return success;
+    }
+
     public void addLowerBoundFile(File path) {
         if (path != null && path.exists()) {
             mLowerBoundFiles.add(path);

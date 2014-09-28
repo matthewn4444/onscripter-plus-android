@@ -10,6 +10,7 @@
     <string name="message_internal_write_error">内蔵メモリにフォントを移動できません！</string>
     <string name="message_read_font_error">フォントを読めません！</string>
     <string name="message_cannot_write_pref">内蔵メモリがいっぱいになった。保存できません。</string>
+    <string name="message_folder_exists">他のフォルダ名を選択してください</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">設定</string>
@@ -53,6 +54,7 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
     <string name="dialog_select_button_text">選択</string>
+    <string name="dialog_create_new_folder">新しいフォルダー</string>
     
     <string name="dialog_button_rate">このアプリを評価！</string>
 
