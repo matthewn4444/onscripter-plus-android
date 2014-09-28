@@ -54,6 +54,7 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">フォルダを選ぶ</string>
     <string name="dialog_select_button_text">選択</string>
+    <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">新しいフォルダー</string>
     
     <string name="dialog_button_rate">このアプリを評価！</string>
