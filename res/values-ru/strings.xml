@@ -56,8 +56,6 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Выберите папку</string>
     <string name="dialog_select_button_text">Выбрать</string>
-    <string name="dialog_sd_card_text">Перейти к SD Card</string>
-    <string name="dialog_interal_storage_text">Перейти к внутренней памяти</string>
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
     <string name="dialog_please_wait">Пожалуйста, подождите&#8230;</string>

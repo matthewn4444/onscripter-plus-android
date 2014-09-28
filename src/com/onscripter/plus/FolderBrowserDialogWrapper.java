@@ -16,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,7 +30,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private FileSystemAdapter mAdapter;
     private final Context mCtx;
     private final TextView mPathText;
-    private final Button mTogglePath;
+    private final ImageButton mTogglePath;
     private final TextView mExternalNotFoundText;
     private Dialog mDialog;
     private boolean isInInternalStorage;
@@ -50,7 +50,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         mListView = (ListView) mLayout.findViewById(R.id.list);
         mPathText = (TextView) mLayout.findViewById(R.id.path);
         mExternalNotFoundText = (TextView) mLayout.findViewById(R.id.extNotFound);
-        mTogglePath = (Button) mLayout.findViewById(R.id.toggleLocation);
+        mTogglePath = (ImageButton) mLayout.findViewById(R.id.toggleLocation);
         mListView.setOnItemClickListener(this);
         mTogglePath.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,7 +128,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         } else {
             isInInternalStorage = false;
             mCurrentInternalPath = InternalStorage;
-            mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
+            mTogglePath.setImageResource(R.drawable.ic_action_phone);
         }
 
         try {
@@ -152,11 +152,11 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
        // Toggle between the internal and external storage
        if (isInInternalStorage) {
            mCurrentInternalPath = mAdapter.getCurrentDirectory();
-           mTogglePath.setText(mCtx.getString(R.string.dialog_interal_storage_text));
+           mTogglePath.setImageResource(R.drawable.ic_action_phone);
            mAdapter.setCurrentDirectory(mCurrentExternalPath);
        } else {
            mCurrentExternalPath = mAdapter.getCurrentDirectory();
-           mTogglePath.setText(mCtx.getString(R.string.dialog_sd_card_text));
+           mTogglePath.setImageResource(R.drawable.ic_action_sd_storage);
            mAdapter.setCurrentDirectory(mCurrentInternalPath);
        }
        isInInternalStorage = !isInInternalStorage;

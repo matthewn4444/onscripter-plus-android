@@ -58,8 +58,6 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">폴더 고르기</string>
     <string name="dialog_select_button_text">선택</string>
-    <string name="dialog_sd_card_text">SD 카드로 가기</string>
-    <string name="dialog_interal_storage_text">내장 메모리로 가기</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_please_wait">기다려주십시오&#8230;</string>
 
