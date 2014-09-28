@@ -34,7 +34,6 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private final ImageButton mTogglePath;
     private final ImageButton mNewFolderButton;
     private final TextView mExternalNotFoundText;
-    private final String mStartingDirectory;
     private final boolean mAccessExtStorage;
     private Dialog mDialog;
     private Dialog mNewFolderDialog;
@@ -47,20 +46,11 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private static File ExternalStorage;
 
     public FolderBrowserDialogWrapper(Context context) {
-        this(context, null, true, true);
-    }
-
-    public FolderBrowserDialogWrapper(Context context, String startDirectory) {
-        this(context, startDirectory, true, true);
+        this(context, true, false);
     }
 
     public FolderBrowserDialogWrapper(Context context, boolean accessExternalStorage, boolean ableToMakeFolders) {
-        this(context, null, accessExternalStorage, ableToMakeFolders);
-    }
-
-    public FolderBrowserDialogWrapper(Context context, String startDirectory, boolean accessExternalStorage, boolean ableToMakeFolders) {
         mCtx = context;
-        mStartingDirectory = startDirectory;
         mAccessExtStorage = accessExternalStorage;
 
         // Inflate the dialog
@@ -110,6 +100,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
                     mNewFolderDialog.show();
                 }
             });
+            mNewFolderButton.setVisibility(View.VISIBLE);
         } else {
             mNewFolderButton.setVisibility(View.GONE);
         }
@@ -157,25 +148,21 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         // Detect if External sdcard is available, if not then remove the sdcard button and adjust the layout
         final LinearLayout.LayoutParams textLayout = (LinearLayout.LayoutParams) mPathText.getLayoutParams();
         if (ExternalStorage == null || !mAccessExtStorage) {
-            ((View)mTogglePath.getParent()).setVisibility(View.GONE);
+            ((View)mTogglePath).setVisibility(View.GONE);
         } else {
-            ((View)mTogglePath.getParent()).setVisibility(View.VISIBLE);
+            ((View)mTogglePath).setVisibility(View.VISIBLE);
         }
         mPathText.setLayoutParams(textLayout);
 
         // Open default location from preference, if cannot find, then open storage
         File openDir;
-        if (mStartingDirectory != null) {
-            openDir = new File(mStartingDirectory);
-        } else {
-            if (path != null) {
-                openDir = new File(path);
-                if (!openDir.exists()) {
-                    openDir = InternalStorage;
-                }
-            } else {
+        if (path != null) {
+            openDir = new File(path);
+            if (!openDir.exists()) {
                 openDir = InternalStorage;
             }
+        } else {
+            openDir = InternalStorage;
         }
 
         // Detect where the current directory is either from internal or external storage
