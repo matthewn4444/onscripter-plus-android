@@ -14,6 +14,8 @@
     <string name="message_read_font_error">폰트를 읽을 수 없습니다!</string>
     <string name="message_cannot_write_pref">내장 메모리가 가득 찼습니다. 저장할 수 없습니다</string>
     <string name="message_folder_exists">다른 폴더 이름을 선택하십시오</string>
+    <string name="message_copy_completed">파일을 복사했습니다.</string>
+    <string name="message_copy_failed">복사에 실패했습니다.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">설정</string>
@@ -60,8 +62,21 @@
     <string name="dialog_select_button_text">선택</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">새로운 폴더</string>
+    <string name="dialog_fix_sd_card_write_title">세이브를 치유를 위해</string>
+    <string name="dialog_scan_files_title">파일을 복사하는</string>
+    <string name="dialog_copy_files_title">파일을 복사하는</string>
+    <string name="dialog_choose_copy_dst_title">대상을 선택</string>
+    <string name="dialog_copy_files_filename">파일:</string>
+    <string name="dialog_copy_files_filesize">크기:</string>
 
     <string name="dialog_button_rate">이 앱을 평가!</string>
+
+    <!-- Dialog Options -->
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>게임은 내장 메모리에 복사</item>
+        <item>게임의 세이브는 내장 메모리에 복사</item>
+        <item>SD Card를 돌려 놓으십시오\n(root 필요)</item>
+    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_global">이 설정은 모든 게임에서 기본으로 설정됩니다.</string>

@@ -47,6 +47,8 @@
     <string name="message_read_font_error">Could not read font!</string>
     <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
+    <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
+    <string name="message_copy_failed">Copy failed.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -107,8 +109,21 @@
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     <string name="dialog_create_new_folder">Create new folder</string>
-    
+    <string name="dialog_fix_sd_card_write_title">Choose how to fix saving</string>
+    <string name="dialog_scan_files_title">Scanning files</string>
+    <string name="dialog_copy_files_title">Copying files</string>
+    <string name="dialog_choose_copy_dst_title">Select copy destination</string>
+    <string name="dialog_copy_files_filename">File:</string>
+    <string name="dialog_copy_files_filesize">Size:</string>
+
     <string name="dialog_button_rate">Rate this App!</string>
+
+    <!-- Dialog Options -->
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>Move your games to an internal storage folder</item>
+        <item>Move only your games\' save files to an internal storage folder</item>
+        <item>Apply the SD Card fix for this issue\n(needs root)</item>
+    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Controls</string>

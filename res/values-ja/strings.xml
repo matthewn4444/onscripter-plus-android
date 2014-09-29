@@ -11,6 +11,8 @@
     <string name="message_read_font_error">フォントを読めません！</string>
     <string name="message_cannot_write_pref">内蔵メモリがいっぱいになった。保存できません。</string>
     <string name="message_folder_exists">他のフォルダ名を選択してください</string>
+    <string name="message_copy_completed">ファイルをコピーでした。</string>
+    <string name="message_copy_failed">コピーに失敗しました。</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">設定</string>
@@ -56,8 +58,21 @@
     <string name="dialog_select_button_text">選択</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">新しいフォルダー</string>
-    
+    <string name="dialog_fix_sd_card_write_title">セーブを直すのために</string>
+    <string name="dialog_scan_files_title">ファイルをコピーする</string>
+    <string name="dialog_copy_files_title">ファイルをコピーする</string>
+    <string name="dialog_choose_copy_dst_title">コピー先を選択し</string>
+    <string name="dialog_copy_files_filename">ファイル:</string>
+    <string name="dialog_copy_files_filesize">サイズ:</string>
+
     <string name="dialog_button_rate">このアプリを評価！</string>
+
+    <!-- Dialog Options -->
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>ゲーム は内蔵メモリにコピーする</item>
+        <item>ゲームのセーブ は内蔵メモリにコピーする</item>
+        <item>SD Cardをなおします\n（root必要）</item>
+    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">コントロール</string>
