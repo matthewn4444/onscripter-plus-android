@@ -156,6 +156,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mCopyTask.execute();
         }
 
+        new ExtSDCardFix(this, mAdapter);
         createDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
         attachAds(listView);
