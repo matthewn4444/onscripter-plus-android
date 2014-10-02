@@ -20,4 +20,7 @@
     <attr name="folderUpImage" format="reference"></attr>
     <attr name="fileImage" format="reference"></attr>
     <attr name="folderImage" format="reference"></attr>
+    <attr name="phoneImage" format="reference"></attr>
+    <attr name="sdcardImage" format="reference"></attr>
+    <attr name="plusImage" format="reference"></attr>
 </resources>
