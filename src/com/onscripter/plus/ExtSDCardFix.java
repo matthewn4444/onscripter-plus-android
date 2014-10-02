@@ -24,39 +24,45 @@ import com.onscripter.plus.CopyFilesDialogTask.CopyFilesDialogListener;
 import com.onscripter.plus.CopyFilesDialogTask.Result;
 
 public final class ExtSDCardFix {
+    // This value will be set before the user has any input in the app
     private static boolean sExtSDCardWritable = true;
     private static boolean sAlreadyScanned = false;
 
-    private ExtSDCardFixListener mListener;
     private final Activity mActivity;
     private final FileSystemAdapter mAdapter;
     private Dialog mFixDialog;
 
-    public interface ExtSDCardFixListener {
-        public void scanCompleteNeedFix();
+    // For us to scan, user must be in the following state:
+    //  1. Must be Kitkat (4.4) or higher
+    //  2. Must have an external sd card
+    //  3. User has games in this folder (which is in external memory)
+    //  4. External memory card is not writable
+    //  5. User's default game folder must be in external sd card path
+    public static boolean folderNeedsFix(File currentPath) {
+        if (currentPath.isFile()) {
+            currentPath = currentPath.getParentFile();
+        }
+        return isKitKatOrHigher() && !sExtSDCardWritable && Environment2.getExternalSDCardDirectory() != null
+                && currentPath.getPath().contains(Environment2.getExternalSDCardDirectory().getPath())
+                && getNumONScripterGames(currentPath).length > 0;
     }
+
 
     public ExtSDCardFix(Activity activity, FileSystemAdapter adapter) {
         mActivity = activity;
         mAdapter = adapter;
 
-        // For us to scan, user must be in the following state:
-        //  1. Must be Kitkat (4.4) or higher
-        //  2. Must have an external sd card
-        //  3. User's default game folder must be in external sd card path
-        //  4. User has games in this folder (which is in external memory)
-        //  5. External memory card is not writable
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            File extSdCard = Environment2.getExternalSDCardDirectory();
-            if (extSdCard != null && mAdapter.getCurrentDirectory().getPath().contains(extSdCard.getPath())) {
-                // Need to fix if not writable
-                boolean hasScanned = false;
-                synchronized (ExtSDCardFix.this) {
-                    hasScanned = sAlreadyScanned;
-                }
-                if (!hasScanned) {
-                    new CheckWritableTask().execute();
-                }
+        // Don't rescan if already scanned
+        synchronized (ExtSDCardFix.this) {
+            if (sAlreadyScanned) {
+                return;
+            }
+        }
+
+        // Only calculate if over kitkat and has external sd card
+        if (isKitKatOrHigher()) {
+            if (Environment2.getExternalSDCardDirectory() != null) {
+                new CheckWritableTask().execute();
                 return;
             }
        }
@@ -68,6 +74,16 @@ public final class ExtSDCardFix {
        }
     }
 
+    private static boolean isKitKatOrHigher() {
+        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT;
+    }
+
+    /**
+     * This task runs very fast just to test if we can write on the external sdcard
+     * This will occur on startup and will finish before user can do anything.
+     * @author CHaSEdBYmAnYcrAZy
+     *
+     */
     private class CheckWritableTask extends AsyncTask<Void, Void, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
@@ -75,16 +91,13 @@ public final class ExtSDCardFix {
                 sExtSDCardWritable = checkIsExternalWritable();
                 sAlreadyScanned = true;
             }
-            if (mListener != null) {
-               mListener.scanCompleteNeedFix();
-            }
             return getCurrentONScripterGames().length;
         }
         @Override
         protected void onPostExecute(Integer numGames) {
             super.onPostExecute(numGames);
-            // If there are currently games listed, show this dialog
-            if (!sExtSDCardWritable && numGames > 0) {
+            // If there are currently games listed and in external sd card location, show this dialog
+            if (needsFix()) {
                 showFixDialog();
             }
         }
@@ -125,16 +138,41 @@ public final class ExtSDCardFix {
         mFixDialog.show();
     }
 
-    public void setExtSDCardFixListener(ExtSDCardFixListener listener) {
-        mListener = listener;
-    }
-
+    /**
+     * Returns whether we are able to write to external sdcard
+     * To see if we have that Kitkat issue, use folderNeedsFix().
+     * Also if there is no external sdcard, then this will be false.
+     * @return
+     */
     public synchronized boolean isWritable() {
         return sExtSDCardWritable;
     }
 
+    /**
+     * Same thing as folderNeedsFix() but the path is taken from
+     * the adapter passed in
+     * @return
+     */
+    public boolean needsFix() {
+        return folderNeedsFix(mAdapter.getCurrentDirectory());
+    }
+
+    /**
+     * Get the number of ONScripter games in the folder attached
+     * to the file system adapter.
+     * @return
+     */
     private File[] getCurrentONScripterGames() {
-        return mAdapter.getCurrentDirectory().listFiles(new FileFilter() {
+        return getNumONScripterGames(mAdapter.getCurrentDirectory());
+    }
+
+    /**
+     * Get the number of ONScripter games in a folder
+     * @param folder
+     * @return
+     */
+    private static File[] getNumONScripterGames(File folder) {
+        return folder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 if (pathname.isDirectory()) {
@@ -156,6 +194,12 @@ public final class ExtSDCardFix {
         return sb.toString();
     }
 
+    /**
+     * Checks the external sdcard to see if we can write to it
+     * Writes a small file to the external sdcard and if successful,
+     * then we return true, if exception occurs, returns false.
+     * @return
+     */
     private boolean checkIsExternalWritable() {
         File ext = Environment2.getExternalSDCardDirectory();
         if (ext == null) {
