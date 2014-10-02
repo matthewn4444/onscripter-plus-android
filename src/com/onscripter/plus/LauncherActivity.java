@@ -65,6 +65,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private FontFileCopyTask mCopyTask = null;
     private FolderBrowserDialogWrapper mDirBrowse = null;
     private SharedPreferences mPrefs = null;
+    private ExtSDCardFix mFix;
     private String mCurrentThemeResult;
     private ChangeLog mChangeLog;
 
@@ -156,7 +157,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mCopyTask.execute();
         }
 
-        new ExtSDCardFix(this, mAdapter);
+        mFix = new ExtSDCardFix(this, mAdapter);
         createDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
         attachAds(listView);
@@ -529,16 +530,21 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void startONScripter(String path, boolean useDefaultFont) {
-        Bundle b = new Bundle();
-        if (useDefaultFont) {
-            b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
+        // If the current game cannot save, then launch the fix dialog
+        if (mFix.needsFix()) {
+            mFix.showFixDialog();
+        } else {
+            Bundle b = new Bundle();
+            if (useDefaultFont) {
+                b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
+            }
+            b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
+            if (mInterHelper.show()) {
+                mStartONScripterBundle = b;
+                return;
+            }
+            goToActivity(ONScripter.class, b);
         }
-        b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
-        if (mInterHelper.show()) {
-            mStartONScripterBundle = b;
-            return;
-        }
-        goToActivity(ONScripter.class, b);
     }
 
     class FontFileCopyTask extends ProgressDialogAsyncTask<Void, Void, Integer> {
