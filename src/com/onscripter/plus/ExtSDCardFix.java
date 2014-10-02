@@ -21,6 +21,7 @@ import android.widget.ListView;
 
 import com.onscripter.plus.CopyFilesDialogTask.CopyFileInfo;
 import com.onscripter.plus.CopyFilesDialogTask.CopyFilesDialogListener;
+import com.onscripter.plus.CopyFilesDialogTask.Result;
 
 public final class ExtSDCardFix {
     private static boolean sExtSDCardWritable = true;
@@ -211,11 +212,11 @@ public final class ExtSDCardFix {
                 for (int i = 0; i < info.length; i++) {
                     info[i] = new CopyFileInfo(games[i].getAbsolutePath(), result + "/" + games[i].getName());
                 }
-                new CopyFilesDialogTask(mActivity, info, new CopyFilesDialogListener() {
+                new CopyFilesDialogTask(mActivity, new CopyFilesDialogListener() {
                     @Override
-                    public void onCopyCompleted(int resultCode) {
+                    public void onCopyCompleted(Result resultCode) {
                         switch(resultCode) {
-                        case CopyFilesDialogTask.RESULT_SUCCESS:
+                        case SUCCESS:
                             alert(R.string.message_copy_completed);
 
                             // Update the preferences with the new folder in internal memory
@@ -226,12 +227,18 @@ public final class ExtSDCardFix {
                             // Change folder location
                             mAdapter.setCurrentDirectory(result);
                             break;
-                        case CopyFilesDialogTask.RESULT_COPY_ERROR:
+                        case NO_FILE_SELECTED:      // This is pretty much impossible to happen
+                            alert(R.string.message_copy_failed_no_files);
+                            break;
+                        case NO_SPACE_ERROR:
+                            alert(R.string.message_copy_failed_no_space);
+                            break;
+                        case COPY_ERROR:
                             alert(R.string.message_copy_failed);
                             break;
                         }
                     }
-                }).execute();
+                }).executeCopy(info);
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);

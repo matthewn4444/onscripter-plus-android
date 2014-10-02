@@ -2,7 +2,6 @@ package com.onscripter.plus;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,23 +11,19 @@ import android.widget.ArrayAdapter;
 
 public abstract class ViewAdapterBase<TItem> extends ArrayAdapter<TItem>{
     protected ArrayList<TItem> entries;
-    private final Activity activity;
+    private final Context context;
     private final int widgetLayout;
     private final int[] resources;
 
-    public ViewAdapterBase(Activity a, int widgetResourceLayout, int[] viewResourceIdListInWidget, ArrayList<TItem> list) {
-        super(a, 0, list);
+    public ViewAdapterBase(Context ctx, int widgetResourceLayout, int[] viewResourceIdListInWidget, ArrayList<TItem> list) {
+        super(ctx, 0, list);
         entries = list;
-        activity = a;
+        context = ctx;
         resources = viewResourceIdListInWidget;
         widgetLayout = widgetResourceLayout;
     }
 
     protected abstract void setWidgetValues(int position, TItem item, View[] elements, View layout);
-
-    protected Activity getActivity() {
-        return activity;
-    }
 
     public ArrayList<TItem> getList() {
         return entries;
@@ -42,7 +37,7 @@ public abstract class ViewAdapterBase<TItem> extends ArrayAdapter<TItem>{
         View viewObj = convertView;
         View[] elements = null;
         if (viewObj == null) {
-            LayoutInflater inflator = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflator = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             viewObj = inflator.inflate(widgetLayout, null);
             int size = resources.length;
             elements = new View[size];

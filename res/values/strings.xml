@@ -49,6 +49,8 @@
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
     <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
     <string name="message_copy_failed">Copy failed.</string>
+    <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy.</string>
+    <string name="message_copy_failed_no_files">There are no files to copy.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -115,7 +117,8 @@
     <string name="dialog_choose_copy_dst_title">Select copy destination</string>
     <string name="dialog_copy_files_filename">File:</string>
     <string name="dialog_copy_files_filesize">Size:</string>
-
+    <string name="dialog_select_files_copy_title">Select files to copy</string>
+    <string name="dialog_bytes_remaining">Available space left:</string>
     <string name="dialog_button_rate">Rate this App!</string>
 
     <!-- Dialog Options -->
