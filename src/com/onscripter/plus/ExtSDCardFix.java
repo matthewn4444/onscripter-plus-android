@@ -10,12 +10,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -112,14 +115,21 @@ public final class ExtSDCardFix {
         if (mFixDialog == null) {
             String[] options = mActivity.getResources().getStringArray(R.array.dialog_opt_fix_sd_card_write);
             final ListAdapter adapter = new ArrayAdapter<String>(mActivity, R.layout.radiobutton_choice_item, options);
+
+            // Inflate the dialog
+            LayoutInflater inflater = (LayoutInflater) mActivity.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
+            LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.fix_dialog, null);
+            final ListView listview = (ListView) layout.findViewById(R.id.options);
+            listview.setAdapter(adapter);
+            listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
             mFixDialog = new AlertDialog.Builder(mActivity)
                         .setTitle(R.string.dialog_fix_sd_card_write_title)
-                        .setSingleChoiceItems(adapter, -1, null)
+                        .setView(layout)
+                        .setCancelable(false)
                         .setPositiveButton(R.string.dialog_select_button_text, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                ListView lv = ((AlertDialog)mFixDialog).getListView();
-                                switch (lv.getCheckedItemPosition()) {
+                                switch (listview.getCheckedItemPosition()) {
                                 case 0:
                                     option1CopyGameFiles();
                                     break;
