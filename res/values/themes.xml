@@ -5,12 +5,18 @@
         <item name="folderUpImage">@drawable/ic_folder_up_light</item>
         <item name="fileImage">@drawable/ic_file_light</item>
         <item name="folderImage">@drawable/ic_folder_light</item>
+        <item name="phoneImage">@drawable/ic_action_phone</item>
+        <item name="sdcardImage">@drawable/ic_action_sd_storage</item>
+        <item name="plusImage">@drawable/ic_action_new</item>
     </style>
     <style name="Theme.Dark" parent="@style/Theme.Sherlock">
         <item name="android:listViewStyle">@style/ListViewStyle.Dark</item>
         <item name="folderUpImage">@drawable/ic_folder_up_dark</item>
         <item name="fileImage">@drawable/ic_file_dark</item>
         <item name="folderImage">@drawable/ic_folder_dark</item>
+        <item name="phoneImage">@drawable/ic_action_phone_dark</item>
+        <item name="sdcardImage">@drawable/ic_action_sd_storage_dark</item>
+        <item name="plusImage">@drawable/ic_action_new_dark</item>
     </style>
 
     <style name="ListViewStyle.Light" parent="android:style/Widget.ListView">

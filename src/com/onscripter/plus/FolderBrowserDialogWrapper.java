@@ -8,6 +8,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.text.method.TextKeyListener;
 import android.view.Display;
@@ -40,6 +42,9 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
     private Dialog mDialog;
     private Dialog mNewFolderDialog;
     private boolean isInInternalStorage;
+
+    private static Drawable IconPhoneDrawable;
+    private static Drawable IconSDcardDrawable;
 
     // Files
     private File mCurrentInternalPath;
@@ -119,6 +124,13 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         if (ExternalStorage != null || mCtx.getString(R.string.dialog_ext_not_found).equals("")) {
             mExternalNotFoundText.setVisibility(View.GONE);
         }
+
+        // Themed icons for this dialog
+        int[] attrs = new int[] { R.attr.phoneImage, R.attr.sdcardImage };
+        TypedArray ta = context.obtainStyledAttributes(attrs);
+        IconPhoneDrawable = ta.getDrawable(0);
+        IconSDcardDrawable = ta.getDrawable(1);
+        ta.recycle();
     }
 
     public ViewGroup getDialogLayout() {
@@ -178,7 +190,7 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
             }
             isInInternalStorage = false;
             mCurrentInternalPath = InternalStorage;
-            mTogglePath.setImageResource(R.drawable.ic_action_phone);
+            mTogglePath.setImageDrawable(IconPhoneDrawable);
         }
 
         try {
@@ -202,11 +214,11 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
        // Toggle between the internal and external storage
        if (isInInternalStorage) {
            mCurrentInternalPath = mAdapter.getCurrentDirectory();
-           mTogglePath.setImageResource(R.drawable.ic_action_phone);
+           mTogglePath.setImageDrawable(IconPhoneDrawable);
            mAdapter.setCurrentDirectory(mCurrentExternalPath);
        } else {
            mCurrentExternalPath = mAdapter.getCurrentDirectory();
-           mTogglePath.setImageResource(R.drawable.ic_action_sd_storage);
+           mTogglePath.setImageDrawable(IconSDcardDrawable);
            mAdapter.setCurrentDirectory(mCurrentInternalPath);
        }
        isInInternalStorage = !isInInternalStorage;
