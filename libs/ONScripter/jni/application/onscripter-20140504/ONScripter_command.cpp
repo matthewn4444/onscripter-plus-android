@@ -950,11 +950,19 @@ int ONScripter::savescreenshotCommand()
     }
 
     const char *buf = script_h.readStr();
-    char filename[256];
+    char filename[1024];
     sprintf( filename, "%s%s", archive_path, buf );
     for ( unsigned int i=0 ; i<strlen( filename ) ; i++ )
         if ( filename[i] == '/' || filename[i] == '\\' )
             filename[i] = DELIMITER;
+
+	// If save and root writable exists and screenshot is saved to save folder,
+	// prepend root writable path to filename
+    if (save_dir && root_writable && strncmp(save_dir, filename, strlen(save_dir)) == 0){
+        size_t rootWriteLength = strlen(root_writable);
+        memmove(filename + rootWriteLength, filename, strlen(filename) + 1);
+        memcpy(filename, root_writable, rootWriteLength);
+    }
 
     SDL_Surface *surface = AnimationInfo::alloc32bitSurface( screenshot_w, screenshot_h, texture_format );
     resizeSurface( screenshot_surface, surface );

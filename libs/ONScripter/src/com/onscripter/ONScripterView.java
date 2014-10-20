@@ -47,7 +47,18 @@ public class ONScripterView extends DemoGLSurfaceView {
      * @param fontPath
      */
     public ONScripterView(Activity activity, String gameDirectory, String fontPath) {
-        this(activity, gameDirectory, fontPath, false);
+        this(activity, gameDirectory, fontPath, null, false);
+    }
+
+    /**
+     * Constructor with font path
+     * @param activity
+     * @param gameDirectory
+     * @param fontPath
+     * * @param shouldRenderOutline chooses whether to show outline on font
+     */
+    public ONScripterView(Activity activity, String gameDirectory, String fontPath, boolean shouldRenderOutline) {
+        this(activity, gameDirectory, fontPath, null, shouldRenderOutline);
     }
 
     /**
@@ -55,10 +66,11 @@ public class ONScripterView extends DemoGLSurfaceView {
      * @param activity
      * @param gameDirectory is the location of the game
      * @param fontPath is the location of the font
+     * @param savePath is the location of the save files
      * @param shouldRenderOutline chooses whether to show outline on font
      */
-    public ONScripterView(Activity activity, String gameDirectory, String fontPath, boolean shouldRenderOutline) {
-        super(activity, gameDirectory, fontPath, shouldRenderOutline);
+    public ONScripterView(Activity activity, String gameDirectory, String fontPath, String savePath, boolean shouldRenderOutline) {
+        super(activity, gameDirectory, fontPath, savePath, shouldRenderOutline);
         nativeInitJavaCallbacks();
 
         mActivity = activity;
