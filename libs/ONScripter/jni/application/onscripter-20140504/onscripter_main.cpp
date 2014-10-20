@@ -320,6 +320,11 @@ int main( int argc, char **argv )
                 argv++;
                 ons.setMenuLanguage(argv[0]);
             }
+            else if ( !strcmp( argv[0]+1, "-save-path" )){
+                argc--;
+                argv++;
+                ons.setRootWritableDir(argv[0]);
+            }
 #endif
             else{
                 printf(" unknown option %s\n", argv[0] );

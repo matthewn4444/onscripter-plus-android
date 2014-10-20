@@ -23,35 +23,22 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 
     public DemoRenderer(Activity _context, String currentDirectory, String fontPath)
     {
-        this(_context, currentDirectory, fontPath, false);
+        this(_context, currentDirectory, fontPath, null, false);
     }
 
     public DemoRenderer(Activity _context, String currentDirectory, String fontPath, boolean renderOutline)
     {
+        this(_context, currentDirectory, fontPath, null, renderOutline);
+    }
+
+    public DemoRenderer(Activity _context, String currentDirectory, String fontPath, String savePath, boolean renderOutline)
+    {
         context = _context;
         mCurrentDirectory = currentDirectory;
         mFontPath = fontPath;
+        mSavePath = savePath;
         mShouldRenderOutline = renderOutline;
-        int n = 3;
-        if (mShouldRenderOutline) {
-            n++;
-        }
-        if (fontPath != null) {
-            n += 2;
-        }
-        String[] arg = new String[n];
-        n = 0;
-        arg[n++] = "--language";
-        arg[n++] = Locale.getDefault().getLanguage();
-        arg[n++] = "--open-only";
-        if (mShouldRenderOutline) {
-            arg[n++] = "--render-font-outline";
-        }
-        if (fontPath != null) {
-            arg[n++] = "-f";
-            arg[n++] = fontPath;
-        }
-        nativeInit(mCurrentDirectory, arg);
+        doNativeInit(true);
     }
 
     @Override
@@ -77,23 +64,40 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
         nativeInitJavaCallbacks();
 
         // Calls main() and never returns, hehe - we'll call eglSwapBuffers() from native code
+        doNativeInit(false);
+    }
+
+    private void doNativeInit(boolean openOnly) {
         int n = 2;
+        if (openOnly) {
+            n++;
+        }
         if (mShouldRenderOutline) {
             n++;
         }
         if (mFontPath != null) {
             n += 2;
         }
+        if (mSavePath != null) {
+            n += 2;
+        }
         String[] arg = new String[n];
         n = 0;
         arg[n++] = "--language";
         arg[n++] = Locale.getDefault().getLanguage();
+        if (openOnly) {
+            arg[n++] = "--open-only";
+        }
         if (mShouldRenderOutline) {
             arg[n++] = "--render-font-outline";
         }
         if (mFontPath != null) {
             arg[n++] = "-f";
             arg[n++] = mFontPath;
+        }
+        if (mSavePath != null) {
+            arg[n++] = "--save-path";
+            arg[n++] = mSavePath;
         }
         nativeInit(mCurrentDirectory, arg);
 
@@ -116,6 +120,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
     private Activity context = null;
     private final String mCurrentDirectory;
     private final String mFontPath;
+    private final String mSavePath;
 
     private final EGL10 mEgl = null;
     private final EGLDisplay mEglDisplay = null;
@@ -131,12 +136,12 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
     }
 
     public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath) {
-        this(context, currentDirectory, fontPath, false);
+        this(context, currentDirectory, fontPath, null, false);
     }
 
-    public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath, boolean shouldRenderOutline) {
+    public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath, String savePath, boolean shouldRenderOutline) {
         super(context);
-        mRenderer = new DemoRenderer(context, currentDirectory, fontPath, shouldRenderOutline);
+        mRenderer = new DemoRenderer(context, currentDirectory, fontPath, savePath, shouldRenderOutline);
         setRenderer(mRenderer);
     }
 

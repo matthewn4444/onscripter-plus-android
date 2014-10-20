@@ -70,6 +70,10 @@ ScriptHandler::~ScriptHandler()
     if (variable_data) delete[] variable_data;
 
 #ifdef ANDROID
+    if (root_writable) {
+        delete[] root_writable;
+    }
+
     if (menuText) {
         delete menuText;
         menuText = NULL;
@@ -135,6 +139,15 @@ void ScriptHandler::reset()
     internal_current_script = NULL;
 }
 
+#ifdef ANDROID
+void ScriptHandler::setRootWritableDir(const char *path)
+{
+    if (root_writable) delete[] root_writable;
+    root_writable = new char[ strlen(path) ];
+    strcpy(root_writable, path);
+}
+#endif
+
 void ScriptHandler::setSaveDir(const char *path)
 {
     if (save_dir) delete[] save_dir;
@@ -142,16 +155,38 @@ void ScriptHandler::setSaveDir(const char *path)
     strcpy(save_dir, path);
 }
 
+#ifdef ANDROID
+FILE *ScriptHandler::fopen( const char *path, const char *mode, bool use_save_dir, bool use_root_write_dir )
+#else
 FILE *ScriptHandler::fopen( const char *path, const char *mode, bool use_save_dir )
+#endif
 {
     char *filename;
     if (use_save_dir && save_dir){
+#ifdef ANDROID
+        if (root_writable) {
+            filename = new char[strlen(root_writable)+strlen(save_dir)+strlen(path)+1];
+            sprintf( filename, "%s%s%s", root_writable, save_dir, path );
+        } else {
+            filename = new char[strlen(save_dir)+strlen(path)+1];
+            sprintf( filename, "%s%s", save_dir, path );
+        }
+    } else {
+        if (root_writable && (strcmp(mode, "wb") == 0 || use_root_write_dir)) {
+            filename = new char[strlen(root_writable)+strlen(archive_path)+strlen(path)+1];
+            sprintf( filename, "%s%s%s", root_writable, archive_path, path );
+        } else {
+            filename = new char[strlen(archive_path)+strlen(path)+1];
+            sprintf( filename, "%s%s", archive_path, path );
+        }
+#else
         filename = new char[strlen(save_dir)+strlen(path)+1];
         sprintf( filename, "%s%s", save_dir, path );
     }
     else{
         filename = new char[strlen(archive_path)+strlen(path)+1];
         sprintf( filename, "%s%s", archive_path, path );
+#endif
     }
 
     FILE *fp = ::fopen( filename, mode );
@@ -624,7 +659,11 @@ void ScriptHandler::loadKidokuData()
     kidoku_buffer = new char[ script_buffer_length/8 + 1 ];
     memset( kidoku_buffer, 0, script_buffer_length/8 + 1 );
 
+#ifdef ANDROID
+    if ( ( fp = fopen( "kidoku.dat", "rb", true, true ) ) != NULL ){
+#else
     if ( ( fp = fopen( "kidoku.dat", "rb", true ) ) != NULL ){
+#endif
         fread( kidoku_buffer, 1, script_buffer_length/8, fp );
         fclose( fp );
     }

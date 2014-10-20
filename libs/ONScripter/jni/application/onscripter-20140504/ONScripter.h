@@ -118,6 +118,9 @@ public:
     void setDLLFile(const char *filename);
     void setArchivePath(const char *path);
     void setSaveDir(const char *path);
+#ifdef ANDROID
+    void setRootWritableDir(const char *path);
+#endif
     void setFullscreenMode();
     void setWindowMode();
     void enableButtonShortCut();
