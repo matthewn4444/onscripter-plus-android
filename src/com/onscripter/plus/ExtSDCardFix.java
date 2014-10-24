@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Random;
 
 import android.app.Activity;
@@ -13,7 +14,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
-import android.content.SharedPreferences.Editor;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
@@ -33,7 +34,16 @@ public final class ExtSDCardFix {
 
     private final Activity mActivity;
     private final FileSystemAdapter mAdapter;
+    private OnSDCardFixListener mListener;
     private Dialog mFixDialog;
+    private SharedPreferences mPrefs;
+
+    interface OnSDCardFixListener {
+        public void writeTestFinished();
+        public void option1Finished();
+        public void option2Finished();
+        public void option3Finished();
+    }
 
     // For us to scan, user must be in the following state:
     //  1. Must be Kitkat (4.4) or higher
@@ -54,6 +64,7 @@ public final class ExtSDCardFix {
     public ExtSDCardFix(Activity activity, FileSystemAdapter adapter) {
         mActivity = activity;
         mAdapter = adapter;
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
         // Don't rescan if already scanned
         synchronized (ExtSDCardFix.this) {
@@ -75,6 +86,27 @@ public final class ExtSDCardFix {
            sExtSDCardWritable = Environment2.hasExternalSDCard();
            sAlreadyScanned = true;
        }
+    }
+
+    public void setOnSDCardFixListener(OnSDCardFixListener listener) {
+        mListener = listener;
+    }
+
+    public static File getSaveFolder(Context ctx) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+        String key = ctx.getString(R.string.settings_save_folder_key);
+        String saveFolder = prefs.getString(key, null);
+        if (saveFolder == null) {
+            return null;
+        }
+        File saveFolderFile = new File(saveFolder);
+
+        // If does not exist, then remove the key from pref
+        if (!saveFolderFile.exists()) {
+            prefs.edit().remove(key).apply();
+            return null;
+        }
+        return saveFolderFile;
     }
 
     private static boolean isKitKatOrHigher() {
@@ -99,8 +131,13 @@ public final class ExtSDCardFix {
         @Override
         protected void onPostExecute(Integer numGames) {
             super.onPostExecute(numGames);
-            // If there are currently games listed and in external sd card location, show this dialog
-            if (needsFix()) {
+            if (mListener != null) {
+                mListener.writeTestFinished();
+            }
+
+            // If there are currently games listed and in external sd card location
+            // and no save folder in pref, show this dialog
+            if (needsFix() && getSaveFolder(mActivity) == null) {
                 showFixDialog();
             }
         }
@@ -134,7 +171,7 @@ public final class ExtSDCardFix {
                                     option1CopyGameFiles();
                                     break;
                                 case 1:
-                                    // TODO move save files
+                                    option2CopyGameSaveFiles();
                                     break;
                                 case 2:
                                     // TODO apply root sd card fix
@@ -247,56 +284,156 @@ public final class ExtSDCardFix {
             .show();
     }
 
+    private boolean isStrOneOf(String[] array, String item) {
+        if (item == null) {
+            return false;
+        }
+        for (String name : array) {
+            if (item.equalsIgnoreCase(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * External SD Card Fixes
      */
     /* Option 1: Move all games in current folder to another folder to internal storage */
     private void option1CopyGameFiles() {
-        final FolderBrowserDialogWrapper dialog = new FolderBrowserDialogWrapper(mActivity, false, true);
-
-        AlertDialog.Builder builder = new Builder(mActivity);
-        builder.setView(dialog.getDialogLayout());
-        builder.setTitle(R.string.dialog_choose_copy_dst_title);
-        builder.setPositiveButton(R.string.dialog_select_button_text, new OnClickListener() {
+        final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity);
+        routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
-            public void onClick(DialogInterface d, int which) {
-                final File result = dialog.getResultDirectory();
-                File[] games = getCurrentONScripterGames();
-                final CopyFileInfo[] info = new CopyFileInfo[games.length];
-                for (int i = 0; i < info.length; i++) {
-                    info[i] = new CopyFileInfo(games[i].getAbsolutePath(), result + "/" + games[i].getName());
+            public void onSuccess() {
+                File result = routine.getResultDirectory();
+                alert(R.string.message_copy_completed);
+
+                // Update the preferences with the new folder in internal memory
+                mPrefs.edit()
+                    .putString(mActivity.getString(R.string.settings_folder_default_key),
+                        result.getAbsolutePath()).apply();
+
+                // Change folder location
+                mAdapter.setCurrentDirectory(result);
+
+                if (mListener != null) {
+                    mListener.option1Finished();
                 }
-                new CopyFilesDialogTask(mActivity, new CopyFilesDialogListener() {
-                    @Override
-                    public void onCopyCompleted(Result resultCode) {
-                        switch(resultCode) {
-                        case SUCCESS:
-                            alert(R.string.message_copy_completed);
-
-                            // Update the preferences with the new folder in internal memory
-                            Editor editor = PreferenceManager.getDefaultSharedPreferences(mActivity).edit();
-                            editor.putString(mActivity.getString(R.string.settings_folder_default_key), result.getAbsolutePath());
-                            editor.apply();
-
-                            // Change folder location
-                            mAdapter.setCurrentDirectory(result);
-                            break;
-                        case NO_FILE_SELECTED:      // This is pretty much impossible to happen
-                            alert(R.string.message_copy_failed_no_files);
-                            break;
-                        case NO_SPACE_ERROR:
-                            alert(R.string.message_copy_failed_no_space);
-                            break;
-                        case COPY_ERROR:
-                            alert(R.string.message_copy_failed);
-                            break;
-                        }
-                    }
-                }).executeCopy(info);
             }
         });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        dialog.setDialog(builder.create());
-        dialog.show(Environment2.getInternalStorageDirectory().getAbsolutePath());
+        routine.execute();
+    }
+
+    /* Option 2: Move all saves for each game in the current folder to another folder to internal storage */
+    private void option2CopyGameSaveFiles() {
+        final File currentDir = mAdapter.getCurrentDirectory();
+        final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity,
+            // File Filter: copy save, images and other metadata files
+            new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    final String[] acceptable = {
+                        "pref.xml", "envdata", "gloval.sav", "kidoku.dat",
+                        "stderr.txt", "stdout.txt"
+                    };
+                    String name = pathname.getName();
+                    return name.startsWith("save") && (name.endsWith(".bmp")                    // File: save___.[dat/png/jpg/bmp]
+                                || name.endsWith(".dat") || name.endsWith(".png")
+                                || name.endsWith(".jpg"))
+                            || pathname.getParentFile().getName().toString().startsWith("save") // Parent folder is save folder
+                            ||isStrOneOf(acceptable, name);                                     // If file is one of the acceptable files
+                    }
+            },
+
+            // Folder filter: copy only save folders (starts with "save")
+            new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.getParentFile().equals(currentDir)          // If parent is current directory
+                            || pathname.getName().toLowerCase(                  // If folder starts with save
+                                    Locale.getDefault()).startsWith("save");
+                }
+            }
+        );
+        routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
+            @Override
+            public void onSuccess() {
+                File result = routine.getResultDirectory();
+                alert(R.string.message_copy_saves_completed);
+
+                // Update the preferences with the new save folder
+                mPrefs.edit().putString(mActivity.getString(R.string.settings_save_folder_key),
+                        result.getAbsolutePath()).apply();
+
+                if (mListener != null) {
+                    mListener.option2Finished();
+                }
+            }
+        });
+        routine.execute();
+    }
+
+    private interface OnCopyRoutineFinished {
+        public void onSuccess();
+    }
+
+    private class CopyToInternalStorageRoutine extends FolderBrowserDialogWrapper {
+        private OnCopyRoutineFinished mListener;
+        public CopyToInternalStorageRoutine(Context context) {
+            this(context, null, null);
+        }
+
+        public CopyToInternalStorageRoutine(final Context context, final FileFilter fileFilter,
+                final FileFilter folderFilter) {
+            super(context, false, true);
+
+            AlertDialog.Builder builder = new Builder(context);
+            builder.setView(getDialogLayout());
+            builder.setTitle(R.string.dialog_choose_copy_dst_title);
+            builder.setNegativeButton(android.R.string.cancel, null);
+            builder.setPositiveButton(R.string.dialog_select_button_text, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    final File result = getResultDirectory();
+                    File[] games = getCurrentONScripterGames();
+                    final CopyFileInfo[] info = new CopyFileInfo[games.length];
+                    for (int i = 0; i < info.length; i++) {
+                        info[i] = new CopyFileInfo(games[i].getAbsolutePath(), result + "/" + games[i].getName());
+                    }
+                    new CopyFilesDialogTask(context, new CopyFilesDialogListener() {
+                        @Override
+                        public void onCopyCompleted(Result resultCode) {
+                            switch(resultCode) {
+                            case SUCCESS:
+                                if (mListener != null) {
+                                    mListener.onSuccess();
+                                }
+                                break;
+                            case NO_FILE_SELECTED:      // This is pretty much impossible to happen
+                                alert(R.string.message_copy_failed_no_files);
+                                break;
+                            case NO_SPACE_ERROR:
+                                alert(R.string.message_copy_failed_no_space);
+                                break;
+                            case COPY_ERROR:
+                                alert(R.string.message_copy_failed);
+                                break;
+                            default:
+                                break;
+                            }
+                        }
+                    }, fileFilter, folderFilter).executeCopy(info);
+                }
+            });
+            setDialog(builder.create());
+        }
+
+        public void setOnCopyRoutineFinished(OnCopyRoutineFinished listener) {
+            mListener = listener;
+        }
+
+        public void execute() {
+            show(Environment2.getInternalStorageDirectory().getAbsolutePath());
+        }
     }
 }

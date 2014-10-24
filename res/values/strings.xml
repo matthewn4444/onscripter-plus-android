@@ -49,6 +49,7 @@
     <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
     <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
+    <string name="message_copy_saves_completed">Finished copying save files.</string>
     <string name="message_copy_failed">Copy failed.</string>
     <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy.</string>
     <string name="message_copy_failed_no_files">There are no files to copy.</string>
@@ -58,6 +59,7 @@
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_remove_ads">Remove Ads</string>
     <string name="menu_action_change_folder">Change Folder</string>
+    <string name="menu_action_change_save_folder">Change Save Folder</string>
 
     <!-- Settings -->
     <string name="settings_render_cate">Render</string>
@@ -77,6 +79,8 @@
     <string name="settings_folder_default_key">settings.folder.default.key</string>
     <string name="settings_folder_default_summary">Select a default folder location to read visual novel files.</string>
     <string name="settings_folder_default_title">Select Default Folder</string>
+
+    <string name="settings_save_folder_key">settings.save.folder.key</string>
 
     <string name="settings_about_cate">About</string>
     <string name="settings_about_key">settings.about.key</string>

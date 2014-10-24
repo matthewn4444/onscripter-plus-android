@@ -37,6 +37,7 @@ import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
+    public static final String SAVE_DIRECTORY_EXTRA = "save_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
     public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
 
@@ -62,6 +63,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private int mDisplayHeight, mGameHeight;
 
     private String mCurrentDirectory;
+    private String mSaveDirectory;
     private boolean mUseDefaultFont;
     private SharedPreferences mPrefs;
     private VNPreferences mVNPrefs;
@@ -94,6 +96,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
 
         mCurrentDirectory = getIntent().getStringExtra(CURRENT_DIRECTORY_EXTRA);
+        mSaveDirectory = getIntent().getStringExtra(SAVE_DIRECTORY_EXTRA);
         mUseDefaultFont = getIntent().getBooleanExtra(USE_DEFAULT_FONT_EXTRA, false);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -263,9 +266,9 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 getResources().getBoolean(R.bool.render_font_outline));
 
         if (mUseDefaultFont) {
-            mGame = ONScripterGame.newInstance(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, mSaveDirectory, shouldRenderOutline);
         } else {
-            mGame = ONScripterGame.newInstance(mCurrentDirectory, null, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, null, mSaveDirectory, shouldRenderOutline);
         }
 
         // Attach the game fragment
