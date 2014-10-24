@@ -35,6 +35,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     private static final String GameDirectoryKey = "game.directory.key";
     private static final String FontPathKey = "font.path.key";
     private static final String RenderOutlineKey = "render.outline.key";
+    private static final String SavePathKey = "save.path.key";
 
     private final VPlayerListener mVideoListener = new VPlayerListener() {
         @Override
@@ -65,12 +66,13 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
         }
     };
 
-    public static ONScripterGame newInstance(String gameDirectory, String fontPath, boolean shouldRenderOutline) {
+    public static ONScripterGame newInstance(String gameDirectory, String fontPath, String savePath, boolean shouldRenderOutline) {
         ONScripterGame frag = new ONScripterGame();
         Bundle args = new Bundle();
         args.putString(GameDirectoryKey, gameDirectory);
         args.putString(FontPathKey, fontPath);
         args.putBoolean(RenderOutlineKey, shouldRenderOutline);
+        args.putString(SavePathKey, savePath);
         frag.setArguments(args);
         return frag;
     }
@@ -84,7 +86,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
             Bundle savedInstanceState) {
         Bundle b = getArguments();
         mGame = new ONScripterView(getActivity(), b.getString(GameDirectoryKey),
-                b.getString(FontPathKey), b.getBoolean(RenderOutlineKey));
+                b.getString(FontPathKey), b.getString(SavePathKey), b.getBoolean(RenderOutlineKey));
         mGame.setONScripterEventListener(this);
         mGameLayout = new FrameLayout(getActivity());
         mGameLayout.addView(mGame);

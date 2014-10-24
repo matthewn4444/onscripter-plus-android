@@ -31,6 +31,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.onscripter.ONScripterView;
+import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 
@@ -52,6 +53,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private FontFileCopyTask mCopyTask = null;
     private FolderBrowserDialogWrapper mDirBrowse = null;
     private SharedPreferences mPrefs = null;
+    private Menu mMenu;
     private ExtSDCardFix mFix;
     private String mCurrentThemeResult;
     private ChangeLog mChangeLog;
@@ -135,6 +137,24 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         }
 
         mFix = new ExtSDCardFix(this, mAdapter);
+        mFix.setOnSDCardFixListener(new OnSDCardFixListener() {
+            @Override
+            public void writeTestFinished() {
+            }
+
+            @Override
+            public void option3Finished() {
+            }
+
+            @Override
+            public void option2Finished() {
+                updateSaveFolderItemVisibility();
+            }
+
+            @Override
+            public void option1Finished() {
+            }
+        });
         createDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
     }
@@ -196,10 +216,18 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         return directory;
     }
 
+    private void updateSaveFolderItemVisibility() {
+        File file = ExtSDCardFix.getSaveFolder(this);
+        mMenu.findItem(R.id.action_change_save_folder).setVisible(
+                ExtSDCardFix.getSaveFolder(this) != null);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
        MenuInflater inflater = getSupportMenuInflater();
        inflater.inflate(R.menu.menu_launcher, menu);
+       mMenu = menu;
+       updateSaveFolderItemVisibility();
        return super.onCreateOptionsMenu(menu);
     }
 
@@ -213,6 +241,9 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             break;
         case R.id.action_change_folder:
             mDirBrowse.show(mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null));
+            break;
+        case R.id.action_change_save_folder:
+            // TODO browse
             break;
         default:
             return super.onOptionsItemSelected(item);
@@ -379,11 +410,29 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void startONScripter(String path, boolean useDefaultFont) {
+        Bundle b = new Bundle();
+        boolean showFixDialog = true;
+
         // If the current game cannot save, then launch the fix dialog
         if (mFix.needsFix()) {
+            // Fix #2: Check if this game has a folder in save directory, then use that
+            File saveFolder = ExtSDCardFix.getSaveFolder(this);
+            if (saveFolder != null) {
+                // The game folder name is also in the save folder, use this save directory
+                final String thatFolder = saveFolder + "/" + new File(path).getName();
+                if (new File(thatFolder).exists()) {
+                    b.putString(ONScripter.SAVE_DIRECTORY_EXTRA, thatFolder);
+                    showFixDialog = false;
+                }
+            } else {
+                updateSaveFolderItemVisibility();
+            }
+        } else {
+            showFixDialog = false;
+        }
+        if (showFixDialog) {
             mFix.showFixDialog();
         } else {
-            Bundle b = new Bundle();
             if (useDefaultFont) {
                 b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }

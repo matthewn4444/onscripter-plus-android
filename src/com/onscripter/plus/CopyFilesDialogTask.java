@@ -1,6 +1,7 @@
 package com.onscripter.plus;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,10 +51,18 @@ public final class CopyFilesDialogTask {
     private CopyFileInfo[] mInfo;
     private boolean mIsRunning;
     private final int mExtSDCardPathLength;
+    private final FileFilter mFileFilter;
+    private final FileFilter mDirectoryFilter;
 
     public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener) {
+        this(ctx, listener, null, null);
+    }
+
+    public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener, FileFilter fileFilter, FileFilter directoryFilter) {
         mCtx = ctx;
         mListener = listener;
+        mFileFilter = fileFilter;
+        mDirectoryFilter = directoryFilter;
         mIsRunning = false;
         mExtSDCardPathLength = Environment2.getExternalSDCardDirectory().getPath().length();
     }
@@ -124,8 +133,14 @@ public final class CopyFilesDialogTask {
         private long scanTotalBytes(File source) {
             long totalBytes = 0;
             if (source.isFile()) {
+                if (mFileFilter != null && !mFileFilter.accept(source)) {
+                    return 0;
+                }
                 totalBytes += source.length();
             } else {
+                if (mDirectoryFilter != null && !mDirectoryFilter.accept(source)) {
+                    return 0;
+                }
                 File[] children = source.listFiles();
                 if (children != null) {
                     for (int i = 0; i < children.length; i++) {
@@ -322,6 +337,10 @@ public final class CopyFilesDialogTask {
         }
 
         private boolean copyFolder(File source, File destination) {
+            // Skip folder if not accepted
+            if (mDirectoryFilter != null && !mDirectoryFilter.accept(source)) {
+                return true;
+            }
             File[] children = source.listFiles();
             if (!destination.exists() && !destination.mkdir()) {
                 // Failed to make a new directory
@@ -345,6 +364,10 @@ public final class CopyFilesDialogTask {
         }
 
         private boolean copyFile(File source, File destination) {
+            // Skip file if not accepted
+            if (mFileFilter != null && !mFileFilter.accept(source)) {
+                return true;
+            }
             InputStream in = null;
             OutputStream out = null;
             int copiedLen = 0;
