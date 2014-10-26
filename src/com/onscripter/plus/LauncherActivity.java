@@ -52,6 +52,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private FileSystemAdapter mAdapter = null;
     private FontFileCopyTask mCopyTask = null;
     private FolderBrowserDialogWrapper mDirBrowse = null;
+    private FolderBrowserDialogWrapper mSaveDirBrowse = null;
     private SharedPreferences mPrefs = null;
     private Menu mMenu;
     private ExtSDCardFix mFix;
@@ -88,6 +89,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         setTheme(themeName.equals(defaultThemeName) ? R.style.Theme_Light : R.style.Theme_Dark);
 
         mDirBrowse = new FolderBrowserDialogWrapper(this, true, false);
+        mSaveDirBrowse = new FolderBrowserDialogWrapper(this, false, true);
         mDialog = new AlertDialog.Builder(this);
 
         File directory = null;
@@ -156,6 +158,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             }
         });
         createDirectoryBrowserDialog();
+        createSaveDirectoryBrowserDialog();
         mChangeLog = new ChangeLog(this);
     }
 
@@ -181,6 +184,22 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         });
         builder.setNegativeButton(android.R.string.cancel, null);
         mDirBrowse.setDialog(builder.create());
+    }
+
+    private void createSaveDirectoryBrowserDialog() {
+        AlertDialog.Builder builder = new Builder(this);
+        builder.setView(mSaveDirBrowse.getDialogLayout());
+        builder.setTitle(R.string.dialog_choose_save_folder_title);
+        builder.setPositiveButton(R.string.dialog_select_button_text, new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mPrefs.edit()
+                .putString(getString(R.string.settings_save_folder_key),
+                        mSaveDirBrowse.getResultDirectory().getPath()).apply();
+            }
+        });
+        builder.setNegativeButton(android.R.string.cancel, null);
+        mSaveDirBrowse.setDialog(builder.create());
     }
 
     private File getStartingDirectory() {
@@ -243,7 +262,13 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mDirBrowse.show(mPrefs.getString(SETTINGS_FOLDER_DEFAULT_KEY, null));
             break;
         case R.id.action_change_save_folder:
-            // TODO browse
+            File saveFolder = ExtSDCardFix.getSaveFolder(this);
+            if (saveFolder != null) {
+                mSaveDirBrowse.show(saveFolder.getAbsolutePath());
+            } else {
+                updateSaveFolderItemVisibility();
+                alert(getString(R.string.message_save_folder_missing));
+            }
             break;
         default:
             return super.onOptionsItemSelected(item);

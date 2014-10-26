@@ -53,6 +53,7 @@
     <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy.</string>
     <string name="message_copy_failed_no_files">There are no files to copy.</string>
     <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
+    <string name="message_save_folder_missing">Save folder does not exist.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -112,6 +113,7 @@
 
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
+    <string name="dialog_choose_save_folder_title">Choose a save folder</string>
     <string name="dialog_select_button_text">Select</string>
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
