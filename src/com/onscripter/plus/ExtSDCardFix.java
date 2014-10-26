@@ -131,14 +131,15 @@ public final class ExtSDCardFix {
         @Override
         protected void onPostExecute(Integer numGames) {
             super.onPostExecute(numGames);
-            if (mListener != null) {
-                mListener.writeTestFinished();
-            }
 
             // If there are currently games listed and in external sd card location
             // and no save folder in pref, show this dialog
             if (needsFix() && getSaveFolder(mActivity) == null) {
                 showFixDialog();
+            }
+
+            if (mListener != null) {
+                mListener.writeTestFinished();
             }
         }
     }

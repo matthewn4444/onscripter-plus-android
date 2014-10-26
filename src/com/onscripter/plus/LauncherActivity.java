@@ -165,6 +165,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         mFix.setOnSDCardFixListener(new OnSDCardFixListener() {
             @Override
             public void writeTestFinished() {
+                mChangeLog = new ChangeLog(LauncherActivity.this);
             }
 
             @Override
@@ -182,7 +183,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         });
         createDirectoryBrowserDialog();
         createSaveDirectoryBrowserDialog();
-        mChangeLog = new ChangeLog(this);
         attachAds(listView);
     }
 
