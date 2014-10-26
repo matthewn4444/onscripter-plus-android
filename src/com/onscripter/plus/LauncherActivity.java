@@ -549,6 +549,13 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mDirBrowse.dismiss();
+        mSaveDirBrowse.dismiss();
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         File currentDir = mAdapter.getFile(position);
 
