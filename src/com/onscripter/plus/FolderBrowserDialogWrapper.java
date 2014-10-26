@@ -149,6 +149,12 @@ public class FolderBrowserDialogWrapper implements OnItemClickListener, OnKeyLis
         mDialog.show();
     }
 
+    public void dismiss() {
+        if (mDialog != null) {
+            mDialog.dismiss();
+        }
+    }
+
     public File getResultDirectory() {
         return mAdapter.getCurrentDirectory();
     }
