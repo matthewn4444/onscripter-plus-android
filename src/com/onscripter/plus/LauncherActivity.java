@@ -295,6 +295,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mAdView.pause();
         }
         super.onPause();
+        mDirBrowse.dismiss();
+        mSaveDirBrowse.dismiss();
     }
 
     @Override
@@ -546,13 +548,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 mAdapter.moveUp();
             }
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mDirBrowse.dismiss();
-        mSaveDirBrowse.dismiss();
     }
 
     @Override
