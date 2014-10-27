@@ -55,16 +55,19 @@ public final class CopyFilesDialogTask {
     private final int mExtSDCardPathLength;
     private final FileFilter mFileFilter;
     private final FileFilter mDirectoryFilter;
+    private final FileFilter mOverwriteFilter;
 
     public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener) {
-        this(ctx, listener, null, null);
+        this(ctx, listener, null, null, null);
     }
 
-    public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener, FileFilter fileFilter, FileFilter directoryFilter) {
+    public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener,
+            FileFilter fileFilter, FileFilter directoryFilter, FileFilter overwriteFilter) {
         mCtx = ctx;
         mListener = listener;
         mFileFilter = fileFilter;
         mDirectoryFilter = directoryFilter;
+        mOverwriteFilter = overwriteFilter;
         mIsRunning = false;
         mExtSDCardPathLength = Environment2.getExternalSDCardDirectory().getPath().length();
     }
@@ -119,6 +122,7 @@ public final class CopyFilesDialogTask {
         private ListView mFileListView;
         private TextView mRemainingText;
         private long mCurrentSumBytes;
+        private boolean mCurrentSetHasOverwrite;
 
         public InternalFileSpaceDialogTask() {
             super(mCtx, mCtx.getString(R.string.dialog_scan_files_title), true);
@@ -141,6 +145,7 @@ public final class CopyFilesDialogTask {
                 // Because we overwrite the destination, if exists, then we dont need extra space for it
                 if (destination.exists()) {
                     totalBytes -= destination.length();
+                    mCurrentSetHasOverwrite = true;
                 }
                 totalBytes += source.length();
             } else {
@@ -183,14 +188,17 @@ public final class CopyFilesDialogTask {
                 if (isCancelled()) {
                     return 0L;
                 }
+                mCurrentSetHasOverwrite = false;
                 long b = scanTotalBytes(new File(mInfo[i].source), new File(mInfo[i].destination));
                 bytes += b;
                 if (b < 0) {
                     b = 0;
                 }
-                String formattedSize = Formatter.formatFileSize(mCtx, b) + (b > 0 ? "" : " "
-                        + mCtx.getString(R.string.dialog_override_files));
-                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mExtSDCardPathLength) + "</b><br><small>" + formattedSize + "</small>");
+                String formattedSize = Formatter.formatFileSize(mCtx, b);
+                if (mCurrentSetHasOverwrite) {
+                    formattedSize += " <font color='red'>" + mCtx.getString(R.string.dialog_override_files) + "</font>";
+                }
+                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mExtSDCardPathLength) + "</b><br><small>+" + formattedSize + "</small>");
                 mListing.add(new Pair<Spanned, Long>(listing, b));
             }
 
@@ -206,84 +214,80 @@ public final class CopyFilesDialogTask {
         protected void onPostExecute(Long totalBytes) {
             super.onPostExecute(totalBytes);
 
-            // If not enough room to copy, we will show a dialog to allow user to choose what to copy
-            if (mRemainingInternalBytes < totalBytes) {
-                if (mInfo.length == 1) {
-                    // Only copying one file and there is no more space, can't copy then
-                    scanFinishedUnsuccessfully(Result.NO_SPACE_ERROR);
-                } else {
-                    // Inflate the dialog
-                    LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
-                    LinearLayout view = (LinearLayout) inflater.inflate(R.layout.selective_file_dialog, null);
+            // Show the choose dialog and tell users if any files are overwritten
+            if (mInfo.length == 1) {
+                // Only copying one file and there is no more space, can't copy then
+                scanFinishedUnsuccessfully(Result.NO_SPACE_ERROR);
+            } else {
+                // Inflate the dialog
+                LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout view = (LinearLayout) inflater.inflate(R.layout.selective_file_dialog, null);
 
-                    // Get the elements of the list, setup the listview and events
-                    mRemainingText = (TextView)view.findViewById(R.id.spaceRemaining);
-                    mFileListView = (ListView)view.findViewById(R.id.fileList);
-                    mFileListView.setAdapter(new ViewAdapterBase<Pair<Spanned, Long>>(mCtx,
-                            R.layout.selective_file_item, new int[]{android.R.id.text1}, mListing) {
-                        @Override
-                        protected void setWidgetValues(int position, Pair<Spanned, Long> item,
-                                View[] elements, View layout) {
-                            ((CheckedTextView)elements[0]).setText(item.first);
-                        }
-                    });
-                    mFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            // change the checkbox state
-                            CheckedTextView checkedTextView = ((CheckedTextView)view);
-                            if (checkedTextView.isEnabled()) {
-                                checkedTextView.toggle();
+                // Get the elements of the list, setup the listview and events
+                mRemainingText = (TextView)view.findViewById(R.id.spaceRemaining);
+                mFileListView = (ListView)view.findViewById(R.id.fileList);
+                mFileListView.setAdapter(new ViewAdapterBase<Pair<Spanned, Long>>(mCtx,
+                        R.layout.selective_file_item, new int[]{android.R.id.text1}, mListing) {
+                    @Override
+                    protected void setWidgetValues(int position, Pair<Spanned, Long> item,
+                            View[] elements, View layout) {
+                        ((CheckedTextView)elements[0]).setText(item.first);
+                    }
+                });
+                mFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // change the checkbox state
+                        CheckedTextView checkedTextView = ((CheckedTextView)view);
+                        if (checkedTextView.isEnabled()) {
+                            checkedTextView.toggle();
 
-                                // Update the UI and count
-                                if (checkedTextView.isChecked()) {
-                                    mCurrentSumBytes += mListing.get(position).second;
-                                } else {
-                                    mCurrentSumBytes -= mListing.get(position).second;
-                                }
-                                updateAndRecalculateList();
+                            // Update the UI and count
+                            if (checkedTextView.isChecked()) {
+                                mCurrentSumBytes += mListing.get(position).second;
+                            } else {
+                                mCurrentSumBytes -= mListing.get(position).second;
                             }
-                        }
-                    });
-
-                    // Build the dialog and attach the layout
-                    Dialog dialog = new AlertDialog.Builder(mCtx)
-                        .setTitle(R.string.dialog_select_files_copy_title)
-                        .setView(view)
-                        .setCancelable(false)
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                int j = 0;
-                                ArrayList<CopyFileInfo> info = new ArrayList<CopyFileInfo>(mFileListView.getChildCount());
-                                for (int i = 0; i < mFileListView.getChildCount(); i++) {
-                                    if (((CheckedTextView)mFileListView.getChildAt(i)).isChecked()) {
-                                        info.add(mInfo[i]);
-                                    }
-                                }
-                                mInfo = info.toArray(new CopyFileInfo[info.size()]);
-                                scanFinished(mCurrentSumBytes);
-                            }
-                        })
-                        .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Cancel out
-                                scanFinishedUnsuccessfully(Result.CANCELLED);
-                            }
-                        })
-                        .create();
-
-                    dialog.setOnShowListener(new OnShowListener() {
-                        @Override
-                        public void onShow(DialogInterface dialog) {
                             updateAndRecalculateList();
                         }
-                    });
-                    dialog.show();
-                }
-            } else {
-                scanFinished(totalBytes);
+                    }
+                });
+
+                // Build the dialog and attach the layout
+                Dialog dialog = new AlertDialog.Builder(mCtx)
+                    .setTitle(R.string.dialog_select_files_copy_title)
+                    .setView(view)
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            int j = 0;
+                            ArrayList<CopyFileInfo> info = new ArrayList<CopyFileInfo>(mFileListView.getChildCount());
+                            for (int i = 0; i < mFileListView.getChildCount(); i++) {
+                                if (((CheckedTextView)mFileListView.getChildAt(i)).isChecked()) {
+                                    info.add(mInfo[i]);
+                                }
+                            }
+                            mInfo = info.toArray(new CopyFileInfo[info.size()]);
+                            scanFinished(mCurrentSumBytes);
+                        }
+                    })
+                    .setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Cancel out
+                            scanFinishedUnsuccessfully(Result.CANCELLED);
+                        }
+                    })
+                    .create();
+
+                dialog.setOnShowListener(new OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        updateAndRecalculateList();
+                    }
+                });
+                dialog.show();
             }
         }
     }
@@ -396,6 +400,16 @@ public final class CopyFilesDialogTask {
             // Skip file if not accepted
             if (mFileFilter != null && !mFileFilter.accept(source)) {
                 return true;
+            }
+
+            // If destination file exists and is same size and not allowed to overwrite, then we skip copying it
+            if (destination.exists()) {
+                if (destination.length() == source.length()) {
+                    if (mOverwriteFilter == null || (mOverwriteFilter != null && !mOverwriteFilter.accept(source))) {
+                        return true;
+                    }
+                }
+                destination.delete();       // Save space, delete before copying
             }
             InputStream in = null;
             OutputStream out = null;
