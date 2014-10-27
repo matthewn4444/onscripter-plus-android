@@ -224,7 +224,8 @@ public final class ExtSDCardFix {
         final CopyFileInfo[] info = new CopyFileInfo[] {
                 new CopyFileInfo(filepath.getAbsolutePath(), saveFolder + "/" + name)
         };
-        copyGameFiles(info, CopyGameFileFF, CopyGameFolderFF, new OnCopyRoutineFinished() {
+        copyGameFiles(info, CopyGameFileFF, CopyGameFolderFF, CopyGameFileFF,
+                new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
                 if (mListener != null) {
@@ -358,7 +359,7 @@ public final class ExtSDCardFix {
      */
     /* Option 1: Move all games in current folder to another folder to internal storage */
     private void option1CopyGameFiles() {
-        final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity);
+        final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity, null, null, CopyGameFileFF);
         routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
@@ -385,7 +386,7 @@ public final class ExtSDCardFix {
     private void option2CopyGameSaveFiles() {
         final File currentDir = mAdapter.getCurrentDirectory();
         final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity,
-                CopyGameFileFF, CopyGameFolderFF);
+                CopyGameFileFF, CopyGameFolderFF, CopyGameFileFF);
         routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
@@ -412,7 +413,8 @@ public final class ExtSDCardFix {
      * @param listener
      */
     private void copyGameFiles(CopyFileInfo[] info, final FileFilter fileFilter,
-            final FileFilter folderFilter, final OnCopyRoutineFinished listener) {
+            final FileFilter folderFilter, final FileFilter overwriteFilter,
+            final OnCopyRoutineFinished listener) {
         new CopyFilesDialogTask(mActivity, new CopyFilesDialogListener() {
             @Override
             public void onCopyCompleted(Result resultCode) {
@@ -435,7 +437,7 @@ public final class ExtSDCardFix {
                     break;
                 }
             }
-        }, fileFilter, folderFilter).executeCopy(info);
+        }, fileFilter, folderFilter, overwriteFilter).executeCopy(info);
     }
 
     private interface OnCopyRoutineFinished {
@@ -445,11 +447,11 @@ public final class ExtSDCardFix {
     private class CopyToInternalStorageRoutine extends FolderBrowserDialogWrapper {
         private OnCopyRoutineFinished mListener;
         public CopyToInternalStorageRoutine(Context context) {
-            this(context, null, null);
+            this(context, null, null, null);
         }
 
         public CopyToInternalStorageRoutine(final Context context, final FileFilter fileFilter,
-                final FileFilter folderFilter) {
+                final FileFilter folderFilter, final FileFilter overwriteFilter) {
             super(context, false, true);
 
             AlertDialog.Builder builder = new Builder(context);
@@ -465,7 +467,7 @@ public final class ExtSDCardFix {
                     for (int i = 0; i < info.length; i++) {
                         info[i] = new CopyFileInfo(games[i].getAbsolutePath(), result + "/" + games[i].getName());
                     }
-                    copyGameFiles(info, fileFilter, folderFilter, mListener);
+                    copyGameFiles(info, fileFilter, folderFilter, overwriteFilter, mListener);
                 }
             });
             setDialog(builder.create());
