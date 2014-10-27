@@ -13,6 +13,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.StatFs;
@@ -246,7 +247,7 @@ public final class CopyFilesDialogTask {
                     });
 
                     // Build the dialog and attach the layout
-                    new AlertDialog.Builder(mCtx)
+                    Dialog dialog = new AlertDialog.Builder(mCtx)
                         .setTitle(R.string.dialog_select_files_copy_title)
                         .setView(view)
                         .setCancelable(false)
@@ -271,8 +272,15 @@ public final class CopyFilesDialogTask {
                                 scanFinishedUnsuccessfully(Result.CANCELLED);
                             }
                         })
-                        .show();
-                    updateAndRecalculateList();
+                        .create();
+
+                    dialog.setOnShowListener(new OnShowListener() {
+                        @Override
+                        public void onShow(DialogInterface dialog) {
+                            updateAndRecalculateList();
+                        }
+                    });
+                    dialog.show();
                 }
             } else {
                 scanFinished(totalBytes);
