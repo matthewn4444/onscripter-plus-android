@@ -130,6 +130,7 @@
     <string name="dialog_select_files_copy_title">Select files to copy</string>
     <string name="dialog_bytes_remaining">Available space left:</string>
     <string name="dialog_button_rate">Rate this App!</string>
+    <string name="dialog_override_files">(Overriding files)</string>
 
     <!-- Dialog Options -->
     <string-array name="dialog_opt_fix_sd_card_write">
