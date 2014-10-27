@@ -14,6 +14,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.StatFs;
 import android.text.Html;
 import android.text.Spanned;
@@ -278,6 +279,7 @@ public final class CopyFilesDialogTask {
     private class InternalCopyDialogTask extends AsyncTask<Void, Void, Result> {
 
         private Dialog mDialog;
+        private boolean mShowDialogTimeout;
         private final LinearLayout mLayout;
         private final TextView mCurrentFileNameText;
         private final TextView mCurrentFileSizeText;
@@ -322,7 +324,16 @@ public final class CopyFilesDialogTask {
                     })
                     .create();
             }
-            mDialog.show();
+            mShowDialogTimeout = true;
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (mShowDialogTimeout) {
+                        mDialog.show();
+                    }
+                }
+            }, 250);
         }
 
         /**
@@ -458,12 +469,14 @@ public final class CopyFilesDialogTask {
         protected void onCancelled() {
             super.onCancelled();
             copyFinished(Result.CANCELLED);
+            mShowDialogTimeout = false;
         }
 
         @Override
         protected void onPostExecute(Result result) {
             super.onPostExecute(result);
             copyFinished(result);
+            mShowDialogTimeout = false;
             mDialog.dismiss();
         }
     }
