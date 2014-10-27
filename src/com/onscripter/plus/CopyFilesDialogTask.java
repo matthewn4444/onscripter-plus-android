@@ -131,11 +131,15 @@ public final class CopyFilesDialogTask {
          * @param source
          * @return
          */
-        private long scanTotalBytes(File source) {
+        private long scanTotalBytes(File source, File destination) {
             long totalBytes = 0;
             if (source.isFile()) {
                 if (mFileFilter != null && !mFileFilter.accept(source)) {
                     return 0;
+                }
+                // Because we overwrite the destination, if exists, then we dont need extra space for it
+                if (destination.exists()) {
+                    totalBytes -= destination.length();
                 }
                 totalBytes += source.length();
             } else {
@@ -145,7 +149,8 @@ public final class CopyFilesDialogTask {
                 File[] children = source.listFiles();
                 if (children != null) {
                     for (int i = 0; i < children.length; i++) {
-                        totalBytes += scanTotalBytes(children[i]);
+                        File dstFile = new File(destination + "/" + children[i].getName());
+                        totalBytes += scanTotalBytes(children[i], dstFile);
                     }
                 }
             }
@@ -177,9 +182,14 @@ public final class CopyFilesDialogTask {
                 if (isCancelled()) {
                     return 0L;
                 }
-                long b = scanTotalBytes(new File(mInfo[i].source));
+                long b = scanTotalBytes(new File(mInfo[i].source), new File(mInfo[i].destination));
                 bytes += b;
-                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mExtSDCardPathLength) + "</b><br><small>" + Formatter.formatFileSize(mCtx, b) + "</small>");
+                if (b < 0) {
+                    b = 0;
+                }
+                String formattedSize = Formatter.formatFileSize(mCtx, b) + (b > 0 ? "" : " "
+                        + mCtx.getString(R.string.dialog_override_files));
+                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mExtSDCardPathLength) + "</b><br><small>" + formattedSize + "</small>");
                 mListing.add(new Pair<Spanned, Long>(listing, b));
             }
 
