@@ -50,7 +50,7 @@
     <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
     <string name="message_copy_saves_completed">Finished copying save files.</string>
     <string name="message_copy_failed">Copy failed.</string>
-    <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy.</string>
+    <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy game files.</string>
     <string name="message_copy_failed_no_files">There are no files to copy.</string>
     <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
     <string name="message_save_folder_missing">Save folder does not exist.</string>

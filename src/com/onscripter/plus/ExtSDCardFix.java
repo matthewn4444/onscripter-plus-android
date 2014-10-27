@@ -38,11 +38,14 @@ public final class ExtSDCardFix {
     private Dialog mFixDialog;
     private SharedPreferences mPrefs;
 
+    private static String SETTINGS_SAVE_FOLDER_KEY;
+
     interface OnSDCardFixListener {
         public void writeTestFinished();
         public void option1Finished();
         public void option2Finished();
         public void option3Finished();
+        public void oneGameCopyFinished(String gamepath);
     }
 
     // For us to scan, user must be in the following state:
@@ -60,11 +63,14 @@ public final class ExtSDCardFix {
                 && getNumONScripterGames(currentPath).length > 0;
     }
 
-
     public ExtSDCardFix(Activity activity, FileSystemAdapter adapter) {
         mActivity = activity;
         mAdapter = adapter;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+
+        if (SETTINGS_SAVE_FOLDER_KEY == null) {
+            SETTINGS_SAVE_FOLDER_KEY = activity.getString(R.string.settings_save_folder_key);
+        }
 
         // Don't rescan if already scanned
         synchronized (ExtSDCardFix.this) {
@@ -206,6 +212,29 @@ public final class ExtSDCardFix {
     }
 
     /**
+     * Asks user if they would like to move this folder to the save location,
+     * then copies all save files to it
+     * This can fail and will show dialog if not enough space
+     * @param filepath of the game folder to copy
+     */
+    public void moveOneGameSave(final File filepath) {
+        String name = filepath.getName();
+        String saveFolder = mPrefs.getString(SETTINGS_SAVE_FOLDER_KEY, null);
+
+        final CopyFileInfo[] info = new CopyFileInfo[] {
+                new CopyFileInfo(filepath.getAbsolutePath(), saveFolder + "/" + name)
+        };
+        copyGameFiles(info, CopyGameFileFF, CopyGameFolderFF, new OnCopyRoutineFinished() {
+            @Override
+            public void onSuccess() {
+                if (mListener != null) {
+                    mListener.oneGameCopyFinished(filepath.getAbsolutePath());
+                }
+            }
+        });
+    }
+
+    /**
      * Get the number of ONScripter games in the folder attached
      * to the file system adapter.
      * @return
@@ -285,7 +314,7 @@ public final class ExtSDCardFix {
             .show();
     }
 
-    private boolean isStrOneOf(String[] array, String item) {
+    private static boolean isStrOneOf(String[] array, String item) {
         if (item == null) {
             return false;
         }
@@ -296,6 +325,33 @@ public final class ExtSDCardFix {
         }
         return false;
     }
+
+    /* File Filter: copy save, images and other metadata files */
+    private static FileFilter CopyGameFileFF = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            final String[] acceptable = {
+                "pref.xml", "envdata", "gloval.sav", "kidoku.dat",
+                "stderr.txt", "stdout.txt"
+            };
+            String name = pathname.getName();
+            return name.startsWith("save") && (name.endsWith(".bmp")                    // File: save___.[dat/png/jpg/bmp]
+                        || name.endsWith(".dat") || name.endsWith(".png")
+                        || name.endsWith(".jpg"))
+                    || pathname.getParentFile().getName().toString().startsWith("save") // Parent folder is save folder
+                    ||isStrOneOf(acceptable, name);                                     // If file is one of the acceptable files
+            }
+    };
+
+    /* Folder filter: copy only save folders (starts with "save") */
+    private final FileFilter CopyGameFolderFF = new FileFilter() {
+        @Override
+        public boolean accept(File pathname) {
+            return pathname.getParentFile().equals(mAdapter.getCurrentDirectory()) // If parent is current directory
+                    || pathname.getName().toLowerCase(                  // If folder starts with save
+                            Locale.getDefault()).startsWith("save");
+        }
+    };
 
     /**
      * External SD Card Fixes
@@ -329,33 +385,7 @@ public final class ExtSDCardFix {
     private void option2CopyGameSaveFiles() {
         final File currentDir = mAdapter.getCurrentDirectory();
         final CopyToInternalStorageRoutine routine = new CopyToInternalStorageRoutine(mActivity,
-            // File Filter: copy save, images and other metadata files
-            new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    final String[] acceptable = {
-                        "pref.xml", "envdata", "gloval.sav", "kidoku.dat",
-                        "stderr.txt", "stdout.txt"
-                    };
-                    String name = pathname.getName();
-                    return name.startsWith("save") && (name.endsWith(".bmp")                    // File: save___.[dat/png/jpg/bmp]
-                                || name.endsWith(".dat") || name.endsWith(".png")
-                                || name.endsWith(".jpg"))
-                            || pathname.getParentFile().getName().toString().startsWith("save") // Parent folder is save folder
-                            ||isStrOneOf(acceptable, name);                                     // If file is one of the acceptable files
-                    }
-            },
-
-            // Folder filter: copy only save folders (starts with "save")
-            new FileFilter() {
-                @Override
-                public boolean accept(File pathname) {
-                    return pathname.getParentFile().equals(currentDir)          // If parent is current directory
-                            || pathname.getName().toLowerCase(                  // If folder starts with save
-                                    Locale.getDefault()).startsWith("save");
-                }
-            }
-        );
+                CopyGameFileFF, CopyGameFolderFF);
         routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
@@ -363,7 +393,7 @@ public final class ExtSDCardFix {
                 alert(R.string.message_copy_saves_completed);
 
                 // Update the preferences with the new save folder
-                mPrefs.edit().putString(mActivity.getString(R.string.settings_save_folder_key),
+                mPrefs.edit().putString(SETTINGS_SAVE_FOLDER_KEY,
                         result.getAbsolutePath()).apply();
 
                 if (mListener != null) {
@@ -372,6 +402,40 @@ public final class ExtSDCardFix {
             }
         });
         routine.execute();
+    }
+
+    /**
+     * Intitiates the copying process to move files from one location to another
+     * @param info
+     * @param fileFilter
+     * @param folderFilter
+     * @param listener
+     */
+    private void copyGameFiles(CopyFileInfo[] info, final FileFilter fileFilter,
+            final FileFilter folderFilter, final OnCopyRoutineFinished listener) {
+        new CopyFilesDialogTask(mActivity, new CopyFilesDialogListener() {
+            @Override
+            public void onCopyCompleted(Result resultCode) {
+                switch(resultCode) {
+                case SUCCESS:
+                    if (listener != null) {
+                        listener.onSuccess();
+                    }
+                    break;
+                case NO_FILE_SELECTED:      // This is pretty much impossible to happen
+                    alert(R.string.message_copy_failed_no_files);
+                    break;
+                case NO_SPACE_ERROR:
+                    alert(R.string.message_copy_failed_no_space);
+                    break;
+                case COPY_ERROR:
+                    alert(R.string.message_copy_failed);
+                    break;
+                default:
+                    break;
+                }
+            }
+        }, fileFilter, folderFilter).executeCopy(info);
     }
 
     private interface OnCopyRoutineFinished {
@@ -401,29 +465,7 @@ public final class ExtSDCardFix {
                     for (int i = 0; i < info.length; i++) {
                         info[i] = new CopyFileInfo(games[i].getAbsolutePath(), result + "/" + games[i].getName());
                     }
-                    new CopyFilesDialogTask(context, new CopyFilesDialogListener() {
-                        @Override
-                        public void onCopyCompleted(Result resultCode) {
-                            switch(resultCode) {
-                            case SUCCESS:
-                                if (mListener != null) {
-                                    mListener.onSuccess();
-                                }
-                                break;
-                            case NO_FILE_SELECTED:      // This is pretty much impossible to happen
-                                alert(R.string.message_copy_failed_no_files);
-                                break;
-                            case NO_SPACE_ERROR:
-                                alert(R.string.message_copy_failed_no_space);
-                                break;
-                            case COPY_ERROR:
-                                alert(R.string.message_copy_failed);
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-                    }, fileFilter, folderFilter).executeCopy(info);
+                    copyGameFiles(info, fileFilter, folderFilter, mListener);
                 }
             });
             setDialog(builder.create());
