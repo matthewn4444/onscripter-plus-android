@@ -180,6 +180,11 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             @Override
             public void option1Finished() {
             }
+
+            @Override
+            public void oneGameCopyFinished(String gamepath) {
+                startONScripter(gamepath);
+            }
         });
         createDirectoryBrowserDialog();
         createSaveDirectoryBrowserDialog();
@@ -596,10 +601,14 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             File saveFolder = ExtSDCardFix.getSaveFolder(this);
             if (saveFolder != null) {
                 // The game folder name is also in the save folder, use this save directory
-                final String thatFolder = saveFolder + "/" + new File(path).getName();
+                final File gameFile = new File(path);
+                final String thatFolder = saveFolder + "/" + gameFile.getName();
                 if (new File(thatFolder).exists()) {
                     b.putString(ONScripter.SAVE_DIRECTORY_EXTRA, thatFolder);
                     showFixDialog = false;
+                } else {
+                    mFix.moveOneGameSave(gameFile);
+                    return;
                 }
             } else {
                 updateSaveFolderItemVisibility();
