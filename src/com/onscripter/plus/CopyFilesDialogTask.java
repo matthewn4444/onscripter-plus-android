@@ -123,6 +123,7 @@ public final class CopyFilesDialogTask {
         private TextView mRemainingText;
         private long mCurrentSumBytes;
         private boolean mCurrentSetHasOverwrite;
+        private AlertDialog mChooseDialog;
 
         public InternalFileSpaceDialogTask() {
             super(mCtx, mCtx.getString(R.string.dialog_scan_files_title), true);
@@ -165,6 +166,7 @@ public final class CopyFilesDialogTask {
 
         private void updateAndRecalculateList() {
             mRemainingText.setText(Formatter.formatFileSize(mCtx, mRemainingInternalBytes - mCurrentSumBytes));
+            boolean atLeastOneSelected = false;
 
             for (int i = 0; i < mFileListView.getChildCount(); i++) {
                 CheckedTextView tv = (CheckedTextView)mFileListView.getChildAt(i);
@@ -174,8 +176,11 @@ public final class CopyFilesDialogTask {
                     } else {
                         tv.setEnabled(true);
                     }
+                } else {
+                    atLeastOneSelected = true;
                 }
             }
+            mChooseDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(atLeastOneSelected);
         }
 
         @SuppressWarnings("deprecation")
@@ -254,7 +259,7 @@ public final class CopyFilesDialogTask {
                 });
 
                 // Build the dialog and attach the layout
-                Dialog dialog = new AlertDialog.Builder(mCtx)
+                mChooseDialog = new AlertDialog.Builder(mCtx)
                     .setTitle(R.string.dialog_select_files_copy_title)
                     .setView(view)
                     .setCancelable(false)
@@ -281,13 +286,13 @@ public final class CopyFilesDialogTask {
                     })
                     .create();
 
-                dialog.setOnShowListener(new OnShowListener() {
+                mChooseDialog.setOnShowListener(new OnShowListener() {
                     @Override
                     public void onShow(DialogInterface dialog) {
                         updateAndRecalculateList();
                     }
                 });
-                dialog.show();
+                mChooseDialog.show();
             }
         }
     }
