@@ -52,6 +52,7 @@ public final class CopyFilesDialogTask {
     private final CopyFilesDialogListener mListener;
     private CopyFileInfo[] mInfo;
     private boolean mIsRunning;
+    private boolean mAtLeastSetCopy;
     private final int mExtSDCardPathLength;
     private final FileFilter mFileFilter;
     private final FileFilter mDirectoryFilter;
@@ -98,7 +99,7 @@ public final class CopyFilesDialogTask {
     }
 
     private void scanFinished(long totalBytes) {
-        if (totalBytes > 0L) {
+        if (mAtLeastSetCopy) {
             new InternalCopyDialogTask(totalBytes).execute();
         } else {
             scanFinishedUnsuccessfully(Result.NO_FILE_SELECTED);
@@ -149,6 +150,7 @@ public final class CopyFilesDialogTask {
                     mCurrentSetHasOverwrite = true;
                 }
                 totalBytes += source.length();
+                mAtLeastSetCopy = true;
             } else {
                 if (mDirectoryFilter != null && !mDirectoryFilter.accept(source)) {
                     return 0;
@@ -187,6 +189,7 @@ public final class CopyFilesDialogTask {
         @Override
         protected Long doInBackground(Void... params) {
             long bytes = 0;
+            mAtLeastSetCopy = false;
 
             // Scan files
             for (int i = 0; i < mInfo.length; i++) {
