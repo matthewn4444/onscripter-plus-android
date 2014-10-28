@@ -10,7 +10,6 @@ import java.util.Random;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -18,6 +17,9 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -35,7 +37,7 @@ public final class ExtSDCardFix {
     private final Activity mActivity;
     private final FileSystemAdapter mAdapter;
     private OnSDCardFixListener mListener;
-    private Dialog mFixDialog;
+    private AlertDialog mFixDialog;
     private SharedPreferences mPrefs;
 
     private static String SETTINGS_SAVE_FOLDER_KEY;
@@ -156,6 +158,7 @@ public final class ExtSDCardFix {
      * this there are 3 options to bypass the situation.
      */
     public void showFixDialog() {
+        boolean alreadyBuilt = true;
         if (mFixDialog == null) {
             String[] options = mActivity.getResources().getStringArray(R.array.dialog_opt_fix_sd_card_write);
             final ListAdapter adapter = new ArrayAdapter<String>(mActivity, R.layout.radiobutton_choice_item, options);
@@ -188,8 +191,21 @@ public final class ExtSDCardFix {
                         })
                         .setNeutralButton(android.R.string.cancel, null)
                         .create();
+
+            listview.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                        int position, long id) {
+                    listview.setOnItemClickListener(null);
+                    mFixDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+                }
+            });
+            alreadyBuilt = false;
         }
         mFixDialog.show();
+        if (!alreadyBuilt) {
+            mFixDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        }
     }
 
     /**
