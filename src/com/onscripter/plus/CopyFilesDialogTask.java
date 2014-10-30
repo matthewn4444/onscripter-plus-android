@@ -53,7 +53,8 @@ public final class CopyFilesDialogTask {
     private CopyFileInfo[] mInfo;
     private boolean mIsRunning;
     private boolean mAtLeastSetCopy;
-    private final int mExtSDCardPathLength;
+    private boolean mSrcFromInternalStorage;        // This limits all src to come from same storage and same for dst
+    private int mStoragePathLength = 0;
     private final FileFilter mFileFilter;
     private final FileFilter mDirectoryFilter;
     private final FileFilter mOverwriteFilter;
@@ -70,11 +71,15 @@ public final class CopyFilesDialogTask {
         mDirectoryFilter = directoryFilter;
         mOverwriteFilter = overwriteFilter;
         mIsRunning = false;
-        mExtSDCardPathLength = Environment2.getExternalSDCardDirectory().getPath().length();
     }
 
     public void executeCopy(CopyFileInfo[] info) {
         if (info.length > 0) {
+            String internalStorage = Environment2.getInternalStorageDirectory().getAbsolutePath();
+            String sourcePath = new File(info[0].source).getAbsolutePath();
+            mSrcFromInternalStorage = sourcePath.startsWith(internalStorage);
+            mStoragePathLength = mSrcFromInternalStorage ? internalStorage.length() :
+                Environment2.getExternalSDCardDirectory().getPath().length();
             synchronized (this) {
                 if (mIsRunning) {
                     return;
@@ -206,14 +211,15 @@ public final class CopyFilesDialogTask {
                 if (mCurrentSetHasOverwrite) {
                     formattedSize += " <font color='red'>" + mCtx.getString(R.string.dialog_override_files) + "</font>";
                 }
-                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mExtSDCardPathLength) + "</b><br><small>+" + formattedSize + "</small>");
+                Spanned listing = Html.fromHtml("<b>" + mInfo[i].source.substring(mStoragePathLength) + "</b><br><small>+" + formattedSize + "</small>");
                 mListing.add(new Pair<Spanned, Long>(listing, b));
             }
 
             // Read remaining memory on internal storage
-            File path = Environment2.getInternalStorageDirectory();
+            File path = mSrcFromInternalStorage ? Environment2.getExternalSDCardDirectory()
+                    : Environment2.getInternalStorageDirectory();
             StatFs stat = new StatFs(path.getPath());
-            mRemainingInternalBytes = stat.getBlockSize() * stat.getAvailableBlocks();
+            mRemainingInternalBytes = (long)stat.getBlockSize() * (long)stat.getAvailableBlocks();
             return bytes;
         }
 
@@ -423,7 +429,7 @@ public final class CopyFilesDialogTask {
             OutputStream out = null;
             int copiedLen = 0;
             mCurrentFileTotalSize = source.length();
-            mCurrentFile = source.getPath().substring(mExtSDCardPathLength);
+            mCurrentFile = source.getPath().substring(mStoragePathLength);
             mCurrentFilePercentage = 0;
             try {
                 in = new FileInputStream(source);
