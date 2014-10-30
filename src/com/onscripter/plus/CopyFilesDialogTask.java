@@ -229,7 +229,7 @@ public final class CopyFilesDialogTask {
             super.onPostExecute(totalBytes);
 
             // Show the choose dialog and tell users if any files are overwritten
-            if (mInfo.length == 1) {
+            if (mInfo.length == 1 && mRemainingInternalBytes < mListing.get(0).second) {
                 // Only copying one file and there is no more space, can't copy then
                 scanFinishedUnsuccessfully(Result.NO_SPACE_ERROR);
             } else {
