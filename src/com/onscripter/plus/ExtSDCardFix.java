@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
@@ -48,6 +49,7 @@ public final class ExtSDCardFix {
         public void option2Finished();
         public void option3Finished();
         public void oneGameCopyFinished(String gamepath);
+        public void copySaveFilesBack();
     }
 
     // For us to scan, user must be in the following state:
@@ -142,13 +144,78 @@ public final class ExtSDCardFix {
 
             // If there are currently games listed and in external sd card location
             // and no save folder in pref, show this dialog
-            if (needsFix() && getSaveFolder(mActivity) == null) {
-                showFixDialog();
+            File saveFolder = getSaveFolder(mActivity);
+            if (needsFix()) {
+                if (saveFolder == null) {
+                    showFixDialog();
+                }
+            } else if (isKitKatOrHigher() && sExtSDCardWritable && saveFolder != null) {
+                promptToCopySaveFilesBack();
             }
 
             if (mListener != null) {
                 mListener.writeTestFinished();
             }
+        }
+    }
+
+    private void copySaveFilesBackFinished() {
+        alert(R.string.message_user_handle_left_over_saves);
+        mPrefs.edit().remove(SETTINGS_SAVE_FOLDER_KEY).apply();
+        if (mListener != null) {
+            mListener.copySaveFilesBack();
+        }
+    }
+
+    private void promptToCopySaveFilesBack() {
+        // Look for common folders from both directories
+        final File saveFolder = getSaveFolder(mActivity);
+        final ArrayList<CopyFileInfo> commonFolders = new ArrayList<CopyFileInfo>();
+        File folder = mAdapter.getCurrentDirectory();
+        File[] files = folder.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                File src = new File(saveFolder + "/" + file.getName());
+                if (src.exists() && src.isDirectory()) {
+                    commonFolders.add(new CopyFileInfo(src.getAbsolutePath(), file.getAbsolutePath()));
+                }
+            }
+        }
+
+        // Regardless what the user chooses, the
+        if (!commonFolders.isEmpty()) {
+            // Before wasn't able to save and now they can, move save files back
+            new AlertDialog.Builder(mActivity)
+                .setMessage(R.string.message_move_save_files_back)
+                .setPositiveButton(android.R.string.ok, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        CopyFileInfo[] info = commonFolders.toArray(new CopyFileInfo[commonFolders.size()]);
+                        copyGameFiles(info, CopyGameFileFF, new FileFilter() {
+                            @Override
+                            public boolean accept(File pathname) {
+                                return pathname.getParentFile().equals(saveFolder) // If parent is current directory
+                                        || pathname.getName().toLowerCase(                  // If folder starts with save
+                                                Locale.getDefault()).startsWith("save");
+                            }
+                        }, CopyGameFileFF,
+                                new OnCopyRoutineFinished() {
+                            @Override
+                            public void onSuccess() {
+                                copySaveFilesBackFinished();
+                            }
+                        });
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        copySaveFilesBackFinished();
+                    }
+                })
+                .show();
+        } else {
+            copySaveFilesBackFinished();
         }
     }
 
