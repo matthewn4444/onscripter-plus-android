@@ -54,6 +54,8 @@
     <string name="message_copy_failed_no_files">There are no files to copy.</string>
     <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
     <string name="message_save_folder_missing">Save folder does not exist.</string>
+    <string name="message_move_save_files_back">You can now write to SDCard and you have save files in internal storage, would you like to move them back to this folder?.</string>
+    <string name="message_user_handle_left_over_saves">You will have to copy the left over saves. This application will read the save files from the game folders and not from the save folder anymore.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>

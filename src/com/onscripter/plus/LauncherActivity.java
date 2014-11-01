@@ -162,6 +162,10 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             public void oneGameCopyFinished(String gamepath) {
                 startONScripter(gamepath);
             }
+            @Override
+            public void copySaveFilesBack() {
+                updateSaveFolderItemVisibility();
+            }
         });
         createDirectoryBrowserDialog();
         createSaveDirectoryBrowserDialog();
