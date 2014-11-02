@@ -51,6 +51,7 @@ public final class CopyFilesDialogTask {
     private final Context mCtx;
     private final CopyFilesDialogListener mListener;
     private CopyFileInfo[] mInfo;
+    private final boolean mAllowUserChoice;
     private boolean mIsRunning;
     private boolean mAtLeastSetCopy;
     private boolean mSrcFromInternalStorage;        // This limits all src to come from same storage and same for dst
@@ -65,11 +66,17 @@ public final class CopyFilesDialogTask {
 
     public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener,
             FileFilter fileFilter, FileFilter directoryFilter, FileFilter overwriteFilter) {
+        this(ctx, listener, fileFilter, directoryFilter, overwriteFilter, true);
+    }
+
+    public CopyFilesDialogTask(Context ctx, CopyFilesDialogListener listener,
+            FileFilter fileFilter, FileFilter directoryFilter, FileFilter overwriteFilter, boolean allowUserChoice) {
         mCtx = ctx;
         mListener = listener;
         mFileFilter = fileFilter;
         mDirectoryFilter = directoryFilter;
         mOverwriteFilter = overwriteFilter;
+        mAllowUserChoice = allowUserChoice;
         mIsRunning = false;
     }
 
@@ -232,7 +239,7 @@ public final class CopyFilesDialogTask {
             if (mInfo.length == 1 && mRemainingInternalBytes < mListing.get(0).second) {
                 // Only copying one file and there is no more space, can't copy then
                 scanFinishedUnsuccessfully(Result.NO_SPACE_ERROR);
-            } else {
+            } else if (mAllowUserChoice) {
                 // Inflate the dialog
                 LayoutInflater inflater = (LayoutInflater) mCtx.getSystemService( Context.LAYOUT_INFLATER_SERVICE);
                 LinearLayout view = (LinearLayout) inflater.inflate(R.layout.selective_file_dialog, null);
@@ -302,6 +309,8 @@ public final class CopyFilesDialogTask {
                     }
                 });
                 mChooseDialog.show();
+            } else {
+                scanFinished(totalBytes);
             }
         }
     }
