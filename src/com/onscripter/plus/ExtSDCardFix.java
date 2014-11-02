@@ -307,7 +307,7 @@ public final class ExtSDCardFix {
         final CopyFileInfo[] info = new CopyFileInfo[] {
                 new CopyFileInfo(filepath.getAbsolutePath(), saveFolder + "/" + name)
         };
-        copyGameFiles(info, CopyGameFileFF, CopyGameFolderFF, CopyGameFileFF,
+        copyGameFiles(info, CopyGameFileFF, CopyGameFolderFF, CopyGameFileFF, false,
                 new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
@@ -498,6 +498,11 @@ public final class ExtSDCardFix {
     private void copyGameFiles(CopyFileInfo[] info, final FileFilter fileFilter,
             final FileFilter folderFilter, final FileFilter overwriteFilter,
             final OnCopyRoutineFinished listener) {
+        copyGameFiles(info, fileFilter, folderFilter, overwriteFilter, true, listener);
+    }
+    private void copyGameFiles(CopyFileInfo[] info, final FileFilter fileFilter,
+            final FileFilter folderFilter, final FileFilter overwriteFilter,
+            final boolean allowUserChoice, final OnCopyRoutineFinished listener) {
         new CopyFilesDialogTask(mActivity, new CopyFilesDialogListener() {
             @Override
             public void onCopyCompleted(Result resultCode) {
@@ -520,7 +525,7 @@ public final class ExtSDCardFix {
                     break;
                 }
             }
-        }, fileFilter, folderFilter, overwriteFilter).executeCopy(info);
+        }, fileFilter, folderFilter, overwriteFilter, allowUserChoice).executeCopy(info);
     }
 
     private interface OnCopyRoutineFinished {
