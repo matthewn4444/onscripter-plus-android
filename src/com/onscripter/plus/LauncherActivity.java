@@ -183,7 +183,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
 
             @Override
             public void oneGameCopyFinished(String gamepath) {
-                startONScripter(gamepath);
+                startONScripterCheckFont(gamepath);
             }
             @Override
             public void copySaveFilesBack() {
@@ -576,18 +576,22 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         }
 
         if (isDirectoryONScripterGame(currentDir)) {
-            // Use default font if there is none in the game folder
-            if (new File(currentDir + "/" + DEFAULT_FONT_FILE_NAME).exists()) {
-                startONScripter(currentDir.getPath());
-            } else {
-                if (mCopyTask != null) {    // Still copying, so wait till finished then run
-                    mCopyTask.runNovelWhenFinished(currentDir.getPath());
-                } else {
-                    startONScripter(currentDir.getPath(), true);
-                }
-            }
+            startONScripterCheckFont(currentDir.getPath());
         } else {
             mAdapter.setChildAsCurrent(position);
+        }
+    }
+
+    private void startONScripterCheckFont(String currentDir) {
+        // Use default font if there is none in the game folder
+        if (new File(currentDir + "/" + DEFAULT_FONT_FILE_NAME).exists()) {
+            startONScripter(currentDir);
+        } else {
+            if (mCopyTask != null) {    // Still copying, so wait till finished then run
+                mCopyTask.runNovelWhenFinished(currentDir);
+            } else {
+                startONScripter(currentDir, true);
+            }
         }
     }
 
