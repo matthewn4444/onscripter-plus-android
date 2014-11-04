@@ -204,6 +204,10 @@ public final class ExtSDCardFix {
                             public void onSuccess() {
                                 copySaveFilesBackFinished();
                             }
+                            @Override
+                            public void onDialogCancel() {
+                                copySaveFilesBackFinished();
+                            }
                         });
                     }
                 })
@@ -521,6 +525,11 @@ public final class ExtSDCardFix {
                 case COPY_ERROR:
                     alert(R.string.message_copy_failed);
                     break;
+                case CANCELLED:
+                    if (listener != null) {
+                        listener.onDialogCancel();
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -528,8 +537,9 @@ public final class ExtSDCardFix {
         }, fileFilter, folderFilter, overwriteFilter, allowUserChoice).executeCopy(info);
     }
 
-    private interface OnCopyRoutineFinished {
-        public void onSuccess();
+    private abstract class OnCopyRoutineFinished {
+        public abstract void onSuccess();
+        public void onDialogCancel() {}
     }
 
     private class CopyToInternalStorageRoutine extends FolderBrowserDialogWrapper {
