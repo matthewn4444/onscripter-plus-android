@@ -35,13 +35,17 @@ public final class ExtSDCardFix {
     private static boolean sExtSDCardWritable = true;
     private static boolean sAlreadyScanned = false;
 
+    private static boolean sHasInit = false;
+    private static Object sSaveFolderLock = new Object();
+    private static File sSaveFolder = null;
+
     private final Activity mActivity;
     private final FileSystemAdapter mAdapter;
     private OnSDCardFixListener mListener;
     private AlertDialog mFixDialog;
     private SharedPreferences mPrefs;
 
-    private static String SETTINGS_SAVE_FOLDER_KEY;
+    private static final String SETTINGS_SAVE_FOLDER_KEY = App.string(R.string.settings_save_folder_key);
 
     interface OnSDCardFixListener {
         public void writeTestFinished();
@@ -72,10 +76,6 @@ public final class ExtSDCardFix {
         mAdapter = adapter;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
 
-        if (SETTINGS_SAVE_FOLDER_KEY == null) {
-            SETTINGS_SAVE_FOLDER_KEY = activity.getString(R.string.settings_save_folder_key);
-        }
-
         // Don't rescan if already scanned
         synchronized (ExtSDCardFix.this) {
             if (sAlreadyScanned) {
@@ -102,21 +102,55 @@ public final class ExtSDCardFix {
         mListener = listener;
     }
 
-    public static File getSaveFolder(Context ctx) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-        String key = ctx.getString(R.string.settings_save_folder_key);
-        String saveFolder = prefs.getString(key, null);
-        if (saveFolder == null) {
-            return null;
-        }
-        File saveFolderFile = new File(saveFolder);
+    /**
+     * Get the save folder where save files may exist
+     * @return null if no save folder exists
+     */
+    public static File getSaveFolder() {
+        ensureInit();
+        return sSaveFolder;
+    }
 
-        // If does not exist, then remove the key from pref
-        if (!saveFolderFile.exists()) {
-            prefs.edit().remove(key).apply();
-            return null;
+    /**
+     * Set the save folder and check if it exists
+     * @param path
+     */
+    public static void setSaveFolder(String path) {
+        synchronized (sSaveFolderLock) {
+            sSaveFolder = path != null ? new File(path) : null;
+            verifySaveFileExistance();
+            if (sSaveFolder != null) {
+                PreferenceManager.getDefaultSharedPreferences(App.getContext())
+                    .edit().putString(SETTINGS_SAVE_FOLDER_KEY, path).apply();
+            }
         }
-        return saveFolderFile;
+    }
+
+    /**
+     * Sets up the save folder
+     */
+    private static void ensureInit() {
+        if (!sHasInit) {
+            synchronized (sSaveFolderLock) {
+                if (!sHasInit) {
+                    sHasInit = true;
+                    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(App.getContext());
+                    String sf = pref.getString(SETTINGS_SAVE_FOLDER_KEY, null);
+                    if (sf != null) {
+                        sSaveFolder = new File(sf);
+                        verifySaveFileExistance();
+                    }
+                }
+            }
+        }
+    }
+
+    private static void verifySaveFileExistance() {
+        if (sSaveFolder == null || sSaveFolder != null && !sSaveFolder.exists()) {
+            PreferenceManager.getDefaultSharedPreferences(App.getContext())
+                .edit().remove(SETTINGS_SAVE_FOLDER_KEY).apply();
+            sSaveFolder = null;
+        }
     }
 
     private static boolean isKitKatOrHigher() {
@@ -144,7 +178,7 @@ public final class ExtSDCardFix {
 
             // If there are currently games listed and in external sd card location
             // and no save folder in pref, show this dialog
-            File saveFolder = getSaveFolder(mActivity);
+            File saveFolder = getSaveFolder();
             if (needsFix()) {
                 if (saveFolder == null) {
                     showFixDialog();
@@ -161,7 +195,7 @@ public final class ExtSDCardFix {
 
     private void copySaveFilesBackFinished() {
         alert(R.string.message_user_handle_left_over_saves);
-        mPrefs.edit().remove(SETTINGS_SAVE_FOLDER_KEY).apply();
+        setSaveFolder(null);
         if (mListener != null) {
             mListener.copySaveFilesBack();
         }
@@ -169,7 +203,7 @@ public final class ExtSDCardFix {
 
     private void promptToCopySaveFilesBack() {
         // Look for common folders from both directories
-        final File saveFolder = getSaveFolder(mActivity);
+        final File saveFolder = getSaveFolder();
         final ArrayList<CopyFileInfo> commonFolders = new ArrayList<CopyFileInfo>();
         File folder = mAdapter.getCurrentDirectory();
         File[] files = folder.listFiles();
@@ -306,7 +340,7 @@ public final class ExtSDCardFix {
      */
     public void moveOneGameSave(final File filepath) {
         String name = filepath.getName();
-        String saveFolder = mPrefs.getString(SETTINGS_SAVE_FOLDER_KEY, null);
+        File saveFolder = getSaveFolder();
 
         final CopyFileInfo[] info = new CopyFileInfo[] {
                 new CopyFileInfo(filepath.getAbsolutePath(), saveFolder + "/" + name)
@@ -481,8 +515,7 @@ public final class ExtSDCardFix {
                 alert(R.string.message_copy_saves_completed);
 
                 // Update the preferences with the new save folder
-                mPrefs.edit().putString(SETTINGS_SAVE_FOLDER_KEY,
-                        result.getAbsolutePath()).apply();
+                setSaveFolder(result.getAbsolutePath());
 
                 if (mListener != null) {
                     mListener.option2Finished();

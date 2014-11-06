@@ -342,9 +342,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         builder.setPositiveButton(R.string.dialog_select_button_text, new OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                mPrefs.edit()
-                .putString(getString(R.string.settings_save_folder_key),
-                        mSaveDirBrowse.getResultDirectory().getPath()).apply();
+                ExtSDCardFix.setSaveFolder(mSaveDirBrowse.getResultDirectory().getAbsolutePath());
             }
         });
         builder.setNegativeButton(android.R.string.cancel, null);
@@ -385,9 +383,9 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void updateSaveFolderItemVisibility() {
-        File file = ExtSDCardFix.getSaveFolder(this);
+        File file = ExtSDCardFix.getSaveFolder();
         mMenu.findItem(R.id.action_change_save_folder).setVisible(
-                ExtSDCardFix.getSaveFolder(this) != null);
+                ExtSDCardFix.getSaveFolder() != null);
     }
 
     @Override
@@ -418,7 +416,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
             }
         case R.id.action_change_save_folder:
-            File saveFolder = ExtSDCardFix.getSaveFolder(this);
+            File saveFolder = ExtSDCardFix.getSaveFolder();
             if (saveFolder != null) {
                 mSaveDirBrowse.show(saveFolder.getAbsolutePath());
             } else {
@@ -606,7 +604,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         // If the current game cannot save, then launch the fix dialog
         if (mFix.needsFix()) {
             // Fix #2: Check if this game has a folder in save directory, then use that
-            File saveFolder = ExtSDCardFix.getSaveFolder(this);
+            File saveFolder = ExtSDCardFix.getSaveFolder();
             if (saveFolder != null) {
                 // The game folder name is also in the save folder, use this save directory
                 final File gameFile = new File(path);
