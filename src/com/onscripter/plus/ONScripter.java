@@ -129,7 +129,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         updateControlPreferences();
 
-        mVNPrefs = new VNPreferences(mCurrentDirectory);
+        mVNPrefs = ExtSDCardFix.getGameVNPreference(mCurrentDirectory);
         mVNPrefs.setOnLoadVNPrefListener(this);
 
         mLeftLayout.setOtherLayout(mRightLayout);

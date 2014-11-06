@@ -127,6 +127,30 @@ public final class ExtSDCardFix {
     }
 
     /**
+     * Get's the games current VNPreference file (pref.xml) handler.
+     * This will choose the preference file from save folder if the file
+     * exists inside the game's folder in the save folder's path
+     * Will return null only if there is no game folder in the save folder
+     * when save folder exists
+     * @param ctx
+     * @param path to the game
+     * @return an instance of VNPreference pointing to the preference file
+     */
+    public static VNPreferences getGameVNPreference(String path) {
+        File saveFolder = getSaveFolder();
+        File pathFile = new File(path);
+        if (folderNeedsFix(pathFile.getParentFile())) {
+            File thatFolder = new File(saveFolder + "/" + pathFile.getName());
+            if (thatFolder.exists()) {
+                return new VNPreferences(thatFolder.getAbsolutePath());
+            } else {
+                return null;
+            }
+        }
+        return new VNPreferences(path);
+    }
+
+    /**
      * Sets up the save folder
      */
     private static void ensureInit() {

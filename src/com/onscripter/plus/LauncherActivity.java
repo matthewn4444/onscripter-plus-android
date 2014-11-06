@@ -166,6 +166,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             @Override
             public void writeTestFinished() {
                 mChangeLog = new ChangeLog(LauncherActivity.this);
+                ParseGameInfoTask.start();
             }
 
             @Override
@@ -745,6 +746,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             synchronized (sParseGameInfoTaskQueue) {
                 sParseGameInfoTaskQueue.add(gamePath);
             }
+        }
+        public static void start() {
             runJob();
         }
         private static void runJob() {
@@ -769,10 +772,13 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         @Override
         protected Void doInBackground(Void... params) {
             if (mGamePath != null) {
-                final VNPreferences pref = new VNPreferences(mGamePath);
+                final VNPreferences pref = ExtSDCardFix.getGameVNPreference(mGamePath);
 
                 // Get the name of game
-                String name = pref.getString(GAME_PREF_NAME_KEY, null);
+                String name = null;
+                if (pref != null) {
+                    name = pref.getString(GAME_PREF_NAME_KEY, null);
+                }
                 if (name == null) {
                     name = ONScripterView.getGameName(mGamePath);
 
@@ -786,8 +792,10 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                     }
 
                     // Save the name into the preferences
-                    pref.putString(GAME_PREF_NAME_KEY, name);
-                    pref.commit();
+                    if (pref != null) {
+                        pref.putString(GAME_PREF_NAME_KEY, name);
+                        pref.commit();
+                    }
                 }
             }
             return null;
