@@ -2,15 +2,18 @@ package com.onscripter.plus;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
 
+import jrummy.sdfix.SDFix;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -22,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckedTextView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -51,7 +55,6 @@ public final class ExtSDCardFix {
         public void writeTestFinished();
         public void option1Finished();
         public void option2Finished();
-        public void option3Finished();
         public void oneGameCopyFinished(String gamepath);
         public void copySaveFilesBack();
     }
@@ -313,7 +316,7 @@ public final class ExtSDCardFix {
                                     option2CopyGameSaveFiles();
                                     break;
                                 case 2:
-                                    // TODO apply root sd card fix
+                                    option3SetSystemWritable();
                                     break;
                                 }
                             }
@@ -547,6 +550,137 @@ public final class ExtSDCardFix {
             }
         });
         routine.execute();
+    }
+
+    /* Option 3: Needs Root; make external SD card writable again by editing system preference files */
+    private void option3SetSystemWritable() {
+        // Warn the user and ask the them if they want this app to modify the system files
+        LayoutInflater inflator = mActivity.getLayoutInflater();
+        View content = inflator.inflate(R.layout.sdcard_fix_su_dialog, null);
+
+        final AlertDialog dialog = new AlertDialog.Builder(mActivity)
+            .setTitle(R.string.app_name)
+            .setView(content)
+            .setCancelable(false)
+            .setNegativeButton(R.string.dialog_back_button_text, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showFixDialog();
+                }
+            })
+            .setPositiveButton(R.string.dialog_next_button_text, new OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    applyRootSDCardFix();
+                }
+            })
+            .show();
+
+        final CheckedTextView chbxView = (CheckedTextView)content.findViewById(R.id.agree_checkbox);
+        chbxView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                chbxView.setChecked(!chbxView.isChecked());
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(chbxView.isChecked());
+            }
+        });
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(chbxView.isChecked());
+    }
+
+    /**
+     * If user has root, this will fix the external sdcard writing issues introduced in
+     * kitkat on some devices. This also shows UI and at the end prompts the user
+     * to reboot the device.
+     *
+     * This uses code form jrummy.sdfix to apply the permissions fix. All it does is
+     * adds a line "<group gid=\"media_rw\" />" in "/system/etc/permissions/platform.xml"
+     * so that on the next reboot, the user will have permission to write to external
+     * sdcard.
+     */
+    private void applyRootSDCardFix() {
+        try {
+            if (SDFix.isRemovableStorageWritableFixApplied()) {
+                // We can only get called here if user has not yet restarted the
+                // phone after applying the fix
+                alert(R.string.message_su_sdcard_fix_exists_no_write);
+                return;
+            }
+        } catch (FileNotFoundException e2) {
+            e2.printStackTrace();
+            alert(R.string.message_su_sdcard_fix_no_file);
+            return;
+        } catch (IOException e2) {
+            e2.printStackTrace();
+            alert(R.string.message_su_sdcard_fix_issue);
+            return;
+        }
+
+        // Run the external sdcard fix
+        final ProgressDialog progressDialog = new ProgressDialog(mActivity);
+        progressDialog.setMessage(mActivity.getString(R.string.dialog_su_sdcard_fix_applying));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        new Thread() {
+            @Override
+            public void run() {
+                boolean isFixed = false;
+                boolean notFoundThrown = false;
+                boolean ioThrown = false;
+                try {
+                    isFixed = SDFix.fixPermissions(mActivity);
+                } catch (IOException e) {
+                    try {
+                        isFixed = SDFix.isRemovableStorageWritableFixApplied();
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                        notFoundThrown = true;
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                        ioThrown = true;
+                    }
+                }
+                final boolean[] results = {isFixed, notFoundThrown, ioThrown};
+                mActivity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressDialog.dismiss();
+                        if (results[1]) {
+                            // Check for FileNotFoundException
+                            alert(R.string.message_su_sdcard_fix_no_file);
+                        } else if (results[2]) {
+                            // Check for IOException
+                            alert(R.string.message_su_sdcard_fix_issue);
+                        } else if (results[0]) {
+                            // Worked fine, tell the user either to close app or reboot the phone
+                            new AlertDialog.Builder(mActivity)
+                                .setTitle(R.string.app_name)
+                                .setCancelable(false)
+                                .setMessage(R.string.message_restart_device)
+                                .setNegativeButton(R.string.dialog_close_app, new OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface arg0, int arg1) {
+                                        mActivity.finish();
+                                    }
+                                })
+                                .setPositiveButton(R.string.dialog_reboot, new OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        try {
+                                            Runtime.getRuntime().exec(new String[]{"su","-c","reboot now"});
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                })
+                                .show();
+                        } else {
+                            // Failed to work
+                            alert(R.string.message_su_sdcard_fix_issue);
+                        }
+                    }
+                });
+            }
+        }.start();
     }
 
     /**
