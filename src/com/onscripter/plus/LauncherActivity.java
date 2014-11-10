@@ -147,10 +147,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             }
 
             @Override
-            public void option3Finished() {
-            }
-
-            @Override
             public void option2Finished() {
                 updateSaveFolderItemVisibility();
             }

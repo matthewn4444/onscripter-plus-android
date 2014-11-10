@@ -56,6 +56,10 @@
     <string name="message_save_folder_missing">Save folder does not exist.</string>
     <string name="message_move_save_files_back">You can now write to SDCard and you have save files in internal storage, would you like to move them back to this folder?.</string>
     <string name="message_user_handle_left_over_saves">You will have to copy the left over saves. This application will read the save files from the game folders and not from the save folder anymore.</string>
+    <string name="message_su_sdcard_fix_no_file">Cannot fix write permissions for external SDCard because plaform.xml does not exist.</string>
+    <string name="message_su_sdcard_fix_exists_no_write">Cannot apply fix to system, have you tried to reboot? If you already tried to reboot, please report this to matthewn4444@gmail.com.</string>
+    <string name="message_su_sdcard_fix_issue">Unable to change system files. Please report this to matthewn4444@gmail.com.</string>
+    <string name="message_restart_device">For the changes to apply, please reboot the device.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -117,6 +121,10 @@
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_choose_save_folder_title">Choose a save folder</string>
     <string name="dialog_select_button_text">Select</string>
+    <string name="dialog_back_button_text">Back</string>
+    <string name="dialog_next_button_text">Next</string>
+    <string name="dialog_close_app">Close App</string>
+    <string name="dialog_reboot">Reboot</string>
     <string name="dialog_ext_not_found">Send matthewn4444@gmail.com sdcard location.</string>
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     <string name="dialog_create_new_folder">Create new folder</string>
@@ -130,6 +138,9 @@
     <string name="dialog_bytes_remaining">Available space left:</string>
     <string name="dialog_button_rate">Rate this App!</string>
     <string name="dialog_override_files">(Replacing some files)</string>
+    <string name="dialog_su_sdcard_fix_desc">This operation will fix writing to the external SD card. This will modify system files as a root user.\n\n<b>This app is not responsible for any issues for this phone and by accepting, you are responsible for any issues that may happen.</b>\n\nThis will write "media_rw" to groups in the file /system/etc/permissions/platform.xml under WRITE_EXTERNAL_STORAGE permission.</string>
+    <string name="dialog_su_sdcard_fix_checkbox">By selecting, you agree to allow this app to modify the system files with root access.</string>
+    <string name="dialog_su_sdcard_fix_applying">Applying fix&#8230;</string>
 
     <!-- Dialog Options -->
     <string-array name="dialog_opt_fix_sd_card_write">
