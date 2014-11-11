@@ -69,8 +69,7 @@ public final class ExtSDCardFix {
         if (currentPath.isFile()) {
             currentPath = currentPath.getParentFile();
         }
-        return isKitKatOrHigher() && !sExtSDCardWritable && Environment2.getExternalSDCardDirectory() != null
-                && currentPath.getPath().contains(Environment2.getExternalSDCardDirectory().getPath())
+        return isKitKatOrHigher() && !sExtSDCardWritable && isPathInExtSDCard(currentPath)
                 && getNumONScripterGames(currentPath).length > 0;
     }
 
@@ -180,6 +179,16 @@ public final class ExtSDCardFix {
         }
     }
 
+    /**
+     * Checks if provided path is within the external sdcard path
+     * @param file path
+     * @return
+     */
+    private static boolean isPathInExtSDCard(File file) {
+        return Environment2.getExternalSDCardDirectory() != null &&
+                file.getAbsolutePath().contains(Environment2.getExternalSDCardDirectory().getAbsolutePath());
+    }
+
     private static boolean isKitKatOrHigher() {
         return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT;
     }
@@ -211,7 +220,13 @@ public final class ExtSDCardFix {
                     showFixDialog();
                 }
             } else if (isKitKatOrHigher() && sExtSDCardWritable && saveFolder != null) {
-                promptToCopySaveFilesBack();
+                // Check to see if currently in external sdcard directory
+                if (isPathInExtSDCard(mAdapter.getCurrentDirectory())) {
+                    promptToCopySaveFilesBack();
+                } else {
+                    // Since we do not need to copy saves to internal storage, just output message
+                    copySaveFilesBackFinished();
+                }
             }
 
             if (mListener != null) {

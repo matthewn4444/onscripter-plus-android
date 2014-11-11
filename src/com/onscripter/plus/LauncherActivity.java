@@ -240,9 +240,11 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void updateSaveFolderItemVisibility() {
-        File file = ExtSDCardFix.getSaveFolder();
-        mMenu.findItem(R.id.action_change_save_folder).setVisible(
-                ExtSDCardFix.getSaveFolder() != null);
+        if (mMenu != null) {
+            File file = ExtSDCardFix.getSaveFolder();
+            mMenu.findItem(R.id.action_change_save_folder).setVisible(
+                    ExtSDCardFix.getSaveFolder() != null);
+        }
     }
 
     @Override

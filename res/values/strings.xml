@@ -55,7 +55,7 @@
     <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
     <string name="message_save_folder_missing">Save folder does not exist.</string>
     <string name="message_move_save_files_back">You can now write to SDCard and you have save files in internal storage, would you like to move them back to this folder?.</string>
-    <string name="message_user_handle_left_over_saves">You will have to copy the left over saves. This application will read the save files from the game folders and not from the save folder anymore.</string>
+    <string name="message_user_handle_left_over_saves">You are now able to write. You will have to copy the left over saves files to their original game folders. This application will read the save files from the game folders and not from the save folder anymore.</string>
     <string name="message_su_sdcard_fix_no_file">Cannot fix write permissions for external SDCard because plaform.xml does not exist.</string>
     <string name="message_su_sdcard_fix_exists_no_write">Cannot apply fix to system, have you tried to reboot? If you already tried to reboot, please report this to matthewn4444@gmail.com.</string>
     <string name="message_su_sdcard_fix_issue">Unable to change system files. Please report this to matthewn4444@gmail.com.</string>
