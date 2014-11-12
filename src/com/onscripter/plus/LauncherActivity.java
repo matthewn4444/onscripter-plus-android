@@ -598,32 +598,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
 
     private void startONScripter(String path, boolean useDefaultFont) {
         Bundle b = new Bundle();
-        boolean showFixDialog = true;
-
-        // If the current game cannot save, then launch the fix dialog
-        if (mFix.needsFix()) {
-            // Fix #2: Check if this game has a folder in save directory, then use that
-            File saveFolder = ExtSDCardFix.getSaveFolder();
-            if (saveFolder != null) {
-                // The game folder name is also in the save folder, use this save directory
-                final File gameFile = new File(path);
-                final String thatFolder = saveFolder + "/" + gameFile.getName();
-                if (new File(thatFolder).exists()) {
-                    b.putString(ONScripter.SAVE_DIRECTORY_EXTRA, thatFolder);
-                    showFixDialog = false;
-                } else {
-                    mFix.moveOneGameSave(gameFile);
-                    return;
-                }
-            } else {
-                updateSaveFolderItemVisibility();
-            }
-        } else {
-            showFixDialog = false;
-        }
-        if (showFixDialog) {
-            mFix.showFixDialog();
-        } else {
+        if (mFix.shouldLaunchGame(path, b)) {
             if (useDefaultFont) {
                 b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }
@@ -633,6 +608,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 return;
             }
             goToActivity(ONScripter.class, b);
+        } else {
+            updateSaveFolderItemVisibility();
         }
     }
 
