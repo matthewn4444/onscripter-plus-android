@@ -60,7 +60,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private ImageButton2 mMouseScrollUpButton;
     private ImageButton2 mMouseScrollDownButton;
 
-    private int mDisplayHeight, mGameHeight;
+    private int mDisplayHeight;
 
     private String mCurrentDirectory;
     private String mSaveDirectory;
@@ -284,7 +284,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     public int getGameHeight() {
-        return mGameHeight;
+        return mGame != null ? mGame.getGameHeight() : 0;
     }
 
     public int getGameFontSize() {
