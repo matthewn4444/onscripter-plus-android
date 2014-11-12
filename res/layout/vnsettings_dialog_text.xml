@@ -28,7 +28,8 @@
     <FrameLayout
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:padding="30dp"
+        android:paddingTop="30dp"
+        android:paddingLeft="30dp"
         android:layout_width="fill_parent">
         <TextView
             android:id="@+id/textPreview"
