@@ -12,8 +12,6 @@
     <string name="message_read_font_error">Не удалось загрузить шрифт!</string>
     <string name="message_cannot_write_pref">Внутренняя память заполнена и не может спасти.</string>
     <string name="message_folder_exists">Пожалуйста, выберите другое имя</string>
-    <string name="message_copy_completed">Копирование завершено. Папка по умолчанию переключается на внутреннюю память.</string>
-    <string name="message_copy_failed">Скопировать не удалось.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>
@@ -61,13 +59,6 @@
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
     <string name="dialog_create_new_folder">Создать новую папку</string>
-    <string name="dialog_fix_sd_card_write_title">Выбрать, как исправить проблемы сохранения</string>
-    <string name="dialog_scan_files_title">Сканирование файлов</string>
-    <string name="dialog_copy_files_title">Копирование файлов</string>
-    <string name="dialog_choose_copy_dst_title">Выбрать папку для копирования</string>
-    <string name="dialog_copy_files_filename">Файл:</string>
-    <string name="dialog_copy_files_filesize">Размер:</string>
-
     <string name="dialog_button_rate">Оцените приложение</string>
 
     <!-- Dialog Options -->
@@ -93,4 +84,15 @@
     <string name="dialog_settings_text_upscaling">Установите масштабирование текста</string>
     <string name="dialog_settings_text_upscaling_scale">Масштаб текста:</string>
     <string name="dialog_settings_text_upscaling_text">Русский 日本語</string>
+
+    <!-- External SD Card Fix -->
+    <string name="message_copy_completed">Копирование завершено. Папка по умолчанию переключается на внутреннюю память.</string>
+    <string name="message_copy_failed">Скопировать не удалось.</string>
+
+    <string name="dialog_fix_sd_card_write_title">Выбрать, как исправить проблемы сохранения</string>
+    <string name="dialog_scan_files_title">Сканирование файлов</string>
+    <string name="dialog_copy_files_title">Копирование файлов</string>
+    <string name="dialog_choose_copy_dst_title">Выбрать папку для копирования</string>
+    <string name="dialog_copy_files_filename">Файл:</string>
+    <string name="dialog_copy_files_filesize">Размер:</string>
 </resources>
