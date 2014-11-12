@@ -383,7 +383,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         if (mMenu != null) {
             File file = ExtSDCardFix.getSaveFolder();
             mMenu.findItem(R.id.action_change_save_folder).setVisible(
-                    ExtSDCardFix.getSaveFolder() != null);
+                    file != null && file.exists());
         }
     }
 
