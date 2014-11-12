@@ -161,32 +161,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mCopyTask.execute();
         }
 
-        mFix = new ExtSDCardFix(this, mAdapter);
-        mFix.setOnSDCardFixListener(new OnSDCardFixListener() {
-            @Override
-            public void writeTestFinished() {
-                mChangeLog = new ChangeLog(LauncherActivity.this);
-                ParseGameInfoTask.start();
-            }
-
-            @Override
-            public void option2Finished() {
-                updateSaveFolderItemVisibility();
-            }
-
-            @Override
-            public void option1Finished() {
-            }
-
-            @Override
-            public void oneGameCopyFinished(String gamepath) {
-                startONScripterCheckFont(gamepath);
-            }
-            @Override
-            public void copySaveFilesBack() {
-                updateSaveFolderItemVisibility();
-            }
-        });
+        initSDCardFix();
         createDirectoryBrowserDialog();
         createSaveDirectoryBrowserDialog();
         attachAds(listView);
@@ -385,6 +360,35 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mMenu.findItem(R.id.action_change_save_folder).setVisible(
                     file != null && file.exists());
         }
+    }
+
+    private void initSDCardFix() {
+        mFix = new ExtSDCardFix(this, mAdapter);
+        mFix.setOnSDCardFixListener(new OnSDCardFixListener() {
+            @Override
+            public void writeTestFinished() {
+                mChangeLog = new ChangeLog(LauncherActivity.this);
+                ParseGameInfoTask.start();
+            }
+
+            @Override
+            public void option2Finished() {
+                updateSaveFolderItemVisibility();
+            }
+
+            @Override
+            public void option1Finished() {
+            }
+
+            @Override
+            public void oneGameCopyFinished(String gamepath) {
+                startONScripterCheckFont(gamepath);
+            }
+            @Override
+            public void copySaveFilesBack() {
+                updateSaveFolderItemVisibility();
+            }
+        });
     }
 
     @Override
