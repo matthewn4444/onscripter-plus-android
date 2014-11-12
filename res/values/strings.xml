@@ -48,25 +48,11 @@
     <string name="message_read_font_error">Could not read font!</string>
     <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
-    <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
-    <string name="message_copy_saves_completed">Finished copying save files.</string>
-    <string name="message_copy_failed">Copy failed.</string>
-    <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy game files.</string>
-    <string name="message_copy_failed_no_files">There are no files to copy.</string>
-    <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
-    <string name="message_save_folder_missing">Save folder does not exist.</string>
-    <string name="message_move_save_files_back">You can now write to SDCard and you have save files in internal storage, would you like to move them back to this folder?.</string>
-    <string name="message_user_handle_left_over_saves">You are now able to write. You will have to copy the left over saves files to their original game folders. This application will read the save files from the game folders and not from the save folder anymore.</string>
-    <string name="message_su_sdcard_fix_no_file">Cannot fix write permissions for external SDCard because plaform.xml does not exist.</string>
-    <string name="message_su_sdcard_fix_exists_no_write">Cannot apply fix to system, have you tried to reboot? If you already tried to reboot, please report this to matthewn4444@gmail.com.</string>
-    <string name="message_su_sdcard_fix_issue">Unable to change system files. Please report this to matthewn4444@gmail.com.</string>
-    <string name="message_restart_device">For the changes to apply, please reboot the device.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
     <string name="menu_action_remove_ads">Remove Ads</string>
     <string name="menu_action_change_folder">Change Folder</string>
-    <string name="menu_action_change_save_folder">Change Save Folder</string>
 
     <!-- Settings -->
     <string name="settings_render_cate">Render</string>
@@ -121,7 +107,6 @@
 
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
-    <string name="dialog_choose_save_folder_title">Choose a save folder</string>
     <string name="dialog_select_button_text">Select</string>
     <string name="dialog_back_button_text">Back</string>
     <string name="dialog_next_button_text">Next</string>
@@ -131,26 +116,7 @@
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     <string name="dialog_please_wait">Please wait&#8230;</string>
     <string name="dialog_create_new_folder">Create new folder</string>
-    <string name="dialog_fix_sd_card_write_title">Choose how to fix saving</string>
-    <string name="dialog_scan_files_title">Scanning files</string>
-    <string name="dialog_copy_files_title">Copying files</string>
-    <string name="dialog_choose_copy_dst_title">Select copy destination</string>
-    <string name="dialog_copy_files_filename">File:</string>
-    <string name="dialog_copy_files_filesize">Size:</string>
-    <string name="dialog_select_files_copy_title">Select files to copy</string>
-    <string name="dialog_bytes_remaining">Available space left:</string>
     <string name="dialog_button_rate">Rate this App!</string>
-    <string name="dialog_override_files">(Replacing some files)</string>
-    <string name="dialog_su_sdcard_fix_desc">This operation will fix writing to the external SD card. This will modify system files as a root user.\n\n<b>This app is not responsible for any issues for this phone and by accepting, you are responsible for any issues that may happen.</b>\n\nThis will write "media_rw" to groups in the file /system/etc/permissions/platform.xml under WRITE_EXTERNAL_STORAGE permission.</string>
-    <string name="dialog_su_sdcard_fix_checkbox">By selecting, you agree to allow this app to modify the system files with root access.</string>
-    <string name="dialog_su_sdcard_fix_applying">Applying fix&#8230;</string>
-
-    <!-- Dialog Options -->
-    <string-array name="dialog_opt_fix_sd_card_write">
-        <item>Move your games to an internal storage folder</item>
-        <item>Move only your games\' save files to an internal storage folder</item>
-        <item>Apply the SD Card fix for this issue\n(needs root)</item>
-    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Controls</string>
@@ -177,4 +143,41 @@
 
     <!-- Game Pref Keys -->
     <string name="game_pref_name">game_name_key</string>
+
+    <!-- External SD Card Fix -->
+    <string name="message_copy_completed">Copy completed. The default folder has been switched to internal storage.</string>
+    <string name="message_copy_saves_completed">Finished copying save files.</string>
+    <string name="message_copy_failed">Copy failed.</string>
+    <string name="message_copy_failed_no_space">Internal file storage is full, cannot copy game files.</string>
+    <string name="message_copy_failed_no_files">There are no files to copy.</string>
+    <string name="message_kitkat_save_issue">Since Android Kitkat 4.4.X, some phones have blocked access for this application to be unable to save to external SD cards. This is the reason why you can\'t save.\nPlease choose how to fix this issue.</string>
+    <string name="message_save_folder_missing">Save folder does not exist.</string>
+    <string name="message_move_save_files_back">You can now write to SDCard and you have save files in internal storage, would you like to move them back to this folder?.</string>
+    <string name="message_user_handle_left_over_saves">You are now able to write. You will have to copy the left over saves files to their original game folders. This application will read the save files from the game folders and not from the save folder anymore.</string>
+    <string name="message_su_sdcard_fix_no_file">Cannot fix write permissions for external SDCard because plaform.xml does not exist.</string>
+    <string name="message_su_sdcard_fix_exists_no_write">Cannot apply fix to system, have you tried to reboot? If you already tried to reboot, please report this to matthewn4444@gmail.com.</string>
+    <string name="message_su_sdcard_fix_issue">Unable to change system files. Please report this to matthewn4444@gmail.com.</string>
+    <string name="message_restart_device">For the changes to apply, please reboot the device.</string>
+
+    <string name="menu_action_change_save_folder">Change Save Folder</string>
+
+    <string name="dialog_choose_save_folder_title">Choose a save folder</string>
+    <string name="dialog_fix_sd_card_write_title">Choose how to fix saving</string>
+    <string name="dialog_scan_files_title">Scanning files</string>
+    <string name="dialog_copy_files_title">Copying files</string>
+    <string name="dialog_choose_copy_dst_title">Select copy destination</string>
+    <string name="dialog_copy_files_filename">File:</string>
+    <string name="dialog_copy_files_filesize">Size:</string>
+    <string name="dialog_select_files_copy_title">Select files to copy</string>
+    <string name="dialog_bytes_remaining">Available space left:</string>
+    <string name="dialog_override_files">(Replacing some files)</string>
+    <string name="dialog_su_sdcard_fix_desc">This operation will fix writing to the external SD card. This will modify system files as a root user.\n\n<b>This app is not responsible for any issues for this phone and by accepting, you are responsible for any issues that may happen.</b>\n\nThis will write "media_rw" to groups in the file /system/etc/permissions/platform.xml under WRITE_EXTERNAL_STORAGE permission.</string>
+    <string name="dialog_su_sdcard_fix_checkbox">By selecting, you agree to allow this app to modify the system files with root access.</string>
+    <string name="dialog_su_sdcard_fix_applying">Applying fix&#8230;</string>
+
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>Move your games to an internal storage folder</item>
+        <item>Move only your games\' save files to an internal storage folder</item>
+        <item>Apply the SD Card fix for this issue\n(needs root)</item>
+    </string-array>
 </resources>
