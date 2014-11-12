@@ -72,7 +72,9 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         mTabHost = (TabHost)activity.getLayoutInflater().inflate(R.layout.vnsettings_dialog, null);
         mTabHost.setup();
         builder.setView(mTabHost);
-        mDialog = builder.create();
+        mDialog = builder
+                .setNeutralButton(android.R.string.ok, null)
+                .create();
         mDialog.setOnDismissListener(this);
         mTabContent = mTabHost.getTabContentView();
         mTabHost.setOnTabChangedListener(this);
