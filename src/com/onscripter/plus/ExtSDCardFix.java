@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -372,6 +373,35 @@ public final class ExtSDCardFix {
      */
     public boolean needsFix() {
         return folderNeedsFix(mAdapter.getCurrentDirectory());
+    }
+
+    /**
+     * Asks if we are able to launch the game given the path, if it can, it
+     * will add the save folder to the bundle passed.
+     * @param path
+     * @param bundle to put save folder if it runs
+     * @return if we should run the game
+     */
+    public boolean shouldLaunchGame(String path, Bundle bundle) {
+        if (needsFix()) {
+            // Fix #2: Check if this game has a folder in save directory, then use that
+            File saveFolder = getSaveFolder();
+            if (saveFolder != null && saveFolder.exists()) {
+                // The game folder name is also in the save folder, use this save directory
+                final File gameFile = new File(path);
+                final String thatFolder = saveFolder + "/" + gameFile.getName();
+                if (new File(thatFolder).exists()) {
+                    bundle.putString(ONScripter.SAVE_DIRECTORY_EXTRA, thatFolder);
+                } else {
+                    moveOneGameSave(gameFile);
+                    return false;
+                }
+            } else {
+                showFixDialog();
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
