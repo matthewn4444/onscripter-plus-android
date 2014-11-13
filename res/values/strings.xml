@@ -16,6 +16,7 @@
 
     <!-- Control Configurations -->
     <integer name="hide_controls_timeout_seconds">5</integer>
+    <integer name="fullscreen_timeout_seconds">4</integer>
     <integer name="bezel_swipe_distance">50</integer>
 
     <!-- Files -->
