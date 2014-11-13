@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.FrameLayout;
@@ -197,6 +198,10 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
             result = mActivity.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public Window getWindow() {
+        return mDialog.getWindow();
     }
 
     public void hide() {

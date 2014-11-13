@@ -1,5 +1,6 @@
 package com.onscripter.plus;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.Context;
@@ -7,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -17,6 +19,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
@@ -42,6 +45,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
 
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
+    private static int FULLSCREEN_TIMEOUT_SECONDS = App.getContext().getResources()
+            .getInteger(R.integer.fullscreen_timeout_seconds) * 1000;
 
     private static String DISPLAY_CONTROLS_KEY;
     private static String SWIPE_GESTURES_KEY;
@@ -72,6 +77,9 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private boolean mAllowRightBezelSwipe;
     private Handler mHideControlsHandler;
 
+    // Kitkat+
+    private Handler mImmersiveHandler;
+
     private ONScripterGame mGame;
 
     private AdView mAdView;
@@ -86,7 +94,15 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     };
 
+    final private Runnable mInvokeFullscreenRunnable = new Runnable() {
+        @Override
+        public void run() {
+            invokeFullscreen();
+        }
+    };
+
     /** Called when the activity is first created. */
+    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -100,7 +116,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mUseDefaultFont = getIntent().getBooleanExtra(USE_DEFAULT_FONT_EXTRA, false);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        invokeFullscreen();
 
         // Setup layout
         setContentView(R.layout.onscripter);
@@ -140,8 +156,20 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mHideControlsHandler = new Handler();
 
         // Get the dimensions of the screen
-        Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-        mDisplayHeight = disp.getHeight();
+        mDisplayHeight = calculateHeight();
+
+        // If Kitkat and higher, we will need to hide the navigation bar immersive mode
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            mImmersiveHandler = new Handler();
+            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility) {
+                    if (visibility == View.VISIBLE) {
+                        refreshFullscreenTimer();
+                    }
+                }
+            });
+        }
 
         // Only show ads on tablet devices
         if (getResources().getBoolean(R.bool.isTablet)) {
@@ -204,6 +232,54 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mGame.useExternalVideo(shouldUseExternalVideo);
 
         Analytics.sendVideoLaunched(filename);
+    }
+
+    @SuppressWarnings("deprecation")
+    @SuppressLint("NewApi")
+    private int calculateHeight() {
+        Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+
+        int version = android.os.Build.VERSION.SDK_INT;
+        if (version < android.os.Build.VERSION_CODES.KITKAT) {
+            // Lower than Kitkat, we are not hiding navigation bar so get normal height
+            return disp.getHeight();
+        } else {
+            // Kitkat, get full height for immersive mode
+            Point size = new Point();
+            disp.getRealSize(size);
+            return size.y;
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private void invokeFullscreen() {
+        int version = android.os.Build.VERSION.SDK_INT;
+        if (version >= android.os.Build.VERSION_CODES.KITKAT) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                  | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                  | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                  | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                  | View.SYSTEM_UI_FLAG_FULLSCREEN
+                  | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        } else if (version >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        }
+    }
+
+    @SuppressLint("NewApi")
+    private void showVNDialog() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD) {
+            // Android 3.2+: a hack to not show the navigation bar when dialogs are shown
+            Window dialogWin = mDialog.getWindow();
+            dialogWin.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+            mDialog.show();
+            dialogWin.getDecorView().setSystemUiVisibility(
+                    getWindow().getDecorView().getSystemUiVisibility());
+            dialogWin.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        } else {
+            mDialog.show();
+        }
     }
 
     private void updateControlPreferences() {
@@ -326,7 +402,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         case R.id.controls_settings_button:
             Analytics.buttonEvent(BUTTON.SETTINGS);
             removeHideControlsTimer();
-            mDialog.show();
+            showVNDialog();
             refreshTimer = false;
             break;
         case R.id.controls_rclick_button:
@@ -382,6 +458,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
 	}
 
+    @SuppressLint("NewApi")
     @Override
     protected void onResume()
     {
@@ -389,6 +466,16 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         if( mGame != null ) {
             mGame.onResume();
         }
+
+        // For Android 4-4.3, it will show low profile
+        int version = android.os.Build.VERSION.SDK_INT;
+        if (version >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH
+                && version < android.os.Build.VERSION_CODES.KITKAT) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
+        } else if (version >= android.os.Build.VERSION_CODES.KITKAT) {
+            invokeFullscreen();
+        }
+
         if (mDialog != null && mDialog.isShowing()) {
             final AdView ad = mDialog.getAdView();
             if (ad != null) {
@@ -398,7 +485,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         if (mAdView != null) {
             mAdView.resume();
         }
-	}
+    }
 
 	@Override
 	protected void onStart() {
@@ -509,7 +596,16 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-	private boolean isDebug() {
+    private void removeFullscreenTimer() {
+        mImmersiveHandler.removeCallbacks(mInvokeFullscreenRunnable);
+    }
+
+    private void refreshFullscreenTimer() {
+        removeFullscreenTimer();
+        mImmersiveHandler.postDelayed(mInvokeFullscreenRunnable, FULLSCREEN_TIMEOUT_SECONDS);
+    }
+
+    private boolean isDebug() {
         return (getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 }
