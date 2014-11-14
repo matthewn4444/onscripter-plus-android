@@ -25,6 +25,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     private VPlayerView mPlayer = null;
     private Thread mONScVideoThread = null;
     private ONScripterEventListener mListener;
+    private OnGameReadyListener mReadyListener;
     private FrameLayout mGameLayout;
     private boolean mUseExternalVideo;
 
@@ -38,6 +39,10 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     private static final String FontPathKey = "font.path.key";
     private static final String RenderOutlineKey = "render.outline.key";
     private static final String SavePathKey = "save.path.key";
+
+    public interface OnGameReadyListener {
+        public void onReady();
+    }
 
     private final VPlayerListener mVideoListener = new VPlayerListener() {
         @Override
@@ -93,6 +98,9 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
         mGame.setONScripterEventListener(this);
         mGameLayout = new FrameLayout(getActivity());
         mGameLayout.addView(mGame);
+        if (mReadyListener != null) {
+            mReadyListener.onReady();
+        }
         return mGameLayout;
     }
 
@@ -162,6 +170,10 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
 
     public void setONScripterEventListener(ONScripterEventListener listener) {
         mListener = listener;
+    }
+
+    public void setOnGameReadyListener(OnGameReadyListener listener) {
+        mReadyListener = listener;
     }
 
     public void setFontScaling(double scaleFactor) {
