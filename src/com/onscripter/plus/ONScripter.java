@@ -14,18 +14,21 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
 
-public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener
+public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener, OnGameReadyListener
 {
     public static final String CURRENT_DIRECTORY_EXTRA = "current_directory_extra";
     public static final String SAVE_DIRECTORY_EXTRA = "save_directory_extra";
@@ -53,6 +56,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private ImageButton2 mMouseScrollUpButton;
     private ImageButton2 mMouseScrollDownButton;
 
+    private int mDisplayWidth;
     private int mDisplayHeight;
 
     private String mCurrentDirectory;
@@ -136,7 +140,10 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mHideControlsHandler = new Handler();
 
         // Get the dimensions of the screen
-        mDisplayHeight = calculateHeight();
+        Point p = new Point();
+        getScreenDimensions(p);
+        mDisplayWidth = p.x;
+        mDisplayHeight = p.y;
 
         // If Kitkat and higher, we will need to hide the navigation bar immersive mode
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
@@ -170,20 +177,42 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mGame.useExternalVideo(shouldUseExternalVideo);
     }
 
+    @Override
+    public void onReady() {
+        fitGameOnScreen();
+    }
+
+    private void fitGameOnScreen() {
+        double screenRatio = mDisplayWidth * 1.0 / mDisplayHeight;
+        double gameRatio = mGame.getGameWidth() * 1.0 / mGame.getGameHeight();
+        if (screenRatio > gameRatio) {
+            // The screen is more widescreen than the game
+            mGame.setBoundingHeight(mDisplayHeight);
+        } else {
+            // The game is more widescreen than the screen
+            mGame.setBoundingWidth(mDisplayWidth);
+
+            // Fit the game vertically centered
+            View wrapper = findViewById(R.id.game_wrapper);
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) wrapper.getLayoutParams();
+            params.gravity = Gravity.CENTER;
+            wrapper.setLayoutParams(params);
+        }
+    }
+
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
-    private int calculateHeight() {
+    private void getScreenDimensions(Point outDimensions) {
         Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
         int version = android.os.Build.VERSION.SDK_INT;
         if (version < android.os.Build.VERSION_CODES.KITKAT) {
             // Lower than Kitkat, we are not hiding navigation bar so get normal height
-            return disp.getHeight();
+            outDimensions.x = disp.getWidth();
+            outDimensions.y = disp.getHeight();
         } else {
             // Kitkat, get full height for immersive mode
-            Point size = new Point();
-            disp.getRealSize(size);
-            return size.y;
+            disp.getRealSize(outDimensions);
         }
     }
 
@@ -290,7 +319,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         transaction.commit();
 
         mGame.setONScripterEventListener(this);
-        mGame.setBoundingHeight(mDisplayHeight);
+        mGame.setOnGameReadyListener(this);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
