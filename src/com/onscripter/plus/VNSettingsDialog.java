@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.preference.PreferenceManager;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -266,7 +267,8 @@ public class VNSettingsDialog implements OnDismissListener, OnClickListener, OnS
         vg.setLayoutParams(lp);
 
         mUpScalingNumber.setText(mFontScale + "");
-        mUpScalingText.setTextSize((float) (mFontScale * mFontPreviewSize * mActivity.getGameHeight() / mScreenHeight));
+        mUpScalingText.setTextSize(TypedValue.COMPLEX_UNIT_PX, (float)
+                (mFontScale * mFontPreviewSize * mScreenHeight / mActivity.getGameHeight()));
     }
 
     @Override
