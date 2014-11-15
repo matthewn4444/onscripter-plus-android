@@ -221,7 +221,7 @@ public class TwoStateLayout extends ViewGroup {
     }
 
     private int getMaxBound() {
-        return -1;
+        return 0;
     }
 
     public void smoothScrollTo(int x) {
@@ -304,11 +304,20 @@ public class TwoStateLayout extends ViewGroup {
 
     @Override
     public void scrollTo(int x, int y) {
+        // Clamp the value
+        if (getMinBound() != getMaxBound()) {
+            if (x < getMinBound()) {
+                x = getMinBound();
+            } else if (x > getMaxBound()) {
+                x = getMaxBound();
+            }
+        }
         if (mScrollX != x) {
             mScrollX = x;
             if (mOtherLayout != null && mLayout.getWidth() > 0) {
                 mOtherLayout.scrollTo(- Math.abs(-x - mLayout.getWidth()), y);
             }
+            bringToFront();
             super.scrollTo(x, y);
             if (mListener != null) {
                 if (x == getMinBound()) {
