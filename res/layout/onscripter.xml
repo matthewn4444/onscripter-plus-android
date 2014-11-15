@@ -13,7 +13,7 @@
         android:id="@+id/left_menu"
         style="@style/controls_menu_style"
         android:layout_gravity="left"
-        android:layout_marginLeft="-80dp"
+        android:layout_marginLeft="-80.5dp"
         app:side="left_side">
         <com.onscripter.plus.ImageButton2
             android:id="@+id/controls_quit_button"
@@ -38,7 +38,7 @@
     <com.onscripter.plus.TwoStateLayout
         android:id="@+id/right_menu"
         app:side="right_side"
-        android:layout_marginRight="-80dp"
+        android:layout_marginRight="-80.5dp"
         android:layout_gravity="right"
         style="@style/controls_menu_style">
         <com.onscripter.plus.ImageButton2
