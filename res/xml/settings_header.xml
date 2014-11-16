@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android" >
+    <header android:fragment="com.onscripter.plus.settings.GeneralSettingsFragment"
+            android:title="@string/settings_general_header"/>
+    <header android:fragment="com.onscripter.plus.settings.AboutSettingsFragment"
+            android:title="@string/settings_about_cate"/>
+</preference-headers>

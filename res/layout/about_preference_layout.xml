@@ -30,7 +30,8 @@
                 android:layout_marginRight="5dp"
                 android:text="@string/settings_about_version_header"/>
             <TextView style="@style/about_settings_text_style"
-                android:text="@string/version_name"/>
+                android:id="@+id/version_text"
+                android:text="@string/empty"/>
         </LinearLayout>
         <LinearLayout
             android:layout_marginBottom="10dp"
