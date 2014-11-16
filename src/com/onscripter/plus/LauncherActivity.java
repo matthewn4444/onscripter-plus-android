@@ -152,6 +152,9 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         mAdapter.onlyShowFolders(true);
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
+        if (themeName.equals(defaultThemeName)) {
+            listView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+        }
         setContentView(listView);
 
         // Copy the font file if it does not exist yet
