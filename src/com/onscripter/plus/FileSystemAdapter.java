@@ -230,8 +230,11 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
         if (mShowBackItem && !isDirectoryAtLowerBound()) {
             add(BackFileListItem);
         }
-        Arrays.sort(mFileList, mFileSorter);
-        addAll(mFileList);
+
+        if (mFileList != null) {
+            Arrays.sort(mFileList, mFileSorter);
+            addAll(mFileList);
+        }
         notifyDataSetChanged();
     }
 
