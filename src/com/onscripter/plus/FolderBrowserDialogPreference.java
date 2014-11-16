@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -30,6 +31,16 @@ public class FolderBrowserDialogPreference extends DialogPreference {
         if (currentapiVersion > context.getResources().getInteger(R.integer.gingerbread_version)) {
             setLayoutResource(R.layout.dialog_preference);
         }
+    }
+
+    @Override
+    protected View onCreateView(ViewGroup parent) {
+        View v = super.onCreateView(parent);
+        int paddingLeft = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                v.getResources().getDimension(R.dimen.preference_padding_start),
+                v.getResources().getDisplayMetrics());
+        v.setPadding(paddingLeft, 0, 0, 0);
+        return v;
     }
 
     @Override

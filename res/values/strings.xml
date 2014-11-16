@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">ONScripter Plus (Ad Free)</string>
 
-    <string name="version_name">1.1.12</string>
     <string name="empty"></string>
     <integer name="gingerbread_version">10</integer>
     <string name="website_thanks">http://onscripter.sourceforge.jp/android/android.html</string>
@@ -54,6 +53,8 @@
     <string name="menu_action_change_folder">Change Folder</string>
 
     <!-- Settings -->
+    <string name="settings_general_header">General</string>
+
     <string name="settings_render_cate">Render</string>
     <string name="settings_render_font_outline_key">settings.render.font.outline.key</string>
     <string name="settings_render_font_outline_summary">Displays an outline for each character for easier reading.</string>
@@ -76,6 +77,7 @@
 
     <string name="settings_about_cate">About</string>
     <string name="settings_about_key">settings.about.key</string>
+    <string name="settings_about_app_key">settings.about.app.key</string>
     <string name="settings_about_author_header">Author:</string>
     <string name="settings_about_og_author_header">Studio O.G.A.:</string>
     <string name="settings_about_version_header">Version:</string>

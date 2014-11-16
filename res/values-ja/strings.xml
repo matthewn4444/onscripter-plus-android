@@ -18,6 +18,8 @@
     <string name="menu_action_change_folder">フォルダを変更する</string>
 
     <!-- Settings -->
+    <string name="settings_general_header">全般</string>
+
     <string name="settings_render_cate">レンダリング</string>
     <string name="settings_render_font_outline_summary">文字を読みやすく輪郭を描きます。</string>
     <string name="settings_render_font_outline_title">文字の輪郭を描画する。</string>

@@ -20,6 +20,8 @@
     <string name="menu_action_change_folder">폴더 바꾸기</string>
 
     <!-- Settings -->
+    <string name="settings_general_header">일반</string>
+
     <string name="settings_render_cate">렌더</string>
     <string name="settings_render_font_outline_summary">글자를 읽기 쉽게 윤곽선을 그립니다.</string>
     <string name="settings_render_font_outline_title">글자에 윤곽선 그리기.</string>
