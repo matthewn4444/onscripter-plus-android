@@ -5,6 +5,11 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.13,11/20/2014</item>
+        <item>Bypass Kitkat issue not able to save to external sdcard</item>
+        <item>Added fix to allow rooted users to write to sdcard</item>
+        <item>Added Kiktat immersion (fullscreen) mode</item>
+        <item>Fixed some text placement issues</item>
         <item>vVersion 1.1.12,9/5/2014</item>
         <item>Added more sd card locations</item>
         <item>vVersion 1.1.11,8/1/2014</item>
