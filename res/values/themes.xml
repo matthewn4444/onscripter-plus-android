@@ -20,7 +20,6 @@
     </style>
 
     <style name="ListViewStyle.Light" parent="android:style/Widget.ListView">
-        <item name="android:background">@color/abs__background_holo_light</item>
         <item name="android:divider">@drawable/light_divider</item>
         <item name="android:dividerHeight">1dp</item>
     </style>
