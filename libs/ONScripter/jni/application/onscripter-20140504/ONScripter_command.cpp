@@ -366,10 +366,20 @@ int ONScripter::strspCommand()
     fi.is_newline_accepted = true;
     fi.num_xy[0] = script_h.readInt();
     fi.num_xy[1] = script_h.readInt();
+#if ANDROID
+    int sizeX = script_h.readInt();
+    int sizeY = script_h.readInt();
+    int spaceX = script_h.readInt();
+    int spaceY = script_h.readInt();
+    fi.setFontParametersForScaling(sizeX, sizeY, spaceX, spaceY, Sentence_font_scale);
+    fi.pitch_xy[0] = spaceX + fi.font_size_xy[0];
+    fi.pitch_xy[1] = spaceY + fi.font_size_xy[1];
+#else
     fi.font_size_xy[0] = script_h.readInt();
     fi.font_size_xy[1] = script_h.readInt();
     fi.pitch_xy[0] = script_h.readInt() + fi.font_size_xy[0];
     fi.pitch_xy[1] = script_h.readInt() + fi.font_size_xy[1];
+#endif
     fi.is_bold = script_h.readInt()?true:false;
     fi.is_shadow = script_h.readInt()?true:false;
 

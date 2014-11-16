@@ -70,6 +70,7 @@ FontInfo::FontInfo()
 void FontInfo::reset()
 {
     tateyoko_mode = YOKO_MODE;
+    display_width = 0;
     clear();
 
     is_bold = true;
