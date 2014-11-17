@@ -26,7 +26,7 @@
     <string name="settings_render_font_outline_summary">글자를 읽기 쉽게 윤곽선을 그립니다.</string>
     <string name="settings_render_font_outline_title">글자에 윤곽선 그리기.</string>
 
-    <string name="settings_controls_cate">버튼</string>
+    <string name="settings_controls_cate">컨트롤</string>
     <string name="settings_controls_display_summary">스와이프 하기 전까지 버튼을 숨깁니다.</string>
     <string name="settings_controls_display_title">버튼을 표시하기 위한 제스처.</string>
     <string name="settings_controls_swipe_summary">제스처로 숨겨진 버튼을 불러옵니다.</string>
@@ -38,7 +38,6 @@
 
     <string name="settings_about_cate">어플에 대하여</string>
     <string name="settings_about_author_header">제작자:</string>
-    <string name="settings_about_og_author_header">Studio O.G.A.:</string>
     <string name="settings_about_version_header">버전:</string>
     <string name="settings_about_github_header">웹사이트:</string>
     <string name="settings_about_summary">이 어플리케이션 소스는 무료입니다. 만약 이 코드를 사용하고자 한다면, Studio O.G.A. Ogapee 와 Matthew Ng에게 연락해주시길 바랍니다.</string>
@@ -60,18 +59,18 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">폴더 고르기</string>
     <string name="dialog_select_button_text">선택</string>
+    <string name="dialog_back_button_text">뒤로</string>
+    <string name="dialog_next_button_text">다음</string>
+    <string name="dialog_close_app">어플 종료</string>
+    <string name="dialog_reboot">재부팅</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">새로운 폴더</string>
     <string name="dialog_button_rate">이 앱을 평가!</string>
 
-    <!-- Dialog Options -->
-    <string-array name="dialog_opt_fix_sd_card_write">
-        <item>게임은 내장 메모리에 복사</item>
-        <item>게임의 세이브는 내장 메모리에 복사</item>
-        <item>SD Card를 돌려 놓으십시오\n(root 필요)</item>
-    </string-array>
-
     <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_title">@string/settings_controls_cate</string>
+    <string name="dialog_settings_text_title">본문</string>
+
     <string name="dialog_settings_controls_global">이 설정은 모든 게임에서 기본으로 설정됩니다.</string>
     <string-array name="settings_controls_swipe_entries">
         <item>양쪽에서 밀기</item>
@@ -86,13 +85,39 @@
     <string name="dialog_settings_text_upscaling_text">한국어 日本語</string>
 
     <!-- External SD Card Fix -->
-    <string name="message_copy_completed">파일을 복사했습니다.</string>
-    <string name="message_copy_failed">복사에 실패했습니다.</string>
+    <string name="message_copy_completed">복사 완료. 기존 폴더를 내부저장소로 옮겼습니다.</string>
+    <string name="message_copy_saves_completed">세이브 파일을 복사 완료하였습니다.</string>
+    <string name="message_copy_failed">복사 실패.</string>
+    <string name="message_copy_failed_no_space">내부 저장소가 가득 차서 게임을 복사 할 수 없습니다.</string>
+    <string name="message_copy_failed_no_files">복사 할 수 있는 파일이 없습니다.</string>
+    <string name="message_kitkat_save_issue">안드로이드 4.4.X 버전의 킷켓을 사용하는 폰들 중에는 외부 저장소를 사용 할 수 없도록 막혀있기도 합니다. 이것이 당신이 게임을 세이브 하지 못하는 이유입니다..\n문제를 수정 버튼을 눌러주세요.</string>
+    <string name="message_save_folder_missing">세이브 폴더가 존재하지 않습니다.</string>
+    <string name="message_move_save_files_back">당신의 SD카드는 이제 사용이 가능합니다. 그리고 내부저장소에 세이브 파일들이 있습니다. 이 파일을 다시 원래의 폴더로 돌리길 원하십니까?</string>
+    <string name="message_user_handle_left_over_saves">이제 세이브 파일들은 원래의 폴더로 돌아갔고 온스크립터 플러스는 세이브 파일을 더 이상 다른 폴더에 저장하지 않습니다.</string>
+    <string name="message_su_sdcard_fix_no_file">SD카드의 수정을 실패하였습니다. 왜냐하면 plaform.xml 파일이 존재하지 않습니다.</string>
+    <string name="message_su_sdcard_fix_exists_no_write">시스템을 수정할 수 없습니다. 핸드폰을 다시 시작 해보시겠습니까? 만약 이미 다시 시작을 해 보았다면, matthewn4444@gmail.com 메일에 영어로 연락을 주세요.</string>
+    <string name="message_su_sdcard_fix_issue">시스템을 수정할 수 없습니다. matthewn4444@gmail.com 메일로 영어로 연락을 주세요.</string>
+    <string name="message_restart_device">수정이 완료 되었습니다. 기기를 재부팅 하여 주십시오.</string>
 
-    <string name="dialog_fix_sd_card_write_title">세이브를 치유를 위해</string>
-    <string name="dialog_scan_files_title">파일을 복사하는</string>
-    <string name="dialog_copy_files_title">파일을 복사하는</string>
-    <string name="dialog_choose_copy_dst_title">대상을 선택</string>
+    <string name="menu_action_change_save_folder">세이브 폴더 변경</string>
+
+    <string name="dialog_choose_save_folder_title">세이브 폴더 선택</string>
+    <string name="dialog_fix_sd_card_write_title">문제를 수정</string>
+    <string name="dialog_scan_files_title">파일을 스캔중</string>
+    <string name="dialog_copy_files_title">파일을 복사중</string>
+    <string name="dialog_choose_copy_dst_title">파일을 복사할 폴더</string>
     <string name="dialog_copy_files_filename">파일:</string>
     <string name="dialog_copy_files_filesize">크기:</string>
+    <string name="dialog_select_files_copy_title">복사 할 파일을 고르세요.</string>
+    <string name="dialog_bytes_remaining">남은 용량:</string>
+    <string name="dialog_override_files">(어떤 파일로 교체)</string>
+    <string name="dialog_su_sdcard_fix_desc">이 방법은 당신의 SD카드를 어플이 접근이 가능하도록 시스템을 수정합니다.\n\n<b>이 어플은 이 문제를 수정하면서 일어나는 어떠한 일에도 보상을 할 수 없습니다.</b>\n\n시스템 내부 /system/etc/permissions/platform.xml 파일에 WRITE_EXTERNAL_STORAGE 퍼미션을 추가할 것입니다.</string>
+    <string name="dialog_su_sdcard_fix_checkbox">선택의 의해 이 온스크립터 플러스가 당신의 시스템을 접근하도록 동의했습니다.</string>
+    <string name="dialog_su_sdcard_fix_applying">수정중&#8230;</string>
+
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>게임을 내부 저장소로 이동</item>
+        <item>게임의 세이브 파일만 내부 저장소로 이동</item>
+        <item>SD카드를 접근 가능하도록 수정(루팅유저)</item>
+    </string-array>
 </resources>

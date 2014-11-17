@@ -59,18 +59,11 @@
     <string name="dialog_select_button_text">選択</string>
     <string name="dialog_back_button_text">バック</string>
     <string name="dialog_next_button_text">次</string>
-    <string name="dialog_close_app">出口</string>
+    <string name="dialog_close_app">終了</string>
     <string name="dialog_reboot">リブート</string>
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">新しいフォルダー</string>
     <string name="dialog_button_rate">このアプリを評価！</string>
-
-    <!-- Dialog Options -->
-    <string-array name="dialog_opt_fix_sd_card_write">
-        <item>ゲーム は内蔵メモリにコピーする</item>
-        <item>ゲームのセーブ は内蔵メモリにコピーする</item>
-        <item>SD Cardをなおします\n（root必要）</item>
-    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">コントロール</string>
@@ -90,13 +83,39 @@
     <string name="dialog_settings_text_upscaling_text">日本語</string>
 
     <!-- External SD Card Fix -->
-    <string name="message_copy_completed">ファイルをコピーでした。</string>
+    <string name="message_copy_completed">コピーが終了した。既存のフォルダを内部メモリに移しました。</string>
+    <string name="message_copy_saves_completed">セーブファイルをコピー完了しました。</string>
     <string name="message_copy_failed">コピーに失敗しました。</string>
+    <string name="message_copy_failed_no_space">内部メモリがいっぱいになってゲームをコピーできません。</string>
+    <string name="message_copy_failed_no_files">コピーできるファイルがありません。</string>
+    <string name="message_kitkat_save_issue">アンドロイド4.4.Xバージョンのキットカットを使用するフォンの中には外部ストレージを使用できないように詰まっています。これがあなたがゲームをセーブしない理由です。\nの問題を修正ボタンを押してください。</string>
+    <string name="message_save_folder_missing">セーブフォルダが存在しません。</string>
+    <string name="message_move_save_files_back">あなたのSDカードはもう使用が可能です。そして内部メモリにセーブファイルがあります。このファイルを再び元のフォルダに回して欲しいですか?</string>
+    <string name="message_user_handle_left_over_saves">もうセーブファイルは元のフォルダに復帰しており、このアプリはセーブファイルをこれ以上他のフォルダに保存しません。</string>
+    <string name="message_su_sdcard_fix_no_file">SDカードの修正を失敗しました。なぜならplaform.xmlファイルが存在しません。</string>
+    <string name="message_su_sdcard_fix_exists_no_write">システムを修正できません。携帯電話をまた始めてみますか?もしすでに再開をして見れば、matthewn4444@gmail.comメールに英語で連絡をください。</string>
+    <string name="message_su_sdcard_fix_issue">システムを修正できません。matthewn4444@gmail.comメールに英語で連絡をください。.</string>
+    <string name="message_restart_device">修正が完了しました。機器を再起動させてください。</string>
 
-    <string name="dialog_fix_sd_card_write_title">セーブを直すのために</string>
-    <string name="dialog_scan_files_title">ファイルをコピーする</string>
-    <string name="dialog_copy_files_title">ファイルをコピーする</string>
-    <string name="dialog_choose_copy_dst_title">コピー先を選択し</string>
+    <string name="menu_action_change_save_folder">セーブフォルダ変更</string>
+
+    <string name="dialog_choose_save_folder_title">セーブフォルダの選択</string>
+    <string name="dialog_fix_sd_card_write_title">問題を修正</string>
+    <string name="dialog_scan_files_title">ファイルをスキャン中</string>
+    <string name="dialog_copy_files_title">ファイルをコピー中</string>
+    <string name="dialog_choose_copy_dst_title">ファイルをコピーするフォルダ</string>
     <string name="dialog_copy_files_filename">ファイル:</string>
     <string name="dialog_copy_files_filesize">サイズ:</string>
+    <string name="dialog_select_files_copy_title">コピーするファイルを選んでください。</string>
+    <string name="dialog_bytes_remaining">残容量:</string>
+    <string name="dialog_override_files">(どんなファイルで交代)</string>
+    <string name="dialog_su_sdcard_fix_desc">この方法は、あなたのSDカードをアプリがアクセスが可能するようにシステムを修正します。\n\n<b>このアプリは問題を修正しながら起こった何事にも補償をすることはできません。</b>\n\nシステム内部/system/etc/permissions/platform.xmlファイルにWRITE_EXTERNAL_STORAGEパーミッションを追加することで</string>
+    <string name="dialog_su_sdcard_fix_checkbox">選択によってこのアプリが貴方のシステムをアクセスすることに同意しました。</string>
+    <string name="dialog_su_sdcard_fix_applying">直しています&#8230;</string>
+
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>ゲームを内部メモリに移動</item>
+        <item>ゲームのセーブファイルだけを内部メモリに移動</item>
+        <item>SDカードをアクセス可能するように修正(ルーティングユーザ)</item>
+    </string-array>
 </resources>
