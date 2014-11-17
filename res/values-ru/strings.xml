@@ -37,7 +37,6 @@
 
     <string name="settings_about_cate">О программе</string>
     <string name="settings_about_author_header">Автор:</string>
-    <string name="settings_about_og_author_header">Studio O.G.A.:</string>
     <string name="settings_about_version_header">Version:</string>
     <string name="settings_about_github_header">Website:</string>
     <string name="settings_about_summary">Это приложение бесплатно и с открытым исходным кодом. Если вы планируете использовать код, пожалуйста, укажите Studio Oga Ogapee и Matthew Ng.</string>
@@ -59,18 +58,15 @@
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Выберите папку</string>
     <string name="dialog_select_button_text">Выбрать</string>
+    <string name="dialog_back_button_text">Назад</string>
+    <string name="dialog_next_button_text">Далее</string>
+    <string name="dialog_close_app">Закрыть приложение</string>
+    <string name="dialog_reboot">Перезагрузить</string>
     <string name="dialog_ext_not_found">Отправте письмо местоположением sdcard на matthewn4444@gmail.com.</string>
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
     <string name="dialog_please_wait">Пожалуйста, подождите&#8230;</string>
     <string name="dialog_create_new_folder">Создать новую папку</string>
     <string name="dialog_button_rate">Оцените приложение</string>
-
-    <!-- Dialog Options -->
-    <string-array name="dialog_opt_fix_sd_card_write">
-        <item>Переместить игры на внутреннее хранилище</item>
-        <item>Переместить только ваши сохранения во внутреннюю память</item>
-        <item>Применить исправление к SD Card, устраняющее эту проблему\n(требует root)</item>
-    </string-array>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Управление</string>
@@ -90,13 +86,39 @@
     <string name="dialog_settings_text_upscaling_text">Русский 日本語</string>
 
     <!-- External SD Card Fix -->
-    <string name="message_copy_completed">Копирование завершено. Папка по умолчанию переключается на внутреннюю память.</string>
-    <string name="message_copy_failed">Скопировать не удалось.</string>
+    <string name="message_copy_completed">Копирование завершено. Теперь папка по умолчанию во внутренней памяти.</string>
+    <string name="message_copy_saves_completed">Копирование сохранений завершено.</string>
+    <string name="message_copy_failed">Не удалось выполнить копирование.</string>
+    <string name="message_copy_failed_no_space">Внутренняя память заполнена, нельзя скопировать файлы игры.</string>
+    <string name="message_copy_failed_no_files">Нет файлов для копирования.</string>
+    <string name="message_kitkat_save_issue">Начиная с Android Kitkat 4.4.X, некоторые телефоны заблокировали доступ записи на внешнюю SD карту. Это причина почему вы не можете сохранить. \nПожалуйста выберите, как исправить эту проблему.</string>
+    <string name="message_save_folder_missing">Папка сохранений не существует.</string>
+    <string name="message_move_save_files_back">Теперь возможна запись на SD карту, но у вас есть файлы сохранений во внутренней памяти, вы бы хотели переместить их?</string>
+    <string name="message_user_handle_left_over_saves">Теперь возможна запись. Вам нужно скопировать сохранения из папки сохранений в папку с игрой. Сейчас приложение будет читать сохранения из папки игры, а не из папки сохранений.</string>
+    <string name="message_su_sdcard_fix_no_file">Не удается исправить разрешение на запись на внешнюю SD карту, потому что platform.xml не существует.</string>
+    <string name="message_su_sdcard_fix_exists_no_write">Нельзя применить исправления к системе, вы пробовали перезагрузить? Если вы уже пробовали перезагрузиться, просьба сообщить об этом в matthewn4444@gmail.com.</string>
+    <string name="message_su_sdcard_fix_issue">Не удается изменить системные файлы. Пожалуйста сообщите об этом matthewn4444@gmail.com.</string>
+    <string name="message_restart_device">Чтобы применить изменения перезагрузите устройство.</string>
 
-    <string name="dialog_fix_sd_card_write_title">Выбрать, как исправить проблемы сохранения</string>
+    <string name="menu_action_change_save_folder">Изменить папку сохранений</string>
+
+    <string name="dialog_choose_save_folder_title">Выбрать папку сохранений</string>
+    <string name="dialog_fix_sd_card_write_title">Выберите способ исправить сохранения</string>
     <string name="dialog_scan_files_title">Сканирование файлов</string>
     <string name="dialog_copy_files_title">Копирование файлов</string>
-    <string name="dialog_choose_copy_dst_title">Выбрать папку для копирования</string>
+    <string name="dialog_choose_copy_dst_title">Выберите назначение копирования</string>
     <string name="dialog_copy_files_filename">Файл:</string>
     <string name="dialog_copy_files_filesize">Размер:</string>
+    <string name="dialog_select_files_copy_title">Выбрать файлы для копирования</string>
+    <string name="dialog_bytes_remaining">Осталось свободного места:</string>
+    <string name="dialog_override_files">(Замена некоторых файлов)</string>
+    <string name="dialog_su_sdcard_fix_desc">Эта операция исправит запись на внешнюю SD карту. Она изменяет системные файлы.\n\n <b>Автор приложения не несет ответственности за возникшие проблемы с телефоном. Согласившись, вы несете ответственность за любые проблемы, которые могут случиться, в том числе, что телефон перестанет работать.</b>\n\nБудет записано разрешение WRITE_EXTERNAL_STORAGE «media_rw» в файл /system/etc/permissions/platform.xml.</string>
+    <string name="dialog_su_sdcard_fix_checkbox">Выбрав, вы соглашаетесь с тем, что это приложение измененит системные файлы с правами суперпользователя.</string>
+    <string name="dialog_su_sdcard_fix_applying">Применение исправления&#8230;</string>
+
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>Переместить ваши игры в папку внутренней памяти</item>
+        <item>Переместить только ваши сохранения в папку внутренней памяти</item>
+        <item>Применить исправление SD карты для этой проблемы (нужен root)</item>
+    </string-array>
 </resources>
