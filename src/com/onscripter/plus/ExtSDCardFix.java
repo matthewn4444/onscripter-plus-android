@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.Analytics.SDCARD_FIX_OPTIONS;
 import com.onscripter.plus.CopyFilesDialogTask.CopyFileInfo;
 import com.onscripter.plus.CopyFilesDialogTask.CopyFilesDialogListener;
@@ -663,6 +664,7 @@ public final class ExtSDCardFix {
             return;
         } catch (IOException e2) {
             e2.printStackTrace();
+            BugSenseHandler.sendException(e2);
             alert(R.string.message_su_sdcard_fix_issue);
             return;
         }
@@ -684,9 +686,11 @@ public final class ExtSDCardFix {
                     try {
                         isFixed = SDFix.isRemovableStorageWritableFixApplied();
                     } catch (FileNotFoundException e1) {
+                        BugSenseHandler.sendException(e1);
                         e1.printStackTrace();
                         notFoundThrown = true;
                     } catch (IOException e1) {
+                        BugSenseHandler.sendException(e1);
                         e1.printStackTrace();
                         ioThrown = true;
                     }
@@ -722,6 +726,7 @@ public final class ExtSDCardFix {
                                         try {
                                             Runtime.getRuntime().exec(new String[]{"su","-c","reboot now"});
                                         } catch (IOException e) {
+                                            BugSenseHandler.sendException(e);
                                             e.printStackTrace();
                                         }
                                     }

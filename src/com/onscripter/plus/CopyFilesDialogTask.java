@@ -31,6 +31,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public final class CopyFilesDialogTask {
 
     public static class CopyFileInfo {
@@ -463,6 +465,7 @@ public final class CopyFilesDialogTask {
                     }
                 }
             } catch (IOException e) {
+                BugSenseHandler.sendException(e);
                 e.printStackTrace();
                 return false;
             } finally {
