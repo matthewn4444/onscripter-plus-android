@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.onscripter.plus.Analytics.SDCARD_FIX_OPTIONS;
 import com.onscripter.plus.CopyFilesDialogTask.CopyFileInfo;
 import com.onscripter.plus.CopyFilesDialogTask.CopyFilesDialogListener;
 import com.onscripter.plus.CopyFilesDialogTask.Result;
@@ -237,6 +238,8 @@ public final class ExtSDCardFix {
     }
 
     private void copySaveFilesBackFinished() {
+        Analytics.sendNowWritableCopySavesBack();
+
         alert(R.string.message_user_handle_left_over_saves);
         setSaveFolder(null);
         if (mListener != null) {
@@ -556,6 +559,8 @@ public final class ExtSDCardFix {
         routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
+                Analytics.sendSDCardFixOption(SDCARD_FIX_OPTIONS.COPY_GAMES);
+
                 File result = routine.getResultDirectory();
                 alert(R.string.message_copy_completed);
 
@@ -583,6 +588,8 @@ public final class ExtSDCardFix {
         routine.setOnCopyRoutineFinished(new OnCopyRoutineFinished() {
             @Override
             public void onSuccess() {
+                Analytics.sendSDCardFixOption(SDCARD_FIX_OPTIONS.COPY_SAVES);
+
                 File result = routine.getResultDirectory();
                 alert(R.string.message_copy_saves_completed);
 
@@ -696,6 +703,8 @@ public final class ExtSDCardFix {
                             // Check for IOException
                             alert(R.string.message_su_sdcard_fix_issue);
                         } else if (results[0]) {
+                            Analytics.sendSDCardFixOption(SDCARD_FIX_OPTIONS.ROOT_PERMISSIONS);
+
                             // Worked fine, tell the user either to close app or reboot the phone
                             new AlertDialog.Builder(mActivity)
                                 .setTitle(R.string.app_name)

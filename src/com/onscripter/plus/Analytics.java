@@ -47,7 +47,8 @@ public final class Analytics {
         ADBLOCKER_USED("Adblocker Used"),
         ACTIVITY_FINISHED("Activity Finished"),
         VIDEO_LAUNCHED("Video Launched"),
-        GAME_NAMES("Name of ONScripter Games");
+        GAME_NAMES("Name of ONScripter Games"),
+        SDCARD_FIX_OPTION("External SD Card fix option");
 
         private final String mVal;
         private Action(final String s) {
@@ -109,7 +110,25 @@ public final class Analytics {
         }
     };
 
+    public static enum SDCARD_FIX_OPTIONS {
+        COPY_GAMES("Option 1: Copy games"),
+        COPY_SAVES("Option 2: Copy games' saves"),
+        ROOT_PERMISSIONS("Option 3: Root and fix permissions");
+
+        private final String mVal;
+        private SDCARD_FIX_OPTIONS(final String s) {
+            mVal = s;
+        }
+        @Override
+        public String toString() {
+            return mVal.trim();
+        }
+    };
+
+
     static final private String PROPERTY_ID = "UA-39733898-3";
+
+    static final private String SDCARD_SAVE_COPY_BACK = "Now writable and copying games back";
 
     static private HashMap<TrackerType, Tracker> sTrackers = new HashMap<TrackerType, Tracker>();
     static private HashMap<String, String> sScreenNameAliases = new HashMap<String, String>();
@@ -247,6 +266,14 @@ public final class Analytics {
 
     public static void sendGameName(String name) {
         send(Category.GAMES, Action.GAME_NAMES, name);
+    }
+
+    public static void sendSDCardFixOption(SDCARD_FIX_OPTIONS option) {
+        send(Category.FEATURE, Action.SDCARD_FIX_OPTION, option.toString());
+    }
+
+    public static void sendNowWritableCopySavesBack() {
+        send(Category.FEATURE, Action.SDCARD_FIX_OPTION, SDCARD_SAVE_COPY_BACK);
     }
 
     // Send hits
