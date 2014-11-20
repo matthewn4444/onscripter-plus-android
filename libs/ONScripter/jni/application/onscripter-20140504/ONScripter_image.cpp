@@ -160,7 +160,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
     }
 
     if (has_alpha){
-        if (tmp->format->Amask || is_png)
+        if (tmp && tmp->format->Amask || is_png)
             *has_alpha = true;
         else
             *has_alpha = false;
