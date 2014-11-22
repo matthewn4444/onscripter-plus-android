@@ -51,7 +51,7 @@
         <item>黒</item>
     </string-array>
 
-    <string name="settings_video_cate">ビデオ</string>
+    <string name="settings_playback_cate">再生</string>
     <string name="settings_external_video_title">外部ビデオプレーヤーを使う</string>
 
     <!-- Dialogs -->

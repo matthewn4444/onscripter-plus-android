@@ -305,11 +305,12 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private void runSDLApp() {
         boolean shouldRenderOutline = mPrefs.getBoolean(getString(R.string.settings_render_font_outline_key),
                 getResources().getBoolean(R.bool.render_font_outline));
+        boolean useHQAudio = mPrefs.getBoolean(getString(R.string.settings_use_hq_audio_key), false);
 
         if (mUseDefaultFont) {
-            mGame = ONScripterGame.newInstance(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, mSaveDirectory, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, LauncherActivity.DEFAULT_FONT_PATH, mSaveDirectory, useHQAudio, shouldRenderOutline);
         } else {
-            mGame = ONScripterGame.newInstance(mCurrentDirectory, null, mSaveDirectory, shouldRenderOutline);
+            mGame = ONScripterGame.newInstance(mCurrentDirectory, null, mSaveDirectory, useHQAudio, shouldRenderOutline);
         }
 
         // Attach the game fragment

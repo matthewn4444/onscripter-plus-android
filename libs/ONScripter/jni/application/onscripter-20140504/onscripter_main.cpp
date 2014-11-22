@@ -325,6 +325,9 @@ int main( int argc, char **argv )
                 argv++;
                 ons.setRootWritableDir(argv[0]);
             }
+            else if ( !strcmp( argv[0]+1, "-audio-hq" )){
+                ons.enableHQAudio();
+            }
 #endif
             else{
                 printf(" unknown option %s\n", argv[0] );
