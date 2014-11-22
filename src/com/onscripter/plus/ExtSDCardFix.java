@@ -140,6 +140,9 @@ public final class ExtSDCardFix {
      * @return an instance of VNPreference pointing to the preference file
      */
     public static VNPreferences getGameVNPreference(String path) {
+        if (path == null) {
+            return null;
+        }
         File saveFolder = getSaveFolder();
         File pathFile = new File(path);
         if (folderNeedsFix(pathFile.getParentFile())) {
