@@ -233,7 +233,9 @@ public class FileSystemAdapter extends ViewAdapterBase<FileListItem> {
 
         if (mFileList != null) {
             Arrays.sort(mFileList, mFileSorter);
-            addAll(mFileList);
+            for (FileListItem item : mFileList) {
+                add(item);
+            }
         }
         notifyDataSetChanged();
     }
