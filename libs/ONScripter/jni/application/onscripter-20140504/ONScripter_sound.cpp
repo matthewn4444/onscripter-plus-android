@@ -43,7 +43,7 @@ void ONScripter::playVideoAndroid(const char *filename, bool click_flag, bool lo
         jc[i] = filename[i];
     jcharArray jca = jniEnv->NewCharArray(strlen(filename));
     jniEnv->SetCharArrayRegion(jca, 0, strlen(filename), jc);
-    jniEnv->CallIntMethod( JavaONScripter, JavaPlayVideo, jca, click_flag, loop_flag );
+    jniEnv->CallVoidMethod( JavaONScripter, JavaPlayVideo, jca, click_flag, loop_flag );
     delete[] jc;
 }
 #endif
