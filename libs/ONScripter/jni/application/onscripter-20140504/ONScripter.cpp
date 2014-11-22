@@ -221,12 +221,16 @@ void ONScripter::initSDL()
 
 void ONScripter::openAudio()
 {
-#if (defined(PDA_WIDTH) || defined(PDA_AUTOSIZE)) && !defined(PSP) && !defined(IPHONE) && !defined(IOS) && !defined(PANDORA)
-    if ( Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
-#else        
-    // This will cause Android to crash in some games
-    if ( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
-#endif        
+    int audioFreq =
+#if defined(ANDROID)
+    // Default is 22050 because 44100 may crash in some games
+    audio_high_quality ? 44100 : 22050;
+#elif (defined(PDA_WIDTH) || defined(PDA_AUTOSIZE)) && !defined(PSP) && !defined(IPHONE) && !defined(IOS) && !defined(PANDORA)
+    22050;
+#else
+    44100;
+#endif
+    if ( Mix_OpenAudio( audioFreq, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
         fprintf(stderr, "Couldn't open audio device!\n"
                 "  reason: [%s].\n", SDL_GetError());
         audio_open_flag = false;
@@ -274,6 +278,7 @@ ONScripter::ONScripter()
     current_button_state.down_flag = false;
 
 #ifdef ANDROID
+    audio_high_quality = false;
     setMenuLanguage("en");
 #endif
 #ifdef ENABLE_KOREAN
@@ -394,6 +399,11 @@ void ONScripter::setKeyEXE(const char *filename)
 }
 
 #ifdef ANDROID
+void ONScripter::enableHQAudio()
+{
+    audio_high_quality = true;
+}
+
 void ONScripter::setMenuLanguage(const char* languageStr)
 {
     ScriptParser::setMenuLanguage(languageStr);

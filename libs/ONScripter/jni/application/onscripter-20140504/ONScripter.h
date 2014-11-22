@@ -120,6 +120,7 @@ public:
     void setSaveDir(const char *path);
 #ifdef ANDROID
     void setRootWritableDir(const char *path);
+    void enableHQAudio();
 #endif
     void setFullscreenMode();
     void setWindowMode();
@@ -362,6 +363,9 @@ private:
     bool disable_rescale_flag;
     bool edit_flag;
     char *key_exe_file;
+#ifdef ANDROID
+    bool audio_high_quality;
+#endif
 
     // variables relevant to button
     struct ButtonState{

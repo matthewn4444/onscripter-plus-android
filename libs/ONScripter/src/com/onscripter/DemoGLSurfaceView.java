@@ -23,21 +23,22 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
 
     public DemoRenderer(Activity _context, String currentDirectory, String fontPath)
     {
-        this(_context, currentDirectory, fontPath, null, false);
+        this(_context, currentDirectory, fontPath, null, false, false);
     }
 
-    public DemoRenderer(Activity _context, String currentDirectory, String fontPath, boolean renderOutline)
+    public DemoRenderer(Activity _context, String currentDirectory, String fontPath, boolean useHQAudio, boolean renderOutline)
     {
-        this(_context, currentDirectory, fontPath, null, renderOutline);
+        this(_context, currentDirectory, fontPath, null, useHQAudio, renderOutline);
     }
 
-    public DemoRenderer(Activity _context, String currentDirectory, String fontPath, String savePath, boolean renderOutline)
+    public DemoRenderer(Activity _context, String currentDirectory, String fontPath, String savePath, boolean useHQAudio, boolean renderOutline)
     {
         context = _context;
         mCurrentDirectory = currentDirectory;
         mFontPath = fontPath;
         mSavePath = savePath;
         mShouldRenderOutline = renderOutline;
+        mUseHQAudio = useHQAudio;
         doNativeInit(true);
     }
 
@@ -75,6 +76,9 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
         if (mShouldRenderOutline) {
             n++;
         }
+        if (mUseHQAudio) {
+            n++;
+        }
         if (mFontPath != null) {
             n += 2;
         }
@@ -90,6 +94,9 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
         }
         if (mShouldRenderOutline) {
             arg[n++] = "--render-font-outline";
+        }
+        if (mUseHQAudio) {
+            arg[n++] = "--audio-hq";
         }
         if (mFontPath != null) {
             arg[n++] = "-f";
@@ -121,6 +128,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer {
     private final String mCurrentDirectory;
     private final String mFontPath;
     private final String mSavePath;
+    private final boolean mUseHQAudio;
 
     private final EGL10 mEgl = null;
     private final EGLDisplay mEglDisplay = null;
@@ -136,12 +144,12 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
     }
 
     public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath) {
-        this(context, currentDirectory, fontPath, null, false);
+        this(context, currentDirectory, fontPath, null, false, false);
     }
 
-    public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath, String savePath, boolean shouldRenderOutline) {
+    public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath, String savePath, boolean useHQAudio, boolean shouldRenderOutline) {
         super(context);
-        mRenderer = new DemoRenderer(context, currentDirectory, fontPath, savePath, shouldRenderOutline);
+        mRenderer = new DemoRenderer(context, currentDirectory, fontPath, savePath, useHQAudio, shouldRenderOutline);
         setRenderer(mRenderer);
     }
 
