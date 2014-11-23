@@ -55,6 +55,8 @@
 
     <string name="settings_playback_cate">재생</string>
     <string name="settings_external_video_title">외부 비디오 플레이어를 사용</string>
+    <string name="settings_use_hq_audio_title">고음질 오디오 사용</string>
+    <string name="settings_use_hq_audio_summary">이 옵션으로 인해 게임이 불안정할 수 있습니다.(매우 낮은 가능성)</string>
 
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">폴더 고르기</string>
