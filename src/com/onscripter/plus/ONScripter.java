@@ -118,6 +118,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mUseDefaultFont = getIntent().getBooleanExtra(USE_DEFAULT_FONT_EXTRA, false);
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         invokeFullscreen();
 
         // Setup layout
