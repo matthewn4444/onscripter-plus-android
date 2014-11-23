@@ -1513,6 +1513,7 @@ void ScriptHandler::parseStr( char **buf )
         char ch, alias_buf[512];
         int alias_buf_len = 0;
         bool first_flag = true;
+        char* search_start = *buf;
         
         while(1){
             if ( alias_buf_len == 511 ) break;
@@ -1551,6 +1552,41 @@ void ScriptHandler::parseStr( char **buf )
             p_str_alias = p_str_alias->next;
         }
         if ( !p_str_alias ){
+#ifdef ANDROID
+            /*
+             * We will be forgiving if the author tried to do "goto *label" but forgot the asterisk
+             * otherwise, we will exit the app. Rollback and see if goto is before this
+             */
+            char* search_buf = search_start;
+
+            // Scan backwards and ignore whitespace
+            while(*(--search_buf) == ' ');
+
+            // If we are at the beginning of the line, it failed
+            if (*search_buf != '\n') {
+                int word_length = 0;
+                // Again scan back till we hit whitespace or new line (the beginning of the line)
+                while(*search_buf != ' ' && *search_buf != '\n' && *search_buf != ':') {
+                    search_buf--;
+                    word_length++;
+                }
+                // Now see if the text before is "goto"
+                if (word_length > 0) {
+                    char text_before[512];
+                    strncpy(text_before, search_buf + 1, word_length);
+                    text_before[word_length] = '\0';
+                    if (strcmp(text_before, "goto") == 0) {
+                        // Now we need to insert an asterisk and continue execution, then put back the space
+                        char* new_buf = --search_start;
+                        *search_start = '*';
+                        parseStr(&new_buf);
+                        *search_start = ' ';
+                        current_variable.type |= VAR_CONST;
+                        return;
+                    }
+                }
+            }
+#endif
             printf("can't find str alias for %s...\n", alias_buf );
             exit(-1);
         }
