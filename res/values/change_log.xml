@@ -6,6 +6,11 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.14,11/24/2014</item>
+        <item>Added higher quality option in settings</item>
+        <item>Fixed video player from crashing</item>
+        <item>Hid statusbar for Android 4.0&#8211;4.1 when playing a game</item>
+        <item>Fixed Gingerbread crashing</item>
         <item>vVersion 1.1.13,11/20/2014</item>
         <item>Bypass Kitkat issue not able to save to external sdcard</item>
         <item>Added fix to allow rooted users to write to sdcard</item>

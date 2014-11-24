@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">Последние изменения</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.14,11/20/2014</item>
+        <item>Добавил выше Выбор качества в настройках</item>
         <item>vVersion 1.1.13,11/20/2014</item>
         <item>Исправлена проблема сохранения на внешнюю SD карту в Android Kitkat</item>
         <item>Добавлен фикс возможности записи на SD карту пользователям с правами root</item>

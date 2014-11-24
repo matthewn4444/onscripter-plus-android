@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">広告削除</string>
     <string name="change_log_dialog_title">変更</string>
     <string-array name="change_log">
+        <item>vバージョン 1.1.14,2014年11月24日</item>
+        <item>+高音質オーディオ</item>
         <item>vバージョン 1.1.13,2014年11月20日</item>
         <item>外部ストレージを使用することができなかったキットカットの大きな短所を迂回するように修正しました。</item>
         <item>ルーティングユーザのためにSDカードをアクセスできる権限を追加しました。</item>
