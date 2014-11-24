@@ -226,8 +226,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void initSDCardFix() {
-        mFix = new ExtSDCardFix(this, mAdapter);
-        mFix.setOnSDCardFixListener(new OnSDCardFixListener() {
+        mFix = new ExtSDCardFix(this, mAdapter, new OnSDCardFixListener() {
             @Override
             public void writeTestFinished() {
                 mChangeLog = new ChangeLog(LauncherActivity.this);

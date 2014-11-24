@@ -74,10 +74,11 @@ public final class ExtSDCardFix {
                 && getNumONScripterGames(currentPath).length > 0;
     }
 
-    public ExtSDCardFix(Activity activity, FileSystemAdapter adapter) {
+    public ExtSDCardFix(Activity activity, FileSystemAdapter adapter, OnSDCardFixListener listener) {
         mActivity = activity;
         mAdapter = adapter;
         mPrefs = PreferenceManager.getDefaultSharedPreferences(activity);
+        mListener = listener;
 
         // Don't rescan if already scanned
         synchronized (ExtSDCardFix.this) {
@@ -99,10 +100,10 @@ public final class ExtSDCardFix {
            sExtSDCardWritable = Environment2.hasExternalSDCard();
            sAlreadyScanned = true;
        }
-    }
 
-    public void setOnSDCardFixListener(OnSDCardFixListener listener) {
-        mListener = listener;
+       if (mListener != null) {
+           mListener.writeTestFinished();
+       }
     }
 
     /**
