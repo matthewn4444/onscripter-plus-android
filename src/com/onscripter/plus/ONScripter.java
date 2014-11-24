@@ -476,12 +476,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         if( mGame != null ) {
             mGame.onPause();
         }
-        if (mDialog != null && mDialog.isShowing()) {
-            final AdView ad = mDialog.getAdView();
-            if (ad != null) {
-                ad.pause();
-            }
-        }
         if (mAdView != null) {
             mAdView.pause();
         }
@@ -505,12 +499,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             invokeFullscreen();
         }
 
-        if (mDialog != null && mDialog.isShowing()) {
-            final AdView ad = mDialog.getAdView();
-            if (ad != null) {
-                ad.resume();
-            }
-        }
         if (mAdView != null) {
             mAdView.resume();
         }
@@ -549,12 +537,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             mGame.exitApp();
         }
 		super.onDestroy();
-        if (mDialog != null) {
-            final AdView ad = mDialog.getAdView();
-            if (ad != null) {
-                ad.destroy();
-            }
-        }
         if (mAdView != null) {
             mAdView.destroy();
         }

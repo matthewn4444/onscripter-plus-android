@@ -21,11 +21,5 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"/>
         </LinearLayout>
-        <com.google.android.gms.ads.AdView android:id="@+id/adView"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            ads:adUnitId="@string/admob_key"
-            ads:adSize="BANNER"/>
     </FrameLayout>
 </TabHost>
