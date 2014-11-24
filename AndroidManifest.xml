@@ -47,49 +47,6 @@
             android:theme="@android:style/Theme.Translucent"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
 
-        <!-- AppFlood -->
-        <activity
-            android:name="com.appflood.AFFullScreenActivity"
-            android:configChanges="keyboardHidden|orientation"
-            android:theme="@android:style/Theme.Translucent"
-            android:launchMode="singleTask">
-            </activity>
-        <activity
-            android:name="com.appflood.mraid.MraidBrowserActivity"
-            android:configChanges="keyboardHidden"
-            android:launchMode="singleTask"
-            android:theme="@android:style/Theme.Translucent">
-            </activity>
-        <activity
-            android:name="com.google.ads.AdActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
-        <receiver
-            android:name="com.appflood.AFReferralReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.android.vending.INSTALL_REFERRER"/>
-           </intent-filter>
-        </receiver>
-
-        <!-- Startapp -->
-
-        <activity android:name="com.startapp.android.publish.list3d.List3DActivity"
-          android:theme="@android:style/Theme" />
-
-        <activity android:name="com.startapp.android.publish.AppWallActivity"
-          android:theme="@android:style/Theme.Translucent"
-          android:configChanges="orientation|keyboardHidden|screenSize" />
-
-        <!-- RevMob -->
-        <activity android:name="com.revmob.ads.fullscreen.FullscreenActivity"
-            android:theme="@android:style/Theme.Translucent"
-            android:configChanges="keyboardHidden|orientation">
-        </activity>
-
-        <!-- InMobi -->
-        <activity android:name="com.inmobi.androidsdk.IMBrowserActivity"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|smallestScreenSize|screenSize" />
-
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
         <meta-data android:name="com.google.android.gms.analytics.globalConfigResource"
             android:resource="@xml/global_tracker" />
