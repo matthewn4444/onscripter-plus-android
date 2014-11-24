@@ -54,6 +54,8 @@
 
     <string name="settings_playback_cate">воспроизведение</string>
     <string name="settings_external_video_title">Используйте внешний видеоплеер</string>
+    <string name="settings_use_hq_audio_title">Используйте высокое качество звука</string>
+    <string name="settings_use_hq_audio_summary">Выбор этого параметра может привести к некоторым игры к краху (очень низкие шансы).</string>
 
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Выберите папку</string>
