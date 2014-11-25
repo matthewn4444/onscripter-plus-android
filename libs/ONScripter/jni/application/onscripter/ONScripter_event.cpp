@@ -400,6 +400,9 @@ extern "C" void waveCallback( int channel )
 
 bool ONScripter::trapHandler()
 {
+    if (event_mode & WAIT_BUTTON_MODE ||
+        event_mode & WAIT_TEXT_MODE) return false;
+
     if (trap_mode & TRAP_STOP){
         trap_mode |= TRAP_CLICKED;
         return false;

@@ -2,7 +2,7 @@
  * 
  *  ONScripter_animation.cpp - Methods to manipulate AnimationInfo
  *
- *  Copyright (c) 2001-2013 Ogapee. All rights reserved.
+ *  Copyright (c) 2001-2014 Ogapee. All rights reserved.
  *
  *  ogapee@aqua.dti2.ne.jp
  *
@@ -354,7 +354,6 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
     if ( buffer[0] == '/' && anim->trans_mode != AnimationInfo::TRANS_STRING){
         buffer++;
         anim->num_of_cells = getNumberFromBuffer( (const char**)&buffer );
-        buffer++;
         if ( anim->num_of_cells == 0 ){
             fprintf( stderr, "ONScripter::parseTaggedString  The number of cells is 0\n");
             return;
@@ -362,23 +361,31 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
 
         anim->duration_list = new int[ anim->num_of_cells ];
 
-        if ( *buffer == '<' ){
+        if (*buffer == ','){
             buffer++;
-            for ( i=0 ; i<anim->num_of_cells ; i++ ){
-                anim->duration_list[i] = getNumberFromBuffer( (const char**)&buffer );
+
+            if ( *buffer == '<' ){
                 buffer++;
+                for ( i=0 ; i<anim->num_of_cells ; i++ ){
+                    anim->duration_list[i] = getNumberFromBuffer( (const char**)&buffer );
+                    buffer++;
+                }
             }
-            buffer++; // skip '>'
+            else{
+                anim->duration_list[0] = getNumberFromBuffer( (const char**)&buffer );
+                for ( i=1 ; i<anim->num_of_cells ; i++ )
+                    anim->duration_list[i] = anim->duration_list[0];
+            }
+            anim->remaining_time = anim->duration_list[0];
+
+            buffer++;
+            anim->loop_mode = *buffer++ - '0'; // 3...no animation
         }
         else{
-            anim->duration_list[0] = getNumberFromBuffer( (const char**)&buffer );
-            for ( i=1 ; i<anim->num_of_cells ; i++ )
-                anim->duration_list[i] = anim->duration_list[0];
-            buffer++;
+            for ( i=0 ; i<anim->num_of_cells ; i++ )
+                anim->duration_list[0] = 0;
+            anim->loop_mode = 3; // 3...no animation
         }
-        anim->remaining_time = anim->duration_list[0];
-        
-        anim->loop_mode = *buffer++ - '0'; // 3...no animation
         if ( anim->loop_mode != 3 ) anim->is_animatable = true;
 
         while(buffer[0] != ';' && buffer[0] != '\0') buffer++;
