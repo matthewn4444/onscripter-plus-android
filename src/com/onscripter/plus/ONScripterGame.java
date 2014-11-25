@@ -254,6 +254,8 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
                     if (mPlayer == null) {
                         mPlayer = new VPlayerView(parent);
                         mPlayer.setVideoListener(mVideoListener);
+                    } else if (mPlayer.getParent() != null) {
+                        ((ViewGroup)mPlayer.getParent()).removeView(mPlayer);
                     }
                     mPlayer.setOnClickListener(clickToSkip ? mVideoClickListener : null);
                     mPlayer.setLoop(shouldLoop);
