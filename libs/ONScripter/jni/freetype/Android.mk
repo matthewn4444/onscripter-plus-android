@@ -4,13 +4,29 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE := freetype
 
-ifeq ($(OS),Windows_NT)
-FIND = $(CYGWIN_HOME)/find
-else
-FIND = find
-endif
-
-APP_SUBDIRS := $(patsubst $(LOCAL_PATH)/%, %, $(shell $(FIND) $(LOCAL_PATH)/src -type d))
+APP_SUBDIRS := src  \
+    src/autofit  \
+    src/base  \
+    src/bdf  \
+    src/cache  \
+    src/cff  \
+    src/cid  \
+    src/gxvalid  \
+    src/gzip  \
+    src/lzw  \
+    src/otvalid  \
+    src/pcf  \
+    src/pfr  \
+    src/psaux  \
+    src/pshinter  \
+    src/psnames  \
+    src/raster  \
+    src/sfnt  \
+    src/smooth  \
+    src/truetype  \
+    src/type1  \
+    src/type42  \
+    src/winfonts
 
 # Add more subdirs here, like src/subdir1 src/subdir2
 
