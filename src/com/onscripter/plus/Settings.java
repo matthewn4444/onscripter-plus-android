@@ -26,10 +26,8 @@ import com.onscripter.plus.settings.LayoutPreference.OnLayoutViewCreatedListener
 public final class Settings extends SherlockPreferenceActivity implements OnPreferenceClickListener {
     private ChangeLog mChangeLog;
 
-    private static final String[] ValidFragments = {
-        GeneralSettingsFragment.class.getName(),
-        AboutSettingsFragment.class.getName()
-    };
+    // TODO when removing 2.X dependency, put the fragment classes back
+    private static String[] ValidFragments;
 
     public static void setVersionString(View layoutView, Context ctx) {
         PackageInfo pInfo;
@@ -55,6 +53,12 @@ public final class Settings extends SherlockPreferenceActivity implements OnPref
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && ValidFragments == null) {
+            ValidFragments = new String[]{
+                GeneralSettingsFragment.class.getName(),
+                AboutSettingsFragment.class.getName()
+            };
+        }
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(R.string.menu_action_settings);
