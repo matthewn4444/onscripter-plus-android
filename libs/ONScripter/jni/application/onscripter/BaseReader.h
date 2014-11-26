@@ -25,6 +25,7 @@
 #define __BASE_READER_H__
 
 #include <stdio.h>
+#include "ONScripter_log.h"
 
 #ifndef SEEK_END
 #define SEEK_END 2

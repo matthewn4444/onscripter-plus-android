@@ -330,7 +330,7 @@ int main( int argc, char **argv )
             }
 #endif
             else{
-                printf(" unknown option %s\n", argv[0] );
+                logw(stderr, " unknown option %s\n", argv[0] );
             }
         }
         else{

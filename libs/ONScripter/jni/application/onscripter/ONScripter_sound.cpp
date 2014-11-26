@@ -95,7 +95,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag, int 
     else{
         buffer = new(std::nothrow) unsigned char[length];
         if (buffer == NULL){
-            fprintf( stderr, "failed to load [%s] because file size [%lu] is too large.\n", filename, length);
+            loge( stderr, "failed to load [%s] because file size [%lu] is too large.\n", filename, length);
             return SOUND_NONE;
         }
         script_h.cBR->getFile( filename, buffer );
@@ -130,7 +130,7 @@ int ONScripter::playSound(const char *filename, int format, bool loop_flag, int 
     if (format & SOUND_MIDI){
         FILE *fp;
         if ( (fp = fopen(TMP_MUSIC_FILE, "wb", true)) == NULL){
-            fprintf(stderr, "can't open temporaly MIDI file %s\n", TMP_MUSIC_FILE);
+            logw(stderr, "can't open temporaly MIDI file %s\n", TMP_MUSIC_FILE);
         }
         else{
             fwrite(buffer, 1, length, fp);
@@ -287,7 +287,7 @@ int ONScripter::playMPEG(const char *filename, bool click_flag, bool loop_flag)
     }
     delete[] mpeg_buffer;
 #else
-    fprintf( stderr, "mpegplay command is disabled.\n" );
+    loge( stderr, "mpegplay command is disabled.\n" );
 #endif
 
     return ret;
@@ -329,7 +329,7 @@ int ONScripter::playAVI( const char *filename, bool click_flag )
         openAudio();
     }
 #else
-    fprintf( stderr, "avi command is disabled.\n" );
+    loge( stderr, "avi command is disabled.\n" );
 #endif
 
     return 0;

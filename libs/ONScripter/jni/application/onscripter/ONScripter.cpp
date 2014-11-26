@@ -70,7 +70,7 @@ void ONScripter::initSDL()
     /* Initialize SDL */
 
     if ( SDL_Init( SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO ) < 0 ){
-        fprintf( stderr, "Couldn't initialize SDL: %s\n", SDL_GetError() );
+        loge( stderr, "Couldn't initialize SDL: %s\n", SDL_GetError() );
         exit(-1);
     }
 
@@ -80,14 +80,14 @@ void ONScripter::initSDL()
 
 #ifdef USE_CDROM
     if( cdaudio_flag && SDL_InitSubSystem( SDL_INIT_CDROM ) < 0 ){
-        fprintf( stderr, "Couldn't initialize CD-ROM: %s\n", SDL_GetError() );
+        loge( stderr, "Couldn't initialize CD-ROM: %s\n", SDL_GetError() );
         exit(-1);
     }
 #endif
 
 #if !defined(IOS)
     if(SDL_InitSubSystem( SDL_INIT_JOYSTICK ) == 0 && SDL_JoystickOpen(0) != NULL)
-        printf( "Initialize JOYSTICK\n");
+        logv( "Initialize JOYSTICK\n");
 #endif
     
 #if defined(PSP) || defined(IPODLINUX) || defined(GP2X) || defined(WINCE)
@@ -97,7 +97,7 @@ void ONScripter::initSDL()
     /* ---------------------------------------- */
     /* Initialize SDL */
     if ( TTF_Init() < 0 ){
-        fprintf( stderr, "can't initialize SDL TTF\n");
+        loge( stderr, "can't initialize SDL TTF\n");
         exit(-1);
     }
 
@@ -115,7 +115,7 @@ void ONScripter::initSDL()
     SDL_Rect **modes;
     modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
     if (modes == (SDL_Rect **)0){
-        fprintf(stderr, "No Video mode available.\n");
+        loge(stderr, "No Video mode available.\n");
         exit(-1);
     }
     else if (modes == (SDL_Rect **)-1){
@@ -198,12 +198,12 @@ void ONScripter::initSDL()
 
 #ifndef USE_SDL_RENDERER
     if ( screen_surface == NULL ) {
-        fprintf( stderr, "Couldn't set %dx%dx%d video mode: %s\n",
+        loge( stderr, "Couldn't set %dx%dx%d video mode: %s\n",
                  screen_width, screen_height, screen_bpp, SDL_GetError() );
         exit(-1);
     }
 #endif
-    printf("Display: %d x %d (%d bpp)\n", screen_width, screen_height, screen_bpp);
+    logv("Display: %d x %d (%d bpp)\n", screen_width, screen_height, screen_bpp);
     dirty_rect.setDimension(screen_width, screen_height);
 
     screen_rect.x = screen_rect.y = 0;
@@ -231,7 +231,7 @@ void ONScripter::openAudio()
     44100;
 #endif
     if ( Mix_OpenAudio( audioFreq, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, DEFAULT_AUDIOBUF ) < 0 ){
-        fprintf(stderr, "Couldn't open audio device!\n"
+        logw(stderr, "Couldn't open audio device!\n"
                 "  reason: [%s].\n", SDL_GetError());
         audio_open_flag = false;
     }
@@ -241,7 +241,7 @@ void ONScripter::openAudio()
         int channels;
 
         Mix_QuerySpec( &freq, &format, &channels);
-        printf("Audio: %d Hz %d bit %s\n", freq,
+        logv("Audio: %d Hz %d bit %s\n", freq,
                (format&0xFF),
                (channels > 1) ? "stereo" : "mono");
         audio_format.format = format;
@@ -504,7 +504,7 @@ int ONScripter::init()
                 delete[] font_file;
                 font_file = new char[ strlen((const char*)val_s) + 1 ];
                 strcpy( font_file, (const char*)val_s );
-                printf("Font: %s\n", font_file);
+                logv("Font: %s\n", font_file);
             }
             FcPatternDestroy( p_pat );
         }
@@ -523,10 +523,10 @@ int ONScripter::init()
         if ( cdrom_drive_number >= 0 && cdrom_drive_number < SDL_CDNumDrives() )
             cdrom_info = SDL_CDOpen( cdrom_drive_number );
         if ( !cdrom_info ){
-            fprintf(stderr, "Couldn't open default CD-ROM: %s\n", SDL_GetError());
+            logw(stderr, "Couldn't open default CD-ROM: %s\n", SDL_GetError());
         }
         else if ( cdrom_info && !CD_INDRIVE( SDL_CDStatus( cdrom_info ) ) ) {
-            fprintf( stderr, "no CD-ROM in the drive\n" );
+            logw( stderr, "no CD-ROM in the drive\n" );
             SDL_CDClose( cdrom_info );
             cdrom_info = NULL;
         }
@@ -566,7 +566,7 @@ int ONScripter::init()
     readToken();
 
     if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
-        fprintf( stderr, "can't open font file: %s\n", font_file );
+        loge( stderr, "can't open font file: %s\n", font_file );
         return -1;
     }
     
@@ -882,7 +882,7 @@ void ONScripter::executeLabel()
 
     while ( current_line<current_label_info.num_of_lines ){
         if ( debug_level > 0 )
-            printf("*****  executeLabel %s:%d/%d:%d:%d *****\n",
+            logv("*****  executeLabel %s:%d/%d:%d:%d *****\n",
                    current_label_info.name,
                    current_line,
                    current_label_info.num_of_lines,
@@ -926,7 +926,7 @@ void ONScripter::executeLabel()
         goto executeLabelTop;
     }
     
-    fprintf( stderr, " ***** End *****\n");
+    logw( stderr, " ***** End *****\n");
     endCommand();
 }
 
@@ -938,7 +938,7 @@ void ONScripter::runScript()
 
 int ONScripter::parseLine( )
 {
-    if (debug_level > 0) printf("ONScripter::Parseline %s\n", script_h.getStringBuffer() );
+    if (debug_level > 0) logv("ONScripter::Parseline %s\n", script_h.getStringBuffer() );
 
     const char *cmd = script_h.getStringBuffer();
     if      (cmd[0] == ';') return RET_CONTINUE;
@@ -992,7 +992,7 @@ int ONScripter::parseLine( )
     else if ( cmd[0] == 'd' && cmd[1] == 'v' && cmd[2] >= '0' && cmd[2] <= '9' )
         return dvCommand();
 
-    fprintf( stderr, " command [%s] is not supported yet!!\n", cmd );
+    logw( stderr, " command [%s] is not supported yet!!\n", cmd );
 
     script_h.skipToken();
 

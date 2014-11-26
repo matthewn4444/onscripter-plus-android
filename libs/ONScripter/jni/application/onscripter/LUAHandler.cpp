@@ -39,7 +39,7 @@ int NL_dofile(lua_State *state)
     
     unsigned long length = lh->sh->cBR->getFileLength(str);
     if (length == 0){
-        printf("cannot open %s\n", str);
+        logw(stderr, "cannot open %s\n", str);
         return 0;
     }
 
@@ -47,7 +47,7 @@ int NL_dofile(lua_State *state)
     int location;
     lh->sh->cBR->getFile(str, buffer, &location);
     if (luaL_loadbuffer(state, (const char*)buffer, length, str) || lua_pcall(state, 0, 0, 0)){
-        printf("cannot parse %s\n", str);
+        logw(stderr, "cannot parse %s\n", str);
     }
 
     delete[] buffer;
@@ -575,7 +575,7 @@ void LUAHandler::init(ONScripter *ons, ScriptHandler *sh)
 
     unsigned long length = sh->cBR->getFileLength(INIT_SCRIPT);
     if (length == 0){
-        printf("cannot open %s\n", INIT_SCRIPT);
+        logv("cannot open %s\n", INIT_SCRIPT);
         return;
     }
 
@@ -583,7 +583,7 @@ void LUAHandler::init(ONScripter *ons, ScriptHandler *sh)
     int location;
     sh->cBR->getFile(INIT_SCRIPT, buffer, &location);
     if (luaL_loadbuffer(state, (const char*)buffer, length, INIT_SCRIPT) || lua_pcall(state, 0, 0, 0)){
-        printf("cannot parse %s\n", INIT_SCRIPT);
+        logw(stderr, "cannot parse %s\n", INIT_SCRIPT);
     }
 
     delete[] buffer;

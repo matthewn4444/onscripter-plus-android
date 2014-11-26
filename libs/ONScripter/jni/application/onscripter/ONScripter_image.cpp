@@ -118,7 +118,16 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
     unsigned long length = script_h.cBR->getFileLength( filename );
 
     if (length == 0){
-        fprintf( stderr, " *** can't find file [%s] ***\n", filename );
+#ifdef ANDROID
+        // Suppress logging cursor files that are unrelated to Android
+        if (strcmp(filename, "uoncur.bmp")
+            && strcmp(filename, "uoffcur.bmp")
+            && strcmp(filename, "doncur.bmp")
+            && strcmp(filename, "doffcur.bmp")
+            && strcmp(filename, "cursor0.bmp")
+            && strcmp(filename, "cursor1.bmp"))
+#endif
+        logw( stderr, " *** can't find file [%s] ***\n", filename );
         return NULL;
     }
 
@@ -138,7 +147,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
     if (length > tmp_image_buf_length){
         buffer = new(std::nothrow) unsigned char[length];
         if (buffer == NULL){
-            fprintf( stderr, "failed to load [%s] because file size [%lu] is too large.\n", filename, length);
+            loge( stderr, "failed to load [%s] because file size [%lu] is too large.\n", filename, length);
             return NULL;
         }
     }
@@ -155,7 +164,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
 
     SDL_Surface *tmp = IMG_Load_RW(src, 0);
     if (!tmp && ext && (!strcmp(ext+1, "JPG") || !strcmp(ext+1, "jpg"))){
-        fprintf(stderr, " *** force-loading a JPG image [%s]\n", filename);
+        logw(stderr, " *** force-loading a JPG image [%s]\n", filename);
         tmp = IMG_LoadJPG_RW(src);
     }
 
@@ -171,7 +180,7 @@ SDL_Surface *ONScripter::createSurfaceFromFile(char *filename, bool *has_alpha, 
     if (buffer != tmp_image_buf) delete[] buffer;
 
     if (!tmp)
-        fprintf( stderr, " *** can't load file [%s] ***\n", filename );
+        logw( stderr, " *** can't load file [%s] ***\n", filename );
 
     return tmp;
 }
