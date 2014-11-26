@@ -325,7 +325,7 @@ const char *ScriptHandler::readToken()
         markAsKidoku( buf++ );
     }
     else if (ch != '\0'){
-        fprintf(stderr, "readToken: skip unknown heading character %c (%x)\n", ch, ch);
+        logw(stderr, "readToken: skip unknown heading character %c (%x)\n", ch, ch);
         buf++;
         goto readTokenTop;
     }
@@ -643,7 +643,7 @@ void ScriptHandler::saveKidokuData()
     FILE *fp;
 
     if ( ( fp = fopen( "kidoku.dat", "wb", true ) ) == NULL ){
-        fprintf( stderr, "can't write kidoku.dat\n" );
+        logw( stderr, "can't write kidoku.dat\n" );
         return;
     }
 
@@ -990,7 +990,7 @@ void ScriptHandler::addStrAlias( const char *str1, const char *str2 )
 
 void ScriptHandler::errorAndExit( const char *str )
 {
-    fprintf( stderr, " **** Script error, %s [%s] ***\n", str, string_buffer );
+    loge( stderr, " **** Script error, %s [%s] ***\n", str, string_buffer );
     exit(-1);
 }
 
@@ -1054,7 +1054,7 @@ int ScriptHandler::readScript( char *path )
     }
 
     if (fp == NULL){
-        fprintf( stderr, "can't open any of 0.txt, 00.txt, nscript.dat and nscript.___\n" );
+        loge( stderr, "can't open any of 0.txt, 00.txt, nscript.dat and nscript.___\n" );
         return -1;
     }
     
@@ -1593,7 +1593,7 @@ void ScriptHandler::parseStr( char **buf )
                 }
             }
 #endif
-            printf("can't find str alias for %s...\n", alias_buf );
+            loge(stderr, "can't find str alias for %s...\n", alias_buf );
             exit(-1);
         }
         current_variable.type |= VAR_CONST;

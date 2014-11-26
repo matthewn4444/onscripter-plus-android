@@ -948,7 +948,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
     if ( event_mode & WAIT_INPUT_MODE ){
         if (event->keysym.sym == SDLK_s && !automode_flag ){
             setInternalSkipMode(true);
-            printf("toggle skip to true\n");
+            logv("toggle skip to true\n");
             stopAnimation( clickstr_state );
 
             return true;
@@ -958,7 +958,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
                 skip_mode &= ~SKIP_TO_EOP;
             else
                 skip_mode |= SKIP_TO_EOP;
-            printf("toggle draw one page flag to %s\n", (skip_mode & SKIP_TO_EOP?"true":"false") );
+            logv("toggle draw one page flag to %s\n", (skip_mode & SKIP_TO_EOP?"true":"false") );
             if ( skip_mode & SKIP_TO_EOP ){
                 stopAnimation( clickstr_state );
 
@@ -968,7 +968,7 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
         else if ( event->keysym.sym == SDLK_a && mode_ext_flag && !automode_flag ){
             setInternalAutoMode(true);
             setInternalSkipMode(false);
-            printf("change to automode\n");
+            logv("change to automode\n");
             stopAnimation( clickstr_state );
 
             return true;

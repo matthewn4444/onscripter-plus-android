@@ -472,7 +472,7 @@ int ScriptParser::nsaCommand()
     delete script_h.cBR;
     script_h.cBR = new NsaReader( nsa_offset, archive_path, BaseReader::ARCHIVE_TYPE_NSA|BaseReader::ARCHIVE_TYPE_NS2, key_table );
     if ( script_h.cBR->open( nsa_path ) ){
-        fprintf( stderr, " *** failed to open nsa or ns2 archive, ignored.  ***\n");
+        logw( stderr, " *** failed to open nsa or ns2 archive, ignored.  ***\n");
     }
 
     return RET_CONTINUE;
@@ -1389,12 +1389,12 @@ int ScriptParser::arcCommand()
         delete script_h.cBR;
         script_h.cBR = new SarReader( archive_path, key_table );
         if ( script_h.cBR->open( buf2 ) ){
-            fprintf( stderr, " *** failed to open archive %s, ignored.  ***\n", buf2 );
+            logw( stderr, " *** failed to open archive %s, ignored.  ***\n", buf2 );
         }
     }
     else if ( strcmp( script_h.cBR->getArchiveName(), "sar" ) == 0 ){
         if ( script_h.cBR->open( buf2 ) ){
-            fprintf( stderr, " *** failed to open archive %s, ignored.  ***\n", buf2 );
+            logw( stderr, " *** failed to open archive %s, ignored.  ***\n", buf2 );
         }
     }
     // skip "arc" commands after "ns?" command

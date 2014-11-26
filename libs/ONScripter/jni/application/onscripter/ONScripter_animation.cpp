@@ -355,7 +355,7 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
         buffer++;
         anim->num_of_cells = getNumberFromBuffer( (const char**)&buffer );
         if ( anim->num_of_cells == 0 ){
-            fprintf( stderr, "ONScripter::parseTaggedString  The number of cells is 0\n");
+            logw( stderr, "ONScripter::parseTaggedString  The number of cells is 0\n");
             return;
         }
 

@@ -418,7 +418,7 @@ void DirectReader::convertFromSJISToUTF8( char *dst_buf, const char *src_buf )
 size_t DirectReader::decodeNBZ( FILE *fp, size_t offset, unsigned char *buf )
 {
     if (key_table_flag)
-        fprintf(stderr, "may not decode NBZ with key_table enabled.\n");
+        logw(stderr, "may not decode NBZ with key_table enabled.\n");
     
     unsigned int original_length, count;
 	BZFILE *bfp;

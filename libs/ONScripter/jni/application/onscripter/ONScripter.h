@@ -476,7 +476,7 @@ private:
             updateSentenceFontSizes();
 
             if ( sentence_font.openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
-                fprintf( stderr, "can't open font file: %s\n", font_file );
+                loge( stderr, "can't open font file: %s\n", font_file );
                 quit();
                 exit(-1);
             }

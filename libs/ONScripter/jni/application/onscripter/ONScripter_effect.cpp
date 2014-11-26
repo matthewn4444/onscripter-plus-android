@@ -380,7 +380,7 @@ bool ONScripter::doEffect( EffectLink *effect, bool clear_dirty_region )
     }
 
     if (effect_counter == 0 && not_implemented)
-        printf("effect No. %d not implemented; substituting crossfade\n", effect_no);
+        logw(stderr, "effect No. %d not implemented; substituting crossfade\n", effect_no);
 
     //printf("effect conut %d / dur %d\n", effect_counter, effect_duration);
     

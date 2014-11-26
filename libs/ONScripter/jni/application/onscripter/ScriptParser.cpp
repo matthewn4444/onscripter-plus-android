@@ -327,7 +327,7 @@ int ScriptParser::getSystemCallNo( const char *buffer )
     else if ( !strcmp( buffer, "automode" ) )    return SYSTEM_AUTOMODE;
     else if ( !strcmp( buffer, "end" ) )         return SYSTEM_END;
     else{
-        printf("Unsupported system call %s\n", buffer );
+        loge(stderr, "Unsupported system call %s\n", buffer );
         return -1;
     }
 }
@@ -342,7 +342,7 @@ void ScriptParser::saveGlovalData()
     writeVariables( script_h.global_variable_border, script_h.variable_range, true );
 
     if (saveFileIOBuf( "gloval.sav" )){
-        fprintf( stderr, "can't open gloval.sav for writing\n");
+        loge( stderr, "can't open gloval.sav for writing\n");
         exit(-1);
     }
 }
@@ -572,7 +572,7 @@ void ScriptParser::writeLog( ScriptHandler::LogInfo &info )
     }
 
     if (saveFileIOBuf( info.filename )){
-        fprintf( stderr, "can't write %s\n", info.filename );
+        loge( stderr, "can't write %s\n", info.filename );
         exit( -1 );
     }
 }
@@ -603,12 +603,12 @@ void ScriptParser::readLog( ScriptHandler::LogInfo &info )
 void ScriptParser::errorAndExit( const char *str, const char *reason )
 {
     if ( reason )
-        fprintf( stderr, " *** Parse error at %s:%d [%s]; %s ***\n",
+        loge( stderr, " *** Parse error at %s:%d [%s]; %s ***\n",
                  current_label_info.name,
                  current_line,
                  str, reason );
     else
-        fprintf( stderr, " *** Parse error at %s:%d [%s] ***\n",
+        loge( stderr, " *** Parse error at %s:%d [%s] ***\n",
                  current_label_info.name,
                  current_line,
                  str );
@@ -691,7 +691,7 @@ int ScriptParser::readEffect( EffectLink *effect )
             effect->anim.remove();
     }
     else if (effect->effect < 0 || effect->effect > 255){
-        fprintf(stderr, "Effect %d is out of range and is switched to 0.\n", effect->effect);
+        logw(stderr, "Effect %d is out of range and is switched to 0.\n", effect->effect);
         effect->effect = 0; // to suppress error
     }
 
@@ -714,7 +714,7 @@ ScriptParser::EffectLink *ScriptParser::parseEffect(bool init_flag)
         link = link->next;
     }
 
-    fprintf(stderr, "Effect No. %d is not found.\n", tmp_effect.effect);
+    loge(stderr, "Effect No. %d is not found.\n", tmp_effect.effect);
     exit(-1);
 
     return NULL;

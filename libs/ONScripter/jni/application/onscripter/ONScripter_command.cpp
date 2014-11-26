@@ -198,7 +198,7 @@ int ONScripter::trapCommand()
         setStr(&trap_dist, buf+1);
     }
     else{
-        printf("trapCommand: [%s] is not supported\n", buf );
+        logw(stderr, "trapCommand: [%s] is not supported\n", buf );
     }
               
     return RET_CONTINUE;
@@ -1246,7 +1246,7 @@ int ONScripter::playCommand()
         setStr(&midi_file_name, buf);
         midi_play_loop_flag = loop_flag;
         if (playSound(midi_file_name, SOUND_MIDI, midi_play_loop_flag) != SOUND_MIDI){
-            fprintf(stderr, "can't play MIDI file %s\n", midi_file_name);
+            logw(stderr, "can't play MIDI file %s\n", midi_file_name);
         }
     }
 
@@ -1482,7 +1482,7 @@ int ONScripter::movieCommand()
 {
     if (script_h.compareString("stop")){
         script_h.readLabel();
-        fprintf(stderr, " [movie stop] is not supported yet!!\n");
+        logw(stderr, " [movie stop] is not supported yet!!\n");
         return RET_CONTINUE;
     }
 
@@ -1501,7 +1501,7 @@ int ONScripter::movieCommand()
             script_h.readInt();
             script_h.readInt();
             script_h.readInt();
-            fprintf(stderr, " [movie pos] is not supported yet!!\n");
+            logw(stderr, " [movie pos] is not supported yet!!\n");
         }
         else if (script_h.compareString("click")){
             script_h.readLabel();
@@ -1513,7 +1513,7 @@ int ONScripter::movieCommand()
         }
         else if (script_h.compareString("async")){ // not supported yet
             script_h.readLabel();
-            fprintf(stderr, " [movie async] is not supported yet!!\n");
+            logw(stderr, " [movie async] is not supported yet!!\n");
         }
         else{
             script_h.readLabel();
@@ -1605,7 +1605,7 @@ int ONScripter::menu_automodeCommand()
 {
     setInternalAutoMode(true);
     setInternalSkipMode(false);
-    printf("menu_automode: change to automode\n");
+    logv("menu_automode: change to automode\n");
     
     return RET_CONTINUE;
 }
@@ -1992,7 +1992,7 @@ int ONScripter::inputCommand()
     const char *buf = script_h.readStr(); // default value
     setStr( &script_h.getVariableData(no).str, buf );
 
-    printf( "*** inputCommand(): $%d is set to the default value: %s\n",
+    logv( "*** inputCommand(): $%d is set to the default value: %s\n",
             no, buf );
     script_h.readInt(); // maxlen
     script_h.readInt(); // widechar flag
@@ -2367,7 +2367,7 @@ int ONScripter::getregCommand()
         }
     }
 
-    if ( !found_flag ) fprintf( stderr, "  The key is not found.\n" );
+    if ( !found_flag ) logw( stderr, "  The key is not found.\n" );
     fclose(fp);
 
     return RET_CONTINUE;

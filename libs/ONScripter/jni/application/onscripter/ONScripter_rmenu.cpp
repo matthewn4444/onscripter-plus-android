@@ -217,7 +217,7 @@ void ONScripter::executeSystemAutomode()
 {
     setInternalAutoMode(true);
     setInternalSkipMode(false);
-    printf("systemcall_automode: change to automode\n");
+    logv("systemcall_automode: change to automode\n");
     leaveSystemCall();
 }
 
