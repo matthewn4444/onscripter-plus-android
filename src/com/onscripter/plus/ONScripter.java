@@ -1,5 +1,8 @@
 package com.onscripter.plus;
 
+import java.io.File;
+import java.util.HashMap;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -246,6 +249,13 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     @Override
     public void onNativeError(NativeONSException e) {
         e.printStackTrace();
+        final HashMap<String, String> passArgs = new HashMap<String, String>(){{
+            put("Game Directory", mCurrentDirectory);
+            put("Save Directory", mSaveDirectory);
+            put("Needs fix", ExtSDCardFix.folderNeedsFix(
+                    new File(mCurrentDirectory).getParentFile()) + "");
+        }};
+        BugSenseHandler.sendExceptionMap(passArgs, e);
     }
 
     @Override
