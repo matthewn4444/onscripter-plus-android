@@ -192,7 +192,7 @@ int ONScripter::loadSaveFile( int no )
     char filename[32];
     sprintf( filename, "save%d.dat", no );
     if (loadFileIOBuf( filename ) == 0){
-        loge( stderr, "can't open save file %s\n", filename );
+        logw( stderr, "can't open save file %s\n", filename );
         return -1;
     }
     
