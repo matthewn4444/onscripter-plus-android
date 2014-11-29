@@ -42,6 +42,7 @@ double      ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
 JavaVM *    ONScripter::JNI_VM = NULL;
 jobject     ONScripter::JavaONScripter = NULL;
 jmethodID   ONScripter::JavaPlayVideo = NULL;
+jmethodID   ONScripter::JavaSendException = NULL;
 jmethodID   ONScripter::JavaReceiveMessage = NULL;
 jclass      ONScripter::JavaONScripterClass = NULL;
 
@@ -1383,7 +1384,7 @@ void ONScripter::setInternalSkipMode(bool enabled) {
     JNI_VM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
-        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::setInternalSkipMode: Java VM AttachCurrentThread() failed");
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "ONScripter::setInternalSkipMode: Java VM AttachCurrentThread() failed");
         return;
     }
 
@@ -1399,7 +1400,7 @@ void ONScripter::setInternalAutoMode(bool enabled) {
     JNI_VM->AttachCurrentThread(&jniEnv, NULL);
 
     if (!jniEnv){
-        __android_log_print(ANDROID_LOG_ERROR, "ONS", "ONScripter::setInternalAutoMode: Java VM AttachCurrentThread() failed");
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "ONScripter::setInternalAutoMode: Java VM AttachCurrentThread() failed");
         return;
     }
 
@@ -1407,3 +1408,25 @@ void ONScripter::setInternalAutoMode(bool enabled) {
     jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, ANDROID_MSG_AUTO_MODE, jb);
 #endif
 }
+
+#ifdef ANDROID
+void ONScripter::onErrorCallback(const char* message) {
+    ScriptParser::onErrorCallback(message);
+
+    JNIEnv * jniEnv = NULL;
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
+
+    if (!jniEnv){
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "ONScripter::logError: Java VM AttachCurrentThread() failed");
+        return;
+    }
+
+    jchar *jc = new jchar[strlen(message)];
+    for (int i=0 ; i<strlen(message) ; i++)
+        jc[i] = message[i];
+    jcharArray jca = jniEnv->NewCharArray(strlen(message));
+    jniEnv->SetCharArrayRegion(jca, 0, strlen(message), jc);
+    jniEnv->CallVoidMethod( JavaONScripter, JavaSendException, jca );
+    delete[] jc;
+}
+#endif

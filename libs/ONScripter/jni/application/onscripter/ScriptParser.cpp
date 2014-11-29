@@ -75,6 +75,8 @@ ScriptParser::ScriptParser()
 
 #ifdef ANDROID
     setMenuLanguage("en");
+
+    script_h.setOnErrorCallback(this);
 #endif
 
     /* ---------------------------------------- */

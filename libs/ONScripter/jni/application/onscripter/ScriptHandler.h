@@ -51,6 +51,14 @@
 
 typedef unsigned char uchar3[3];
 
+#ifdef ANDROID
+class IErrorCallback
+{
+public:
+    virtual void onErrorCallback(const char*) = 0;
+};
+#endif
+
 class ScriptHandler
 {
 public:
@@ -172,6 +180,10 @@ public:
     void setSystemLanguage(const char* languageStr);
     MenuTextBase* getSystemLanguageText() { return menuText; };
     void setRootWritableDir(char const* path);
+
+    void setOnErrorCallback(IErrorCallback* fn) {
+        error_callback = fn;
+    }
 #endif
 #ifdef ENABLE_KOREAN
     bool isKoreanMode(){ return korean_mode; };
@@ -325,6 +337,18 @@ private:
     int  calcArithmetic( int num1, int op, int num2 );
     int  parseArray( char **buf, ArrayVariable &array );
     int  *getArrayPtr( int no, ArrayVariable &array, int offset );
+#ifdef ANDROID
+    void logError(const char* fmt, ...) {
+        if (error_callback) {
+            va_list ap;
+            char buf[1024];
+            va_start(ap, fmt);
+            vsnprintf(buf, 1024, fmt, ap);
+            error_callback->onErrorCallback(buf);
+            va_end(ap);
+        }
+    }
+#endif
 
     /* ---------------------------------------- */
     /* Variable */
@@ -345,6 +369,8 @@ private:
     char *save_dir;
 #ifdef ANDROID
     char *root_writable;
+
+    IErrorCallback* error_callback;
 #endif
     int  script_buffer_length;
     char *script_buffer;

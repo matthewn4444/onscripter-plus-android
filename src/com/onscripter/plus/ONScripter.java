@@ -26,6 +26,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.exception.NativeONSException;
 import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
@@ -178,6 +179,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     public void videoRequested(final String filename, final boolean clickToSkip, final boolean shouldLoop) {
         boolean shouldUseExternalVideo = mPrefs.getBoolean(USE_EXTERNAL_VIDEO_KEY, false);
         mGame.useExternalVideo(shouldUseExternalVideo);
+    }
+
+    @Override
+    public void onNativeError(NativeONSException e) {
+        e.printStackTrace();
     }
 
     @Override

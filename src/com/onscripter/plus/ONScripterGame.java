@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.exception.NativeONSException;
 import com.vplayer.MediaStreamInfo;
 import com.vplayer.VPlayerListener;
 import com.vplayer.VPlayerView;
@@ -271,6 +272,13 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
                     mONScVideoThread = null;
                 }
             }
+        }
+    }
+
+    @Override
+    public void onNativeError(NativeONSException e) {
+        if (mListener != null) {
+            mListener.onNativeError(e);
         }
     }
 

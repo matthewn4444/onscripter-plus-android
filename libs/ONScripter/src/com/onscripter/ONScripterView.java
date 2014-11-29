@@ -14,6 +14,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import com.onscripter.exception.NativeONSException;
+
 
 public class ONScripterView extends DemoGLSurfaceView {
 
@@ -90,6 +92,7 @@ public class ONScripterView extends DemoGLSurfaceView {
         public void autoStateChanged(boolean selected);
         public void skipStateChanged(boolean selected);
         public void videoRequested(String filename, boolean clickToSkip, boolean shouldLoop);
+        public void onNativeError(NativeONSException e);
     }
 
     static class UpdateHandler extends Handler {
@@ -176,6 +179,13 @@ public class ONScripterView extends DemoGLSurfaceView {
             } else {
                 Log.e("ONScripterView", "Cannot play video because it either does not exist or cannot be read. File: " + video.getPath());
             }
+        }
+    }
+
+    public void receiveException(char[] message) {
+        if (mListener != null) {
+            NativeONSException exception = new NativeONSException(new String(message));
+            mListener.onNativeError(exception);
         }
     }
 

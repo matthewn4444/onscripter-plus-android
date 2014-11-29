@@ -90,6 +90,7 @@ public:
     static jobject JavaONScripter;
     static jmethodID JavaPlayVideo;
     static jmethodID JavaReceiveMessage;
+    static jmethodID JavaSendException;
     static jclass JavaONScripterClass;
 
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
@@ -97,6 +98,7 @@ public:
         JavaONScripterClass = (jclass)jniEnv->NewGlobalRef(jniEnv->GetObjectClass(JavaONScripter));
         JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
+        JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException", "([C)V");
     }
 
     static double Sentence_font_scale;
@@ -331,6 +333,9 @@ public:
     int allsp2hideCommand();
     int allsphideCommand();
     int amspCommand();
+#ifdef ANDROID
+    virtual void onErrorCallback(const char*);
+#endif
 
 private:
     // ----------------------------------------
