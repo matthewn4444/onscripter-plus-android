@@ -1372,7 +1372,6 @@ int ONScripter::mp3stopCommand()
         else{
             // wait until fadout is finished when playing music other than ogg
             event_mode = WAIT_TIMER_MODE;
-            waitEvent(-1);
         }
     }
 
