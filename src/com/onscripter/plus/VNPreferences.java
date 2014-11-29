@@ -23,6 +23,8 @@ public class VNPreferences {
     private static final String XML_HEADER = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>";
     public static final String PREF_FILE_NAME = "pref.xml";
 
+    private static final int MIN_FILE_SPACE_KB = 300;
+
     // XML parsing texts
     private static final String XML_MAP_NODE = "map";
     private static final String XML_FLOAT_NODE = "float";
@@ -367,8 +369,10 @@ public class VNPreferences {
                 // Check for space left
                 StatFs stat = new StatFs(mPath);
                 long bytesAvailable = (long)stat.getBlockSize() *(long)stat.getBlockCount();
-                long megAvailable = bytesAvailable / 1048576;
-                if (megAvailable == 0) {
+                final long kbAvailable = bytesAvailable / 1024;
+
+                // If at least 300kb is left over
+                if (kbAvailable <= MIN_FILE_SPACE_KB) {
                     return OnLoadVNPrefListener.Result.NO_MEMORY;
                 } else if (mData != null && !mData.isEmpty()) {
                     synchronized (mReadWriteLock) {
