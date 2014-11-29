@@ -406,10 +406,20 @@ public class VNPreferences {
                             os.flush();
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
-                            BugSenseHandler.sendException(e);
+                            final HashMap<String, String> passArgs = new HashMap<String, String>(){{
+                                put("Path", mPath);
+                                put("Ext SDcard Writable", ExtSDCardFix.isWritable() + "");
+                                put("Space left", kbAvailable + "kb");
+                            }};
+                            BugSenseHandler.sendExceptionMap(passArgs, e);
                         } catch (IOException e) {
                             e.printStackTrace();
-                            BugSenseHandler.sendException(e);
+                            final HashMap<String, String> passArgs = new HashMap<String, String>(){{
+                                put("Path", mPath);
+                                put("Ext SDcard Writable", ExtSDCardFix.isWritable() + "");
+                                put("Space left", kbAvailable + "kb");
+                            }};
+                            BugSenseHandler.sendExceptionMap(passArgs, e);
                         } finally {
                             if (os != null) {
                                 try {
