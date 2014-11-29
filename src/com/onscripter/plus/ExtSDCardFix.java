@@ -370,7 +370,7 @@ public final class ExtSDCardFix {
      * Also if there is no external sdcard, then this will be false.
      * @return
      */
-    public synchronized boolean isWritable() {
+    public static synchronized boolean isWritable() {
         return sExtSDCardWritable;
     }
 
