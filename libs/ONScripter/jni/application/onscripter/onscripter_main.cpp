@@ -140,7 +140,7 @@ JAVA_EXPORT_NAME(ONScripterView_nativeSetSentenceFontScale) ( JNIEnv*  env, jobj
 	}
 }
 
-JNIEXPORT void JNICALL JAVA_EXPORT_NAME(ONScripterView_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
+JNIEXPORT void JNICALL JAVA_EXPORT_NAME(DemoGLSurfaceView_nativeInitJavaCallbacks) (JNIEnv * jniEnv, jobject thiz)
 {
     ONScripter::setJavaEnv(jniEnv, thiz);
 }

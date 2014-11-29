@@ -149,6 +149,7 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
 
     public DemoGLSurfaceView(Activity context, String currentDirectory, String fontPath, String savePath, boolean useHQAudio, boolean shouldRenderOutline) {
         super(context);
+        nativeInitJavaCallbacks();
         mRenderer = new DemoRenderer(context, currentDirectory, fontPath, savePath, useHQAudio, shouldRenderOutline);
         setRenderer(mRenderer);
     }
@@ -232,6 +233,7 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
 
     DemoRenderer mRenderer;
 
+    private native int nativeInitJavaCallbacks();
     protected native void nativeMouse( int x, int y, int action );
     protected native void nativeKey( int keyCode, int down );
 }

@@ -25,7 +25,6 @@ public class ONScripterView extends DemoGLSurfaceView {
     private final Activity mActivity;
 
     // Native methods
-    private native int nativeInitJavaCallbacks();
     private native int nativeGetWidth();
     private native int nativeGetHeight();
     private native void nativeSetSentenceFontScale(double scale);
@@ -71,7 +70,6 @@ public class ONScripterView extends DemoGLSurfaceView {
      */
     public ONScripterView(Activity activity, String gameDirectory, String fontPath, String savePath, boolean useHQAudio, boolean shouldRenderOutline) {
         super(activity, gameDirectory, fontPath, savePath, useHQAudio, shouldRenderOutline);
-        nativeInitJavaCallbacks();
 
         mActivity = activity;
         mCurrentDirectory = gameDirectory;
