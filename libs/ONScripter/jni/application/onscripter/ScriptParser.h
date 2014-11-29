@@ -58,6 +58,9 @@
 typedef unsigned char uchar3[3];
 
 class ScriptParser
+#ifdef ANDROID
+    : public IErrorCallback
+#endif
 {
 public:
     ScriptParser();
@@ -167,6 +170,20 @@ public:
     int addkinsokuCommand();
     int addCommand();
     
+#ifdef ANDROID
+    void logError(const char* fmt, ...) {
+        va_list ap;
+        char buf[1024];
+        va_start(ap, fmt);
+        vsnprintf(buf, 1024, fmt, ap);
+        va_end(ap);
+        onErrorCallback(buf);
+    }
+    virtual void onErrorCallback(const char* message) {
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "%s", message);
+    }
+#endif
+
 protected:
     struct UserFuncLUT{
         struct UserFuncLUT *next;

@@ -32,6 +32,7 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.exception.NativeONSException;
 import com.onscripter.plus.Analytics.BUTTON;
 import com.onscripter.plus.Analytics.CHANGE;
 import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
@@ -240,6 +241,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mGame.useExternalVideo(shouldUseExternalVideo);
 
         Analytics.sendVideoLaunched(filename);
+    }
+
+    @Override
+    public void onNativeError(NativeONSException e) {
+        e.printStackTrace();
     }
 
     @Override
