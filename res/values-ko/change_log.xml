@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.1.15,2014년 12월 1일</item>
+        <item>많은 버그를 고쳤다</item>
         <item>v버전 1.1.14,2014년 11월 24일</item>
         <item>+고음질 오디오</item>
         <item>추락하는 고정형 비디오 플레이어</item>
