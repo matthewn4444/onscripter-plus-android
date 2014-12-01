@@ -5,6 +5,10 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.15,12/1/2014</item>
+        <item>Fixed the black screen on Tsukihime</item>
+        <item>Fixed loading issues with Kagetsu Toyha</item>
+        <item>Fixed crashing on Gingerbread</item>
         <item>vVersion 1.1.14,11/24/2014</item>
         <item>Added higher quality option in settings</item>
         <item>Fixed video player from crashing</item>
