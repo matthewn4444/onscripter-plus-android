@@ -529,11 +529,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 	}
 
     @Override
-    protected void onStop()
+    protected void onUserLeaveHint()
     {
-        super.onStop();
+        super.onUserLeaveHint();
         if( mGame != null ) {
-            mGame.onStop();
+            mGame.onUserLeaveHint();
         }
         Analytics.stop(this);
 
