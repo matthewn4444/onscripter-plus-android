@@ -17,6 +17,19 @@ import android.util.Log;
 import com.onscripter.exception.NativeONSException;
 
 
+/**
+ * This class is a wrapper to render ONScripter games inside a single view object
+ * without any extra code. All you need to do is create the object by the
+ * constructor and add it to your layout. Then you can set a ONScripterEventListener
+ * if you want to. Finally it is your job to set the size of this view.
+ *
+ * You must also pass the following events from your activity for this ONScripterView
+ * to act normally: <b>onPause, onResume, and onUserLeaveHint</b> and also on the
+ * <i>onDestroy</i> event you should call <b>exitApp()</b>. Fail to do any of these
+ * will cause the game to crash.
+ * @author Matthew Ng
+ *
+ */
 public class ONScripterView extends DemoGLSurfaceView {
 
     private static final int MSG_AUTO_MODE = 1;

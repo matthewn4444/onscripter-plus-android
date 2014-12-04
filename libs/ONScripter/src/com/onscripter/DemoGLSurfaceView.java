@@ -225,12 +225,6 @@ class DemoGLSurfaceView extends GLSurfaceView_SDL {
         nativeKey( 0, 3 ); // send SDL_ACTIVEEVENT
     }
 
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-    }
-
     DemoRenderer mRenderer;
 
     private native int nativeInitJavaCallbacks();

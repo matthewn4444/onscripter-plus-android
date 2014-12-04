@@ -433,9 +433,16 @@ public class GLSurfaceView_SDL extends SurfaceView implements SurfaceHolder.Call
         mGLThread.onResume();
     }
 
-    public void onStop()
+    /**
+     * Inform the view that the activity is going to be minimized. The owner of this
+     * view must call this method when user leaves the activity. Calling this method
+     * will recreate the OpenGL surface and resume the rendering thread only if user
+     * powers off and then back on the device.
+     * Must not be called before a renderer has been set.
+     */
+    public void onUserLeaveHint()
     {
-        mGLThread.onStop();
+        mGLThread.onUserLeaveHint();
     }
 
     /**
@@ -879,7 +886,7 @@ public class GLSurfaceView_SDL extends SurfaceView implements SurfaceHolder.Call
         GLThread(Renderer renderer) {
             super();
             mDone = false;
-            mStopped = true;
+            mUserMinimizedApp = false;
             mWidth = 0;
             mHeight = 0;
             mRequestRender = true;
@@ -1051,7 +1058,6 @@ public class GLSurfaceView_SDL extends SurfaceView implements SurfaceHolder.Call
         public void onPause() {
             synchronized (this) {
                 mPaused = true;
-                mStopped = false;
                 mWidthBack = mWidth;
                 mHeightBack = mHeight;
             }
@@ -1060,21 +1066,28 @@ public class GLSurfaceView_SDL extends SurfaceView implements SurfaceHolder.Call
         public void onResume()
         {
             synchronized (this){
+                // Avoid running onResume twice to crash
+                if (!mPaused) {
+                    return;
+                }
                 mWidth = 0;
                 mHeight = 0;
                 mPaused = false;
                 notify();
             }
-            if (mStopped == false){ // e.g. resume from power button
+            if (mUserMinimizedApp == false){ // e.g. resume from power button
                 surfaceCreated();
                 onWindowResize(mWidthBack, mHeightBack);
             }
+            synchronized (this){
+                mUserMinimizedApp = false;
+            }
         }
 
-        public void onStop()
+        public void onUserLeaveHint()
         {
             synchronized (this) {
-                mStopped = true;
+                mUserMinimizedApp = true;
             }
         }
 
@@ -1123,7 +1136,7 @@ public class GLSurfaceView_SDL extends SurfaceView implements SurfaceHolder.Call
 
         private boolean mDone;
         private boolean mPaused;
-        private boolean mStopped;
+        private boolean mUserMinimizedApp;
         private boolean mHasSurface;
         private int mWidth;
         private int mHeight;
