@@ -491,22 +491,17 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     protected void onPause()
     {
         super.onPause();
-        if( mGame != null ) {
-            mGame.onPause();
-        }
+
         if (mAdView != null) {
             mAdView.pause();
         }
-	}
+    }
 
     @SuppressLint("NewApi")
     @Override
     protected void onResume()
     {
         super.onResume();
-        if( mGame != null ) {
-            mGame.onResume();
-        }
 
         // For Android 4-4.3, it will show low profile
         int version = android.os.Build.VERSION.SDK_INT;
