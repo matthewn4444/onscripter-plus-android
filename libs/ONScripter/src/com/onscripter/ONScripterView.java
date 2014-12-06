@@ -195,9 +195,9 @@ public class ONScripterView extends DemoGLSurfaceView {
         }
     }
 
-    public void receiveException(char[] message) {
+    public void receiveException(String message) {
         if (mListener != null) {
-            NativeONSException exception = new NativeONSException(new String(message));
+            NativeONSException exception = new NativeONSException(message);
             mListener.onNativeError(exception);
         }
     }

@@ -98,7 +98,7 @@ public:
         JavaONScripterClass = (jclass)jniEnv->NewGlobalRef(jniEnv->GetObjectClass(JavaONScripter));
         JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
-        JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException", "([C)V");
+        JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException", "(Ljava/lang/String;)V");
     }
 
     static double Sentence_font_scale;

@@ -22,12 +22,18 @@
  */
 
 #include "ONScripter.h"
+#include "utf8_decode.h"
 #ifdef USE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
 #endif
 
 extern void initSJIS2UTF16();
 extern "C" void waveCallback( int channel );
+
+#ifdef ENABLE_KOREAN
+extern unsigned short convKOR2UTF16(unsigned short code);
+#endif
+extern unsigned short convSJIS2UTF16( unsigned short in );
 
 #define DEFAULT_AUDIOBUF  4096
 
@@ -1421,11 +1427,62 @@ void ONScripter::onErrorCallback(const char* message) {
         return;
     }
 
-    jchar *jc = new jchar[strlen(message)];
-    for (int i=0 ; i<strlen(message) ; i++)
-        jc[i] = message[i];
-    jcharArray jca = jniEnv->NewCharArray(strlen(message));
-    jniEnv->SetCharArrayRegion(jca, 0, strlen(message), jc);
+    /* We will convert the bytes in to utf16 (unicode) to pass to Java */
+
+    // Prescan for any characters that are not basic chars (like UTF8)
+    bool parseAsUTF8 = true;
+    int i = 0;
+    while(i < strlen(message)) {
+        char c = message[i];
+        if (IS_UTF8(c)) {
+            i += UTF8ByteLength(c);
+        }
+        else if (IS_TWO_BYTE(c)) {
+            parseAsUTF8 = false;
+            break;
+        }
+        else {
+            i++;
+        }
+    }
+
+    // Convert bytes to unicode
+    size_t size = strlen(message);
+    jchar *jc = new jchar[size];
+    int j = 0;
+    for (int i=0; i<size ; i++) {
+        jchar c = message[i];
+
+        if (i + 1 < size) {
+            unsigned char c2 = message[i + 1];
+            unsigned short index = c << 8 | c2;
+#ifdef ENABLE_KOREAN
+            if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
+                c = convKOR2UTF16( index );
+                i++;
+            } else
+#endif
+            if (IS_UTF8(c) && parseAsUTF8){
+                char text[] = {c, c2};
+                c = decodeUTF8Character(text, NULL);
+                i += UTF8ByteLength(c) - 1;
+            }
+            else if (IS_TWO_BYTE(c)){
+                c = convSJIS2UTF16( index );
+                i++;
+            }
+            else{
+                if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
+                    c = c - 0xa0 + 0xff60;
+            }
+        } else {
+            if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
+                    c = c - 0xa0 + 0xff60;
+        }
+        jc[j++] = c;
+    }
+
+    jstring jca = jniEnv->NewString(jc, j);
     jniEnv->CallVoidMethod( JavaONScripter, JavaSendException, jca );
     delete[] jc;
 }
