@@ -329,7 +329,7 @@ int ScriptParser::getSystemCallNo( const char *buffer )
     else if ( !strcmp( buffer, "automode" ) )    return SYSTEM_AUTOMODE;
     else if ( !strcmp( buffer, "end" ) )         return SYSTEM_END;
     else{
-        loge(stderr, "Unsupported system call %s\n", buffer );
+        loge(stderr, "Unsupported system call '%s'\n", buffer );
         return -1;
     }
 }
