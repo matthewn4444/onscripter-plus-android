@@ -252,8 +252,16 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         final HashMap<String, String> passArgs = new HashMap<String, String>(){{
             put("Game Directory", mCurrentDirectory);
             put("Save Directory", mSaveDirectory);
+            put("Is Ext SDCard Writable", ExtSDCardFix.isWritable() ? "true" : "false");
+            put("Resolution", mGame.getGameWidth() + " x " + mGame.getGameHeight());
             put("Needs fix", ExtSDCardFix.folderNeedsFix(
-                    new File(mCurrentDirectory).getParentFile()) + "");
+                    new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
+
+            // Add the game's name if exists
+            String name = mVNPrefs.getString(getString(R.string.game_pref_name), null);
+            if (name != null) {
+                put("Game Name", name);
+            }
         }};
         BugSenseHandler.sendExceptionMap(passArgs, e);
     }
