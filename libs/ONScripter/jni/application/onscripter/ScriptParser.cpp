@@ -343,8 +343,12 @@ void ScriptParser::saveGlovalData()
     allocFileIOBuf();
     writeVariables( script_h.global_variable_border, script_h.variable_range, true );
 
-    if (saveFileIOBuf( "gloval.sav" )){
+    int ret = saveFileIOBuf( "gloval.sav" );
+    if (ret == -1){
         loge( stderr, "can't open gloval.sav for writing\n");
+        exit(-1);
+    } else if (ret == -2) {
+        loge( stderr, "unable to write gloval.sav correctly\n");
         exit(-1);
     }
 }
