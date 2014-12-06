@@ -165,7 +165,13 @@ char *ONScripter::readSaveStrFromFile( int no )
     sprintf( filename, "save%d.dat", no );
     size_t len = loadFileIOBuf( filename );
     if (len == 0){
-        loge( stderr, "readSaveStrFromFile: can't open save file %s\n", filename );
+        // Sometimes games store extra data in some random save file above 20,
+        // but to be safe we only throw above 40
+        if (no > 40) {
+            loge( stderr, "readSaveStrFromFile: can't open save file %s\n", filename );
+        } else {
+            logw( stderr, "readSaveStrFromFile: can't open save file %s\n", filename );
+        }
         return NULL;
     }
 
@@ -255,7 +261,11 @@ int ONScripter::saveSaveFile( bool write_to_disk, int no, const char *savestr )
         memcpy(file_io_buf, save_data_buf, save_data_len);
         file_io_buf_ptr = save_data_len;
         if (saveFileIOBuf( filename, 0, savestr )){
-            loge( stderr, "can't open save file %s for writing\n", filename );
+            if (no > 40) {
+                loge( stderr, "can't open save file %s for writing\n", filename );
+            } else {
+                logw( stderr, "can't open save file %s for writing\n", filename );
+            }
             return -1;
         }
 
