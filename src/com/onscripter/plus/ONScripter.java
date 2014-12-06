@@ -380,6 +380,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 mRightLayout.setEnabled(false);
                 break;
             }
+        } else {
+            mAllowLeftBezelSwipe = false;
+            mAllowRightBezelSwipe = false;
+            mLeftLayout.setEnabled(true);
+            mRightLayout.setEnabled(true);
         }
     }
 
