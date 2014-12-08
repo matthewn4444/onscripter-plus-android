@@ -247,13 +247,15 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     @Override
-    public void onNativeError(NativeONSException e, String line, String backtrace) {
+    public void onNativeError(NativeONSException e, final String line, final String backtrace) {
         e.printStackTrace();
         final HashMap<String, String> passArgs = new HashMap<String, String>(){{
             put("Game Directory", mCurrentDirectory);
             put("Save Directory", mSaveDirectory);
             put("Is Ext SDCard Writable", ExtSDCardFix.isWritable() ? "true" : "false");
             put("Resolution", mGame.getGameWidth() + " x " + mGame.getGameHeight());
+            put("Script line", line);
+            put("Backtrace", backtrace);
             put("Needs fix", ExtSDCardFix.folderNeedsFix(
                     new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
 
