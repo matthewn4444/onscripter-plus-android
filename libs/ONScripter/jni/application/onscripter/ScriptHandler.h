@@ -55,7 +55,7 @@ typedef unsigned char uchar3[3];
 class IErrorCallback
 {
 public:
-    virtual void onErrorCallback(const char*) = 0;
+    virtual void onErrorCallback(const char*, const char* = NULL) = 0;
 };
 #endif
 
@@ -338,16 +338,19 @@ private:
     int  parseArray( char **buf, ArrayVariable &array );
     int  *getArrayPtr( int no, ArrayVariable &array, int offset );
 #ifdef ANDROID
-    void logError(const char* fmt, ...) {
+    void logErrorWithExtra(const char* extra, const char* fmt, ...) {
         if (error_callback) {
             va_list ap;
             char buf[1024];
             va_start(ap, fmt);
             vsnprintf(buf, 1024, fmt, ap);
-            error_callback->onErrorCallback(buf);
+            error_callback->onErrorCallback(buf, extra);
             va_end(ap);
         }
     }
+
+#define logError(fmt, ...) \
+    logErrorWithExtra(NULL, fmt, ##__VA_ARGS__)
 #endif
 
     /* ---------------------------------------- */

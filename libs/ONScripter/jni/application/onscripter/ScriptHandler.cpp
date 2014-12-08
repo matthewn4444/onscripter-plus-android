@@ -990,7 +990,7 @@ void ScriptHandler::addStrAlias( const char *str1, const char *str2 )
 
 void ScriptHandler::errorAndExit( const char *str )
 {
-    loge( stderr, " **** Script error, %s [%s] ***\n", str, string_buffer );
+    logee( stderr, string_buffer, " **** Script error, %s ***", str );
     exit(-1);
 }
 

@@ -98,7 +98,8 @@ public:
         JavaONScripterClass = (jclass)jniEnv->NewGlobalRef(jniEnv->GetObjectClass(JavaONScripter));
         JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
-        JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException", "(Ljava/lang/String;)V");
+        JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException",
+            "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     }
 
     static double Sentence_font_scale;
@@ -334,7 +335,7 @@ public:
     int allsphideCommand();
     int amspCommand();
 #ifdef ANDROID
-    virtual void onErrorCallback(const char*);
+    virtual void onErrorCallback(const char*, const char*);
 #endif
 
 private:
@@ -462,6 +463,8 @@ private:
     int  getNumberFromBuffer( const char **buf );
 
 #ifdef ANDROID
+    size_t basicStringToUnicode(jchar* out, const char* text);
+
     void setSentenceFontParamters(int sizeX, int sizeY) {
         sentence_font.setFontParametersForScaling(sizeX, sizeY, Sentence_font_scale);
     }

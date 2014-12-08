@@ -171,16 +171,19 @@ public:
     int addCommand();
     
 #ifdef ANDROID
-    void logError(const char* fmt, ...) {
+    void logErrorWithExtra(const char* extra, const char* fmt, ...) {
         va_list ap;
         char buf[1024];
         va_start(ap, fmt);
         vsnprintf(buf, 1024, fmt, ap);
         va_end(ap);
-        onErrorCallback(buf);
+        onErrorCallback(buf, extra);
     }
-    virtual void onErrorCallback(const char* message) {
-        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "%s", message);
+    virtual void onErrorCallback(const char* message, const char* extra) {
+        if (extra)
+            __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "%s [%s]", message, extra);
+        else
+            __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "%s", message);
     }
 #endif
 

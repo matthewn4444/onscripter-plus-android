@@ -247,7 +247,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     @Override
-    public void onNativeError(NativeONSException e) {
+    public void onNativeError(NativeONSException e, String line, String backtrace) {
         e.printStackTrace();
         final HashMap<String, String> passArgs = new HashMap<String, String>(){{
             put("Game Directory", mCurrentDirectory);

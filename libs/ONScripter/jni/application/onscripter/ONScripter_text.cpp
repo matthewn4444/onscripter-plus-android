@@ -1406,4 +1406,65 @@ bool ONScripter::scanText()
     }
 }
 
+#ifdef ANDROID
+// TODO this is temporary till the encoder class is built
+// Converts a string (char*) to Unicode (jchar*) and returns the size
+//  Does not check if buffer is smaller than input text
+size_t ONScripter::basicStringToUnicode(jchar* out, const char* text)
+{
+    // Prescan for any characters that are not basic chars (like UTF8)
+    bool parseAsUTF8 = true;
+    int i = 0;
+    while(i < strlen(text)) {
+        char c = text[i];
+        if (IS_UTF8(c)) {
+            i += UTF8ByteLength(c);
+        }
+        else if (IS_TWO_BYTE(c)) {
+            parseAsUTF8 = false;
+            break;
+        }
+        else {
+            i++;
+        }
+    }
+
+    // Convert bytes to unicode
+    size_t size = strlen(text);
+    int j = 0;
+    for (int i=0; i<size ; i++) {
+        jchar c = text[i];
+
+        if (i + 1 < size) {
+            unsigned char c2 = text[i + 1];
+            unsigned short index = c << 8 | c2;
+#ifdef ENABLE_KOREAN
+            if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
+                c = convKOR2UTF16( index );
+                i++;
+            } else
+#endif
+            if (IS_UTF8(c) && parseAsUTF8){
+                char t[] = {c, c2};
+                c = decodeUTF8Character(t, NULL);
+                i += UTF8ByteLength(c) - 1;
+            }
+            else if (IS_TWO_BYTE(c)){
+                c = convSJIS2UTF16( index );
+                i++;
+            }
+            else{
+                if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
+                    c = c - 0xa0 + 0xff60;
+            }
+        } else {
+            if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
+                    c = c - 0xa0 + 0xff60;
+        }
+        out[j++] = c;
+    }
+    out[j] = 0;
+    return j;
+}
+#endif
 
