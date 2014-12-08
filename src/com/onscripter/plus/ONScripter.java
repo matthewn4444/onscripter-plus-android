@@ -182,8 +182,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     @Override
-    public void onNativeError(NativeONSException e) {
-        e.printStackTrace();
+    public void onNativeError(NativeONSException e, String line, String backtrace) {
     }
 
     @Override

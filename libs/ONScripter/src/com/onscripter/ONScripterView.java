@@ -105,7 +105,7 @@ public class ONScripterView extends DemoGLSurfaceView {
         public void autoStateChanged(boolean selected);
         public void skipStateChanged(boolean selected);
         public void videoRequested(String filename, boolean clickToSkip, boolean shouldLoop);
-        public void onNativeError(NativeONSException e);
+        public void onNativeError(NativeONSException e, String line, String backtrace);
     }
 
     static class UpdateHandler extends Handler {
@@ -195,10 +195,15 @@ public class ONScripterView extends DemoGLSurfaceView {
         }
     }
 
-    public void receiveException(String message) {
+    public void receiveException(String message, String currentLineBuffer, String backtrace) {
+        if (currentLineBuffer != null) {
+            Log.e("ONScripter", message + "\nCurrent line: " + currentLineBuffer + "\n" + backtrace);
+        } else {
+            Log.e("ONScripter", message + "\n" + backtrace);
+        }
         if (mListener != null) {
             NativeONSException exception = new NativeONSException(message);
-            mListener.onNativeError(exception);
+            mListener.onNativeError(exception, currentLineBuffer, backtrace);
         }
     }
 

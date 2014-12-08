@@ -276,9 +276,9 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     }
 
     @Override
-    public void onNativeError(NativeONSException e) {
+    public void onNativeError(NativeONSException e, String line, String backtrace) {
         if (mListener != null) {
-            mListener.onNativeError(e);
+            mListener.onNativeError(e, line, backtrace);
         }
     }
 
