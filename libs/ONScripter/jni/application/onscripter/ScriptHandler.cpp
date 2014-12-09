@@ -255,8 +255,23 @@ const char *ScriptHandler::readToken()
             }
             else{
                 if (ch == '%' || ch == '?'){
-                    addIntVariable(&buf);
-                    SKIP_SPACE(buf);
+                    // To correct a common parsing error where non-English scripts are corrupted
+                    // followed by a 1-Byte '?' or '%', we ignore them if it is not followed by a number
+                    char nextChar = buf[1];
+                    if ('0' <= nextChar && nextChar <= '9') {
+                        addIntVariable(&buf);
+                        SKIP_SPACE(buf);
+                    } else {
+                        addStringBuffer( ch );
+                        if (nextChar == 0x0a) {
+                            // Caused by character corruption, most likely suppose to be clickwait
+                            ch = *buf = '\\';
+                            continue;
+                        } else if (nextChar == '\0') {
+                            break;
+                        }
+                        buf++;
+                    }
                 }
                 else if (ch == '$'){
                     addStrVariable(&buf);
