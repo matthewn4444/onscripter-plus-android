@@ -265,6 +265,9 @@ int ONScripter::loadSaveFile2( int file_version )
                 ai->color[2-j] = readChar();
             readChar(); // 0x00
 
+            // Corrupted save file causes crashing when dividing by 0
+            if (!ai->max_param) errorAndExit("Cannot load corrupt save file", "Dividing by 0");
+
             int w = ai->max_width * ai->param / ai->max_param;
             if ( ai->max_width > 0 && w > 0 ) ai->orig_pos.w = w;
 
