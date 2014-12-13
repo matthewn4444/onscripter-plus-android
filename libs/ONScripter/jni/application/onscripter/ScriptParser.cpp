@@ -608,16 +608,13 @@ void ScriptParser::readLog( ScriptHandler::LogInfo &info )
 
 void ScriptParser::errorAndExit( const char *str, const char *reason )
 {
+    char location[1024];
+    sprintf(location, "%s:%d", current_label_info.name, current_line);
+
     if ( reason )
-        loge( stderr, " *** Parse error at %s:%d [%s]; %s ***\n",
-                 current_label_info.name,
-                 current_line,
-                 str, reason );
+        logee( stderr, location, " *** Parse error: %s [%s] ***\n", str, reason );
     else
-        loge( stderr, " *** Parse error at %s:%d [%s] ***\n",
-                 current_label_info.name,
-                 current_line,
-                 str );
+        logee( stderr, location, " *** Parse error: %s ***\n", str );
     exit(-1);
 }
 
