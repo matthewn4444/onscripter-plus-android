@@ -292,7 +292,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     }
 }
 
-void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info )
+void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool single_line )
 {
     int i;
 
@@ -381,6 +381,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
 #endif
             ){
             if ( checkLineBreak( str, info ) ){
+                if (single_line) break;
                 info->newLine();
                 for (int i=0 ; i<indent_offset ; i++)
                     info->advanceCharInHankaku(2);
@@ -393,9 +394,11 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
                 text[2] = *str++;
             }
 #endif
+            if (single_line && info->isEndOfLine()) break;
             drawChar( text, info, false, false, surface, cache_info );
         }
         else if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
+            if (single_line) break;
             info->newLine();
             str++;
         }
@@ -404,6 +407,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             for (int i = 0; i < numCharBytes; i++) {
                 text[i] = *str++;
             }
+            if (single_line && info->isEndOfLine()) break;
             drawChar( text, info, false, false, surface, cache_info );
         }
         else if (*str){
@@ -420,6 +424,7 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
                 }
             }
 #endif
+            if (single_line && info->isEndOfLine()) break;
             drawChar( text, info, false, false, surface, cache_info );
         }
     }

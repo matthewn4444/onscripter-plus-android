@@ -275,7 +275,7 @@ bool ONScripter::executeSystemLoad()
     menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1  - menu_font.num_xy[1] * menu_font.pitch_xy[1]) / 2;
     menu_font.setXY( (menu_font.num_xy[0] - strlen( load_menu_name ) / 2) / 2, 0 );
     uchar3 color = {0xff, 0xff, 0xff};
-    drawString( load_menu_name, color, &menu_font, true, accumulation_surface, NULL, &text_info );
+    drawString( load_menu_name, color, &menu_font, true, accumulation_surface, NULL, &text_info, true );
     menu_font.newLine();
     menu_font.newLine();
         
@@ -305,7 +305,7 @@ bool ONScripter::executeSystemLoad()
                      save_file_info.sjis_no );
             nofile_flag = true;
         }
-        ButtonLink *button = getSelectableSentence( buffer, &menu_font, false, nofile_flag );
+        ButtonLink *button = getSelectableSentence( buffer, &menu_font, false, nofile_flag, true );
         root_button_link.insert( button );
         button->no = i;
         flush( refreshMode() );
@@ -380,7 +380,7 @@ void ONScripter::executeSystemSave()
     menu_font.top_xy[1] = (screen_height * screen_ratio2 / screen_ratio1  - menu_font.num_xy[1] * menu_font.pitch_xy[1]) / 2;
     menu_font.setXY((menu_font.num_xy[0] - strlen( save_menu_name ) / 2 ) / 2, 0);
     uchar3 color = {0xff, 0xff, 0xff};
-    drawString( save_menu_name, color, &menu_font, true, accumulation_surface, NULL, &text_info );
+    drawString( save_menu_name, color, &menu_font, true, accumulation_surface, NULL, &text_info, true );
     menu_font.newLine();
     menu_font.newLine();
         
@@ -410,7 +410,7 @@ void ONScripter::executeSystemSave()
                      save_file_info.sjis_no );
             nofile_flag = true;
         }
-        ButtonLink *button = getSelectableSentence( buffer, &menu_font, false, nofile_flag );
+        ButtonLink *button = getSelectableSentence( buffer, &menu_font, false, nofile_flag, true );
         root_button_link.insert( button );
         button->no = i;
         flush( refreshMode() );

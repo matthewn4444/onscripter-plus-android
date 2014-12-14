@@ -453,7 +453,7 @@ private:
     void clearCurrentPage();
     void shadowTextDisplay( SDL_Surface *surface, SDL_Rect &clip );
     void newPage();
-    ButtonLink *getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag = true, bool nofile_flag = false );
+    ButtonLink *getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag = true, bool nofile_flag = false, bool single_line = false );
     void decodeExbtnControl( const char *ctl_str, SDL_Rect *check_src_rect=NULL, SDL_Rect *check_dst_rect=NULL );
     void saveAll();
     void loadEnvData();
@@ -520,7 +520,7 @@ private:
     int  calcDurationToNextAnimation();
     void stepAnimation(int t);
     void proceedAnimation();
-    void setupAnimationInfo(AnimationInfo *anim, FontInfo *info=NULL);
+    void setupAnimationInfo(AnimationInfo *anim, FontInfo *info=NULL, bool single_line=false);
     void parseTaggedString(AnimationInfo *anim );
     void drawTaggedSurface(SDL_Surface *dst_surface, AnimationInfo *anim, SDL_Rect &clip);
     void stopAnimation(int click);
@@ -803,7 +803,7 @@ private:
     void shiftHalfPixelY(SDL_Surface *surface);
     void drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char *text, int xy[2], bool shadow_flag, AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect );
     void drawChar( char* text, FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip=NULL );
-    void drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL );
+    void drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect = NULL, AnimationInfo *cache_info=NULL, bool single_line=false );
     void restoreTextBuffer(SDL_Surface *surface = NULL);
     void enterTextDisplayMode(bool text_flag = true);
     void leaveTextDisplayMode(bool force_leave_flag = false);

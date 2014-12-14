@@ -1140,7 +1140,7 @@ void ONScripter::newPage()
     flush( refreshMode(), &sentence_font_info.pos );
 }
 
-ButtonLink *ONScripter::getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag, bool nofile_flag )
+ButtonLink *ONScripter::getSelectableSentence( char *buffer, FontInfo *info, bool flush_flag, bool nofile_flag, bool single_line )
 {
     int current_text_xy[2];
     current_text_xy[0] = info->xy[0];
@@ -1169,7 +1169,7 @@ ButtonLink *ONScripter::getSelectableSentence( char *buffer, FontInfo *info, boo
     ai->scalePosXY( screen_ratio1, screen_ratio2 );
     ai->visible = true;
 
-    setupAnimationInfo( ai, info );
+    setupAnimationInfo( ai, info, single_line );
     bl->select_rect = bl->image_rect = ai->pos;
 
     info->newLine();
