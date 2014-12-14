@@ -2152,8 +2152,16 @@ int ONScripter::gettagCommand()
                 const char *buf_start = buf;
                 while(*buf != '/' && *buf != 0 && *buf != ']' && 
                       (!zenkakko_flag || buf[0] != "¡Û"[0] || buf[1] != "¡Û"[1])){
+#ifdef ENABLE_KOREAN
+                    unsigned short index = buf[1] != '\0' && buf[1] != '\\' ?
+                        (buf[0] & 0xFF) << 8 ^ buf[1] & 0xFF : 0;
+#endif
                     if (IS_TWO_BYTE(*buf))
                         buf += 2;
+#ifdef ENABLE_KOREAN
+                    else if (IS_KOR(index))
+                        buf += 2;
+#endif
                     else
                         buf++;
                 }
