@@ -44,8 +44,6 @@ extern unsigned short convSJIS2UTF16( unsigned short in );
 #define DEFAULT_AUTOMODE_TIME 1000
 
 #ifdef ANDROID
-#include "backtrace.h"
-
 double      ONScripter::Sentence_font_scale = DEFAULT_SENTENCE_SCALE;
 JavaVM *    ONScripter::JNI_VM = NULL;
 jobject     ONScripter::JavaONScripter = NULL;

@@ -3,4 +3,6 @@
 
 unsigned int get_backtrace(char** out, unsigned int buffSize);
 
+void print_backtrace(const char* label = NULL);
+
 #endif // __BACKTRACE_H__

@@ -27,6 +27,7 @@
 #include "ScriptParser.h"
 #include "DirtyRect.h"
 #include "ButtonLink.h"
+#include "backtrace.h"
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
