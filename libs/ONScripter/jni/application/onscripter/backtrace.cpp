@@ -4,6 +4,10 @@
 #include <dlfcn.h>
 #include <cxxabi.h>
 
+#ifdef ANDROID
+#include <android/log.h>
+#endif
+
 #include "backtrace.h"
 
 // Help from http://www.netmite.com/android/mydroid/frameworks/base/libs/utils/CallStack.cpp
@@ -85,4 +89,24 @@ unsigned int get_backtrace(char** out, unsigned int buffSize)
     unsigned int length = (unsigned int)out_buff - (unsigned int)*out;
     *(*out + length) = 0;
     return length;
+}
+
+void print_backtrace(const char* label)
+{
+    size_t size = 2048;
+    char* buffer = new char[size];
+    get_backtrace(&buffer, size);
+#ifdef ANDROID
+    if (label)
+        __android_log_print(ANDROID_LOG_VERBOSE, label, "%s", buffer);
+    else
+        __android_log_print(ANDROID_LOG_VERBOSE, "backtrace", "%s", buffer);
+#else
+    if (label)
+        printf("%s: %s", label, buffer);
+    else
+        printf("%s", buffer);
+#endif
+    delete[] buffer;
+    buffer = 0;
 }
