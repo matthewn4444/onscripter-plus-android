@@ -2,6 +2,9 @@
 <resources>
     <string name="change_log_dialog_title">変更</string>
     <string-array name="change_log">
+        <item>vバージョン 1.1.16,2014年12月15日</item>
+        <item>アンドロイドLのセーブスクリーンを直した</item>
+        <item>たくさんバグを直した</item>
         <item>vバージョン 1.1.15,2014年12月1日</item>
         <item>たくさんバグを直した</item>
         <item>vバージョン 1.1.14,2014年11月24日</item>
