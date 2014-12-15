@@ -6,6 +6,11 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.16,12/15/2014</item>
+        <item>Fixed freezing when turning phone on</item>
+        <item>Fixed side controls from disappearing</item>
+        <item>Fixed a bunch of Korean games (e.g Akatsuki no Goei, Cross channel, Nanatsu no Fushigi no Owaru Toki, etc)</item>
+        <item>Fixed save/load slots layout</item>
         <item>vVersion 1.1.15,12/1/2014</item>
         <item>Fixed the black screen on Tsukihime</item>
         <item>Fixed loading issues with Kagetsu Toyha</item>

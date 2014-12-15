@@ -3,6 +3,9 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.1.16,2014년 12월 15일</item>
+        <item>많이 게임을 고쳤다(새벽의 호위,크로스 채널,등). </item>
+        <item>안드로이드 L의 세이브 스크린을 고쳤다.</item>
         <item>v버전 1.1.15,2014년 12월 1일</item>
         <item>많은 버그를 고쳤다</item>
         <item>v버전 1.1.14,2014년 11월 24일</item>

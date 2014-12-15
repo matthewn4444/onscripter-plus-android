@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">Последние изменения</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.16,12/15/2014</item>
+        <item>Исправлено множество ошибок</item>
         <item>vVersion 1.1.15,12/1/2014</item>
         <item>Исправлено множество ошибок</item>
         <item>vVersion 1.1.14,11/20/2014</item>
