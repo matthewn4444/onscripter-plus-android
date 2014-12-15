@@ -1140,7 +1140,8 @@ bool ONScripter::processText()
         string_buffer_offset++;
         return true;
     }
-    else if ( ch == '/' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
+    else if ( ch == '/' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)
+               && script_h.getStringBuffer()[string_buffer_offset + 1] == '\n'){    // Do not crash when scripts use '/'
         if ( ruby_struct.stage == RubyStruct::BODY ){
             current_page->add('/');
             sentence_font.addLineOffset(ruby_struct.margin);
@@ -1230,12 +1231,15 @@ bool ONScripter::processText()
             clickstr_state = CLICK_NONE;
         }
         
+        bool characterIs1Byte = (ch & 0x80) == 0;
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;
+
         if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
              !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)){
-            out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
+            if (!characterIs1Byte)  // Let 1 Byte characters play nice with 2 byte characters
+                out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
             drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
             num_chars_in_sentence++;
         }
@@ -1297,7 +1301,7 @@ bool ONScripter::processText()
         }
 
         if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
-             !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR))
+             !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) && !characterIs1Byte)
             string_buffer_offset++;
         string_buffer_offset++;
 
