@@ -54,6 +54,38 @@
 #define MESSAGE_OK "‚n‚j"
 #define MESSAGE_CANCEL "ƒLƒƒƒ“ƒZƒ‹"
 #endif
+
+#else
+
+// Only used as a replacement for sprintf for failing on Android L
+// This only works with '%s' string arrays in the format. Corrects
+// the broken sprintf when format contains Asian character bytes.
+int makeSaveSystemList(char* buffer, const char* format, ...)
+{
+    int i = 0, j = 0;
+    char* str;
+    va_list vl;
+    char c;
+
+    va_start(vl, format);
+    while((c = format[i]) != '\0') {
+        if (c == '%') {
+            str = va_arg(vl, char*);
+            if (str) {
+                while(*str != '\0') {
+                    buffer[j++] = *(str++);
+                }
+            }
+            i++;
+        } else {
+            buffer[j++] = c;
+        }
+        i++;
+    }
+    buffer[j] = '\0';
+    va_end(vl);
+    return j;
+}
 #endif
 
 void ONScripter::enterSystemCall()
@@ -290,7 +322,12 @@ bool ONScripter::executeSystemLoad()
         menu_font.setXY( (menu_font.num_xy[0] - (strlen( save_item_name ) / 2 + 15) ) / 2 );
 
         if ( save_file_info.valid ){
+#ifdef ANDROID
+            // Manual sprintf because broken on Android L with Asian characters
+            makeSaveSystemList( buffer, MESSAGE_SAVE_EXIST,
+#else
             sprintf( buffer, MESSAGE_SAVE_EXIST,
+#endif
                      save_item_name,
                      save_file_info.sjis_no,
                      save_file_info.sjis_month,
@@ -300,7 +337,11 @@ bool ONScripter::executeSystemLoad()
             nofile_flag = false;
         }
         else{
+#ifdef ANDROID
+            makeSaveSystemList( buffer, MESSAGE_SAVE_EMPTY,
+#else
             sprintf( buffer, MESSAGE_SAVE_EMPTY,
+#endif
                      save_item_name,
                      save_file_info.sjis_no );
             nofile_flag = true;
@@ -395,7 +436,12 @@ void ONScripter::executeSystemSave()
         menu_font.setXY( (menu_font.num_xy[0] - (strlen( save_item_name ) / 2 + 15) ) / 2 );
 
         if ( save_file_info.valid ){
+#ifdef ANDROID
+            // Manual sprintf because broken on Android L with Asian characters
+            makeSaveSystemList( buffer, MESSAGE_SAVE_EXIST,
+#else
             sprintf( buffer, MESSAGE_SAVE_EXIST,
+#endif
                      save_item_name,
                      save_file_info.sjis_no,
                      save_file_info.sjis_month,
@@ -405,7 +451,11 @@ void ONScripter::executeSystemSave()
             nofile_flag = false;
         }
         else{
+#ifdef ANDROID
+            makeSaveSystemList( buffer, MESSAGE_SAVE_EMPTY,
+#else
             sprintf( buffer, MESSAGE_SAVE_EMPTY,
+#endif
                      save_item_name,
                      save_file_info.sjis_no );
             nofile_flag = true;
