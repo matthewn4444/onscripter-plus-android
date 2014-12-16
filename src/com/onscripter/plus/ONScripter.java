@@ -255,7 +255,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             put("Is Ext SDCard Writable", ExtSDCardFix.isWritable() ? "true" : "false");
             put("Resolution", mGame.getGameWidth() + " x " + mGame.getGameHeight());
             put("Script line", line);
-            put("Backtrace", backtrace);
             put("Needs fix", ExtSDCardFix.folderNeedsFix(
                     new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
 
@@ -263,6 +262,12 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             String name = mVNPrefs.getString(getString(R.string.game_pref_name), null);
             if (name != null) {
                 put("Game Name", name);
+            }
+
+            // Output the backtrace line by line because of bugsense limitations
+            String[] lines = backtrace.split("\n");
+            for (int i = 0; i < lines.length; i++) {
+                put("Backtrace " + (i + 1), lines[i]);
             }
         }};
         BugSenseHandler.sendExceptionMap(passArgs, e);
