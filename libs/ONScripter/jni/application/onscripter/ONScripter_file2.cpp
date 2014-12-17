@@ -431,6 +431,10 @@ int ONScripter::loadSaveFile2( int file_version )
     i = readInt();
     current_label_info = script_h.getLabelByLine( i );
     current_line = i - current_label_info.start_line;
+
+    // Not possible to have a negative line number, this causes crashes later
+    if (current_line < 0) errorAndExit("Cannot load corrupt save file", "Saved current line is negative.");
+
     //printf("load %d:%d(%d-%d)\n", current_label_info.start_line, current_line, i, current_label_info.start_line);
     char *buf = script_h.getAddressByLine( i );
     
