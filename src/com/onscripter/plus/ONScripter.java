@@ -92,7 +92,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     };
 
     /** Called when the activity is first created. */
-    @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -151,15 +150,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
         // If Kitkat and higher, we will need to hide the navigation bar immersive mode
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            mImmersiveHandler = new Handler();
-            getWindow().getDecorView().setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if (visibility == View.VISIBLE) {
-                        refreshFullscreenTimer();
-                    }
-                }
-            });
+            initImmersiveListeners();
         }
 
         runSDLApp();
@@ -188,6 +179,22 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     @Override
     public void onReady() {
         fitGameOnScreen();
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private void initImmersiveListeners() {
+        mImmersiveHandler = new Handler();
+        View v = getWindow().getDecorView();
+        if (v != null) {
+            v.setOnSystemUiVisibilityChangeListener(new OnSystemUiVisibilityChangeListener() {
+                @Override
+                public void onSystemUiVisibilityChange(int visibility) {
+                    if (View.VISIBLE == visibility) {
+                        refreshFullscreenTimer();
+                    }
+                }
+            });
+        }
     }
 
     private void fitGameOnScreen() {
