@@ -194,6 +194,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 super.onAdDismiss();
                 findViewById(android.R.id.content).setVisibility(View.GONE);
                 mGame.exitApp();
+                finish();
             }
 
             @Override
