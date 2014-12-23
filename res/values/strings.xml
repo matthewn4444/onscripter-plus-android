@@ -48,6 +48,7 @@
     <string name="message_read_font_error">Could not read font!</string>
     <string name="message_cannot_write_pref">There is not enough memory to save settings.</string>
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
+    <string name="message_corrupt_save_file">Cannot load save file because it is corrupted. Please choose another.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>

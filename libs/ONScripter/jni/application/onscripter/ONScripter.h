@@ -82,8 +82,11 @@ static const char* MESSAGE_OK;
 static const char* MESSAGE_CANCEL;
 
 private:
-static const int ANDROID_MSG_AUTO_MODE = 1;
-static const int ANDROID_MSG_SKIP_MODE = 2;
+    typedef enum {
+        ANDROID_MSG_AUTO_MODE = 1,
+        ANDROID_MSG_SKIP_MODE = 2,
+        ANDROID_MSG_CORRUPT_SAVE_FILE = 3,
+    } MessageType_t;
 
 public:
     // Static Java Environment
@@ -493,6 +496,7 @@ private:
     }
 
     void playVideoAndroid(const char *filename, bool click_flag, bool loop_flag);
+    void sendUserMessage(MessageType_t type);
 #endif
     void setInternalAutoMode(bool enabled);
     void setInternalSkipMode(bool enabled);

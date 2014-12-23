@@ -29,12 +29,14 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.ONScripterView.UserMessage;
 import com.onscripter.exception.NativeONSException;
 import com.onscripter.plus.Analytics.BUTTON;
 import com.onscripter.plus.Analytics.CHANGE;
@@ -228,6 +230,19 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     @Override
     public void skipStateChanged(boolean selected) {
         mSkipButton.setSelected(selected);
+    }
+
+    @Override
+    public void onUserMessage(UserMessage messageId) {
+        int stringResId = 0;
+        switch (messageId) {
+        case CORRUPT_SAVE_FILE:
+            stringResId = R.string.message_corrupt_save_file;
+            break;
+        default:
+            return;
+        }
+        Toast.makeText(this, stringResId, Toast.LENGTH_LONG).show();
     }
 
     @Override

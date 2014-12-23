@@ -1452,4 +1452,20 @@ void ONScripter::onErrorCallback(const char* message, const char* extra) {
     }
     delete[] buffer;
 }
+
+void ONScripter::sendUserMessage(MessageType_t type) {
+    if (type < ANDROID_MSG_CORRUPT_SAVE_FILE) {
+        errorAndExit("Invalid user message");
+    }
+
+    JNIEnv * jniEnv = NULL;
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
+
+    if (!jniEnv){
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "ONScripter::sendUserMessage: Java VM AttachCurrentThread() failed");
+        return;
+    }
+
+    jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, type, JNI_FALSE);
+}
 #endif
