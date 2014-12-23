@@ -23,8 +23,159 @@
 
 #include "ONScripter.h"
 
+
+// Helper macros to scan through the save file
+#define CHECK_EOF() \
+    if (file_io_buf_ptr >= file_io_buf_len) { \
+        logw(stderr, "Save file is corrupted because file is too small."); \
+        return -1; \
+    }
+
+#define SCAN_MULTI(n, fn_name) \
+    for (int i = 0; i < n; i++) { \
+        fn_name(); \
+        CHECK_EOF(); \
+    }
+
 int ONScripter::loadSaveFile2( int file_version )
 {
+    // Used to scan the save file for any corruption that could crash the game if not
+    // scanned. This runs through the file to make sure that we can read all the fields
+    // in the save file. If we cannot then we ignore it and ask the user to choose again
+    int before = file_io_buf_ptr;
+
+    SCAN_MULTI(8, readInt);
+    SCAN_MULTI(2, readStr);
+    SCAN_MULTI(2, readInt);
+    SCAN_MULTI(1, readStr);
+    SCAN_MULTI(14, readInt);
+    SCAN_MULTI(1, readStr);
+    SCAN_MULTI(6, readInt);
+    SCAN_MULTI(4, readStr);
+    SCAN_MULTI(9, readInt);
+
+    if (file_version >= 203){
+        SCAN_MULTI(3, readInt);
+    }
+
+    for ( int j=0 ; j<MAX_SPRITE_NUM ; j++ ){
+        SCAN_MULTI(1, readStr);
+        SCAN_MULTI(4, readInt);
+        if (file_version >= 203) SCAN_MULTI(1, readInt);
+    }
+
+    for (int j=0 ; j<script_h.global_variable_border ; j++){
+        SCAN_MULTI(1, readInt);
+        SCAN_MULTI(1, readStr);
+    }
+
+    int tmp_num_nest = readInt();
+    if (tmp_num_nest > 0){
+        file_io_buf_ptr += (tmp_num_nest-1)*4;
+        while( tmp_num_nest > 0 ){
+            if (readInt() > 0){
+                file_io_buf_ptr -= 8;
+                tmp_num_nest--;
+            }
+            else{
+                file_io_buf_ptr -= 16;
+                SCAN_MULTI(3, readInt);
+                file_io_buf_ptr -= 16;
+                tmp_num_nest -= 4;
+            }
+        }
+        tmp_num_nest = readInt();
+        file_io_buf_ptr += tmp_num_nest*4;
+    }
+
+    SCAN_MULTI(5, readInt);
+    SCAN_MULTI(2, readStr);
+    SCAN_MULTI(6, readInt);
+    SCAN_MULTI(1, readStr);
+    SCAN_MULTI(2, readInt);
+
+    for (int j=0 ; j<MAX_PARAM_NUM ; j++ ){
+        int temp_int = readInt();
+        CHECK_EOF();
+        if (temp_int) {
+            SCAN_MULTI(4, readInt);
+
+            // This later is gained to be divided by 0, if 0 then we should
+            // say that this is corrupted before it crashes
+            temp_int = readInt();
+            CHECK_EOF();
+            if (!temp_int) {
+                logw(stderr, "Save file is corrupted because data is 0");
+                return -1;
+            }
+            SCAN_MULTI(1, readInt);
+        } else {
+            SCAN_MULTI(6, readInt);
+        }
+    }
+
+    SCAN_MULTI(MAX_PARAM_NUM * 6 + 3, readInt);
+    SCAN_MULTI(1, readStr);
+
+    if ( file_version >= 202 ) {
+        SCAN_MULTI(1, readArrayVariable);
+    }
+
+    SCAN_MULTI(2, readInt);
+    SCAN_MULTI(2, readStr);
+
+    if ( file_version >= 201 ){
+        SCAN_MULTI(3, readInt);
+        SCAN_MULTI(1, readStr);
+    }
+
+    if (file_version >= 204){
+        SCAN_MULTI(1, readInt);
+        for ( int j=0 ; j<MAX_SPRITE2_NUM ; j++ ){
+            SCAN_MULTI(1, readStr);
+            SCAN_MULTI(8, readInt);
+        }
+        SCAN_MULTI(6, readInt);
+        if (file_version >= 205) {
+            SCAN_MULTI(1, readInt);
+            SCAN_MULTI(1, readChar);
+        }
+    }
+
+    if (file_version >= 206){
+        SCAN_MULTI(5, readInt);
+    }
+
+    {
+        int l = readInt();
+        CHECK_EOF();
+        for ( int j=0 ; j<l ; j++ ){
+            while(readChar()) {
+                CHECK_EOF();
+            }
+            if (file_version == 203) SCAN_MULTI(1, readChar); // 0
+        }
+    }
+
+    if (file_version >= 205){
+        int l = readInt();
+        CHECK_EOF();
+        SCAN_MULTI(l, readStr);
+    } else if (file_version >= 204) {
+        SCAN_MULTI(2, readInt);
+    }
+
+    {
+        int temp_int = readInt();
+        CHECK_EOF();
+        if (!temp_int) {
+            logw(stderr, "Save file is corrupted because current line cannot be negative");
+            return -1;
+        }
+    }
+    file_io_buf_ptr = before;
+
+    // Now this will actually read the save file and load it into the game
     deleteNestInfo();
     
     int i, j;

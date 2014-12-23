@@ -510,14 +510,14 @@ protected:
 
     void allocFileIOBuf();
     int saveFileIOBuf( const char *filename, int offset=0, const char *savestr=NULL );
-    size_t loadFileIOBuf( const char *filename );
+    size_t loadFileIOBuf( const char *filename, size_t *outSize=NULL );
 
     void writeChar( char c, bool output_flag );
     char readChar();
     void writeInt( int i, bool output_flag );
     int readInt();
     void writeStr( char *s, bool output_flag );
-    void readStr( char **s );
+    void readStr( char **s = NULL );
     void writeVariables( int from, int to, bool output_flag );
     void readVariables( int from, int to );
     void writeArrayVariable( bool output_flag );

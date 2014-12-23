@@ -394,7 +394,7 @@ int ScriptParser::saveFileIOBuf( const char *filename, int offset, const char *s
     return 0;
 }
 
-size_t ScriptParser::loadFileIOBuf( const char *filename )
+size_t ScriptParser::loadFileIOBuf( const char *filename, size_t* outSize )
 {
     bool use_save_dir = false;
     if (strcmp(filename, "envdata") != 0) use_save_dir = true;
@@ -415,6 +415,10 @@ size_t ScriptParser::loadFileIOBuf( const char *filename )
     fseek(fp, 0, SEEK_SET);
     size_t ret = fread(file_io_buf, 1, len, fp);
     fclose(fp);
+
+    if (outSize) {
+        *outSize = len;
+    }
 
     return ret;
 }
@@ -479,12 +483,14 @@ void ScriptParser::readStr(char **s)
         if (file_io_buf[file_io_buf_ptr+counter++] == 0) break;
     }
     
-    if (*s) delete[] *s;
-    *s = NULL;
-    
-    if (counter > 1){
-        *s = new char[counter];
-        memcpy(*s, file_io_buf + file_io_buf_ptr, counter);
+    if (s) {
+        if (*s) delete[] *s;
+        *s = NULL;
+
+        if (counter > 1){
+            *s = new char[counter];
+            memcpy(*s, file_io_buf + file_io_buf_ptr, counter);
+        }
     }
     file_io_buf_ptr += counter;
 }
