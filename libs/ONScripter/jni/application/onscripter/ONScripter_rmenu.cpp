@@ -373,10 +373,15 @@ bool ONScripter::executeSystemLoad()
         deleteButtonLink();
 
         if (executeSystemYesNo( SYSTEM_LOAD, file_no )){
+            FontInfo* oldFont = current_font;
+            int old_system_menu_mode = system_menu_mode;
             current_font = &sentence_font;
             system_menu_mode = 0; // for fadeout in mp3stopCommand()
-            if ( loadSaveFile( file_no ) )
+            if ( loadSaveFile( file_no ) ) {
+                current_font = oldFont;
+                system_menu_mode = old_system_menu_mode;
                 return false;
+            }
 
             leaveSystemCall( false );
             refreshSurface(backup_surface, NULL, REFRESH_NORMAL_MODE);

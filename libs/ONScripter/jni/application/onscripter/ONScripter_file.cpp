@@ -196,8 +196,10 @@ char *ONScripter::readSaveStrFromFile( int no )
 int ONScripter::loadSaveFile( int no )
 {
     char filename[32];
+    int ret = 0;
+    size_t fileSize, oldBufLen = file_io_buf_len;
     sprintf( filename, "save%d.dat", no );
-    if (loadFileIOBuf( filename ) == 0){
+    if (loadFileIOBuf( filename, &fileSize ) == 0){
         logw( stderr, "can't open save file %s\n", filename );
         return -1;
     }
@@ -211,7 +213,10 @@ int ONScripter::loadSaveFile( int no )
     if ( i != (int)strlen( SAVEFILE_MAGIC_NUMBER ) ){
         file_io_buf_ptr = 0;
         logv("Save file version is unknown\n" );
-        return loadSaveFile2( SAVEFILE_VERSION_MAJOR*100 + SAVEFILE_VERSION_MINOR );
+        file_io_buf_len = fileSize;
+        ret = loadSaveFile2( SAVEFILE_VERSION_MAJOR*100 + SAVEFILE_VERSION_MINOR );
+        file_io_buf_len = oldBufLen;
+        return ret;
     }
     
     int file_version = readChar() * 100;
@@ -222,11 +227,14 @@ int ONScripter::loadSaveFile( int no )
         return -1;
     }
 
-    if ( file_version >= 200 )
-        return loadSaveFile2( file_version );
+    if ( file_version >= 200 ) {
+        file_io_buf_len = fileSize;
+        ret = loadSaveFile2( file_version );
+        file_io_buf_len = oldBufLen;
+        return ret;
+    }
     
     logw( stderr, "Save file is too old.\n");
-
     return -1;
 }
 
