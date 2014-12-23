@@ -19,6 +19,7 @@ public final class Environment2 {
         "/mnt/extSdCard",
         "/mnt/extsd",
         "/mnt/sdcard-ext",
+        "/mnt/sdcard2",
         "/storage/sdcard1/",
         "/storage/external_SD",
     };
