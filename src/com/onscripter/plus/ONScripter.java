@@ -24,8 +24,10 @@ import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.ONScripterView.UserMessage;
 import com.onscripter.exception.NativeONSException;
 import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
@@ -164,6 +166,19 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     @Override
     public void skipStateChanged(boolean selected) {
         mSkipButton.setSelected(selected);
+    }
+
+    @Override
+    public void onUserMessage(UserMessage messageId) {
+        int stringResId = 0;
+        switch (messageId) {
+        case CORRUPT_SAVE_FILE:
+            stringResId = R.string.message_corrupt_save_file;
+            break;
+        default:
+            return;
+        }
+        Toast.makeText(this, stringResId, Toast.LENGTH_LONG).show();
     }
 
     @Override

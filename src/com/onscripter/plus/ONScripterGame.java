@@ -14,6 +14,7 @@ import android.widget.FrameLayout;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
+import com.onscripter.ONScripterView.UserMessage;
 import com.onscripter.exception.NativeONSException;
 import com.vplayer.MediaStreamInfo;
 import com.vplayer.VPlayerListener;
@@ -222,6 +223,13 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     public void skipStateChanged(boolean selected) {
         if (mListener != null) {
             mListener.skipStateChanged(selected);
+        }
+    }
+
+    @Override
+    public void onUserMessage(UserMessage messageId) {
+        if (mListener != null) {
+            mListener.onUserMessage(messageId);
         }
     }
 

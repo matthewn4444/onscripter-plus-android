@@ -380,6 +380,9 @@ bool ONScripter::executeSystemLoad()
             if ( loadSaveFile( file_no ) ) {
                 current_font = oldFont;
                 system_menu_mode = old_system_menu_mode;
+#ifdef ANDROID
+                sendUserMessage(ANDROID_MSG_CORRUPT_SAVE_FILE);
+#endif
                 return false;
             }
 

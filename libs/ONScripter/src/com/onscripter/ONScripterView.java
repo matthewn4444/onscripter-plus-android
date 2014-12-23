@@ -34,6 +34,11 @@ public class ONScripterView extends DemoGLSurfaceView {
 
     private static final int MSG_AUTO_MODE = 1;
     private static final int MSG_SKIP_MODE = 2;
+    private static final int NUM_CONTROL_MODES = 2;
+
+    public enum UserMessage {
+        CORRUPT_SAVE_FILE
+    };
 
     private final AudioThread mAudioThread;
     private final String mCurrentDirectory;
@@ -106,6 +111,7 @@ public class ONScripterView extends DemoGLSurfaceView {
         public void skipStateChanged(boolean selected);
         public void videoRequested(String filename, boolean clickToSkip, boolean shouldLoop);
         public void onNativeError(NativeONSException e, String line, String backtrace);
+        public void onUserMessage(UserMessage messageId);
     }
 
     static class UpdateHandler extends Handler {
@@ -118,7 +124,11 @@ public class ONScripterView extends DemoGLSurfaceView {
         {
             ONScripterView view = mThisView.get();
             if (view != null) {
-                view.updateControls(msg.what, (Boolean)msg.obj);
+                if (msg.what <= NUM_CONTROL_MODES) {
+                    view.updateControls(msg.what, (Boolean)msg.obj);
+                } else {
+                    view.sendUserMessage(msg.what);
+                }
             }
         }
     }
@@ -140,6 +150,16 @@ public class ONScripterView extends DemoGLSurfaceView {
                 break;
             case MSG_SKIP_MODE:
                 mListener.skipStateChanged(flag);
+                break;
+            }
+        }
+    }
+
+    private void sendUserMessage(int messageIdFromNDK) {
+        if (mListener != null) {
+            switch(messageIdFromNDK) {
+            case 3:
+                mListener.onUserMessage(UserMessage.CORRUPT_SAVE_FILE);
                 break;
             }
         }
