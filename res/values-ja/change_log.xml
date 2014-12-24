@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">広告削除</string>
     <string name="change_log_dialog_title">変更</string>
     <string-array name="change_log">
+        <item>vバージョン 1.1.17,2014年12月24日</item>
+        <item>たくさんバグを直した</item>
         <item>vバージョン 1.1.16,2014年12月15日</item>
         <item>アンドロイドLのセーブスクリーンを直した</item>
         <item>たくさんバグを直した</item>
