@@ -12,6 +12,7 @@
     <string name="message_read_font_error">Не удалось загрузить шрифт!</string>
     <string name="message_cannot_write_pref">Внутренняя память заполнена и не может спасти.</string>
     <string name="message_folder_exists">Пожалуйста, выберите другое имя</string>
+    <string name="message_corrupt_save_file">Не удается загрузить поврежденный файл.\nПожалуйста, загрузите другой файл.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>

@@ -14,6 +14,7 @@
     <string name="message_read_font_error">폰트를 읽을 수 없습니다!</string>
     <string name="message_cannot_write_pref">내장 메모리가 가득 찼습니다. 저장할 수 없습니다</string>
     <string name="message_folder_exists">다른 폴더 이름을 선택하십시오</string>
+    <string name="message_corrupt_save_file">망가진 파일을 로드할 수 없습니다.\n다른 파일을 로드하세요.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">설정</string>
