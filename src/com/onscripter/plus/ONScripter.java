@@ -274,7 +274,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             // Output the backtrace line by line because of bugsense limitations
             String[] lines = backtrace.split("\n");
             for (int i = 0; i < lines.length; i++) {
-                put("Backtrace " + (i + 1), lines[i]);
+                put("Backtrace " + (i + 1 < 10 ? "0" : "") + (i + 1), lines[i]);
             }
         }};
         BugSenseHandler.sendExceptionMap(passArgs, e);
