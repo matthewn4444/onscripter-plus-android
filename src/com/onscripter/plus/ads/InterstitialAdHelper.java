@@ -199,7 +199,7 @@ public class InterstitialAdHelper {
             mAct.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if ((ViewGroup)mOverlay.getParent() != null) {
+                    if (mOverlay != null && (ViewGroup)mOverlay.getParent() != null) {
                         ((ViewGroup)mOverlay.getParent()).removeView(mOverlay);
                     }
                     mOverlay = null;
