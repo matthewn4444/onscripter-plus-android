@@ -156,6 +156,26 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         updateControlPreferences();
 
         mVNPrefs = ExtSDCardFix.getGameVNPreference(mCurrentDirectory);
+        if (mVNPrefs == null) {
+            // Temp to find the bug why VPref is returning null
+            HashMap<String, String> data = new HashMap<String, String>();
+            data.put("Game Directory", mCurrentDirectory);
+            if (mCurrentDirectory != null) {
+                data.put("Needs fix", ExtSDCardFix.folderNeedsFix(
+                        new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
+            }
+            data.put("Save Directory", mSaveDirectory);
+            if (ExtSDCardFix.getSaveFolder() != null) {
+                data.put("Registered Save Directory", ExtSDCardFix.getSaveFolder().getAbsolutePath());
+            } else {
+                data.put("Registered Save Directory", "None");
+            }
+            data.put("Is Ext SDCard Writable", ExtSDCardFix.isWritable() ? "true" : "false");
+            BugSenseHandler.sendExceptionMap(data, new NullPointerException("VPreferences is null"));
+            Toast.makeText(this, "There was an error running the game", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         mVNPrefs.setOnLoadVNPrefListener(this);
 
         mLeftLayout.setOtherLayout(mRightLayout);
