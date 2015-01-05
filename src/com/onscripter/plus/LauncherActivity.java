@@ -30,7 +30,6 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.onscripter.ONScripterView;
 import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
@@ -607,7 +606,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                     name = pref.getString(GAME_PREF_NAME_KEY, null);
                 }
                 if (name == null) {
-                    name = ONScripterView.getGameName(mGamePath);
+                    name = GameUtils.getGameName(mGamePath);
 
                     // If can't find the name, then we will use the file path
                     if (name == null) {
