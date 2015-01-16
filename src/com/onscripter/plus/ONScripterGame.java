@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
+import com.onscripter.ONScripterTracer;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.onscripter.ONScripterView.UserMessage;
@@ -193,6 +194,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
 
     public void finishVideo() {
         if (mONScVideoThread != null) {
+            ONScripterTracer.traceVideoEndEvent();
             mPlayer.stop();
 
             // Clean up the video and resume the game

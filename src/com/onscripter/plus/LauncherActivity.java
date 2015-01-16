@@ -17,19 +17,24 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
@@ -143,6 +148,9 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         initSDCardFix();
         createDirectoryBrowserDialog();
         createSaveDirectoryBrowserDialog();
+
+        registerForContextMenu(listView);
+        ONScripterTracer.allowPlayback(false);
     }
 
     @Override
@@ -417,6 +425,12 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        ONScripterTracer.close();
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
         File currentDir = mAdapter.getFile(position);
 
@@ -438,6 +452,23 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mAdapter.setChildAsCurrent(position);
         }
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+            menu.add("Replay");
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
+        ONScripterTracer.allowPlayback(true);
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        onItemClick(null, null, info.position, 0);
+        return super.onContextItemSelected(item);
+    }
+
 
     private void startONScripterCheckFont(String currentDir) {
         // Use default font if there is none in the game folder

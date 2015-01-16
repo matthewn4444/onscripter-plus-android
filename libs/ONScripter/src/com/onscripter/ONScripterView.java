@@ -24,7 +24,7 @@ import com.onscripter.exception.NativeONSException;
  * @author Matthew Ng
  *
  */
-public class ONScripterView extends DemoGLSurfaceView {
+public class ONScripterView extends TracedONScripterView {
 
     private static final int MSG_AUTO_MODE = 1;
     private static final int MSG_SKIP_MODE = 2;
@@ -199,9 +199,13 @@ public class ONScripterView extends DemoGLSurfaceView {
     }
 
     public void playVideo(char[] filename, boolean clickToSkip, boolean shouldLoop){
+        if (!allowVideo()) {
+            return;
+        }
         if (mListener != null) {
             File video = new File(mCurrentDirectory + "/" + new String(filename));
             if (video.exists() && video.canRead()) {
+                ONScripterTracer.traceVideoStartEvent();
                 mListener.videoRequested(video.getAbsolutePath(), clickToSkip, shouldLoop);
             } else {
                 Log.e("ONScripterView", "Cannot play video because it either does not exist or cannot be read. File: " + video.getPath());
@@ -209,7 +213,9 @@ public class ONScripterView extends DemoGLSurfaceView {
         }
     }
 
+    @Override
     public void receiveException(String message, String currentLineBuffer, String backtrace) {
+        super.receiveException(message, currentLineBuffer, backtrace);
         if (currentLineBuffer != null) {
             Log.e("ONScripter", message + "\nCurrent line: " + currentLineBuffer + "\n" + backtrace);
         } else {
