@@ -998,6 +998,31 @@ bool ONScripter::keyPressEvent( SDL_KeyboardEvent *event )
         }
     }
 
+#ifdef ANDROID
+    // For playback to load game on Key 1 press; remove this in the future
+    if (event->keysym.sym == SDLK_1) {
+        if ( !loadSaveFile( 1 ) ){
+            dirty_rect.fill( screen_width, screen_height );
+            refreshSurface(backup_surface, &dirty_rect.bounding_box, REFRESH_NORMAL_MODE);
+            flush( refreshMode() );
+
+            saveon_flag = true;
+            internal_saveon_flag = true;
+            setInternalSkipMode(false);
+            setInternalAutoMode(false);
+            deleteButtonLink();
+            deleteSelectLink();
+            text_on_flag = false;
+            indent_offset = 0;
+            line_enter_status = 0;
+            page_enter_status = 0;
+            string_buffer_offset = 0;
+            break_flag = false;
+            flushEvent();
+        }
+    }
+#endif
+
     return false;
 }
 

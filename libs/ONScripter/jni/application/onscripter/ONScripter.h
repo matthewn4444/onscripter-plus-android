@@ -95,6 +95,7 @@ public:
     static jmethodID JavaPlayVideo;
     static jmethodID JavaReceiveMessage;
     static jmethodID JavaSendException;
+    static jmethodID JavaOnLoadFile;
     static jclass JavaONScripterClass;
 
     static void setJavaEnv(JNIEnv * jniEnv, jobject thiz) {
@@ -102,6 +103,7 @@ public:
         JavaONScripterClass = (jclass)jniEnv->NewGlobalRef(jniEnv->GetObjectClass(JavaONScripter));
         JavaPlayVideo = jniEnv->GetMethodID(JavaONScripterClass, "playVideo", "([CZZ)V");
         JavaReceiveMessage = jniEnv->GetStaticMethodID(JavaONScripterClass,"receiveMessageFromNDK", "(IZ)V");
+        JavaOnLoadFile = jniEnv->GetMethodID(JavaONScripterClass,"onLoadFile", "(Ljava/lang/String;Ljava/lang/String;)V");
         JavaSendException = jniEnv->GetMethodID(JavaONScripterClass,"receiveException",
             "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
     }
@@ -497,6 +499,7 @@ private:
 
     void playVideoAndroid(const char *filename, bool click_flag, bool loop_flag);
     void sendUserMessage(MessageType_t type);
+    void sendLoadFileEvent(char* filepath);
 #endif
     void setInternalAutoMode(bool enabled);
     void setInternalSkipMode(bool enabled);

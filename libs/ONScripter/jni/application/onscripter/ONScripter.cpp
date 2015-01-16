@@ -50,6 +50,7 @@ jobject     ONScripter::JavaONScripter = NULL;
 jmethodID   ONScripter::JavaPlayVideo = NULL;
 jmethodID   ONScripter::JavaSendException = NULL;
 jmethodID   ONScripter::JavaReceiveMessage = NULL;
+jmethodID   ONScripter::JavaOnLoadFile = NULL;
 jclass      ONScripter::JavaONScripterClass = NULL;
 
 const char* ONScripter::MESSAGE_SAVE_EXIST = NULL;
@@ -1467,5 +1468,21 @@ void ONScripter::sendUserMessage(MessageType_t type) {
     }
 
     jniEnv->CallStaticVoidMethod(JavaONScripterClass, JavaReceiveMessage, type, JNI_FALSE);
+}
+
+void ONScripter::sendLoadFileEvent(char* filename) {
+    JNIEnv * jniEnv = NULL;
+    JNI_VM->AttachCurrentThread(&jniEnv, NULL);
+
+    if (!jniEnv){
+        __android_log_print(ANDROID_LOG_ERROR, ONSCRIPTER_LOG_TAG, "ONScripter::sendLoadFileEvent: Java VM AttachCurrentThread() failed");
+        return;
+    }
+
+    jstring jsavepath = NULL;
+    if (save_dir) {
+        jsavepath = jniEnv->NewStringUTF(save_dir);
+    }
+    jniEnv->CallVoidMethod(JavaONScripter, JavaOnLoadFile, jniEnv->NewStringUTF(filename), jsavepath);
 }
 #endif

@@ -215,6 +215,9 @@ int ONScripter::loadSaveFile( int no )
         logv("Save file version is unknown\n" );
         file_io_buf_len = fileSize;
         ret = loadSaveFile2( SAVEFILE_VERSION_MAJOR*100 + SAVEFILE_VERSION_MINOR );
+#ifdef ANDROID
+        if (ret == 0) sendLoadFileEvent(filename);
+#endif
         file_io_buf_len = oldBufLen;
         return ret;
     }
@@ -230,6 +233,9 @@ int ONScripter::loadSaveFile( int no )
     if ( file_version >= 200 ) {
         file_io_buf_len = fileSize;
         ret = loadSaveFile2( file_version );
+#ifdef ANDROID
+        if (ret == 0) sendLoadFileEvent(filename);
+#endif
         file_io_buf_len = oldBufLen;
         return ret;
     }
