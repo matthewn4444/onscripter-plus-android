@@ -14,6 +14,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -56,9 +57,11 @@ public class ONScripterTracer {
         sSkipTime += System.currentTimeMillis();
     }
 
-    public static void traceLoadEvent(String filename, String savePath) {
+    public static void traceLoadEvent(Context c, String saveFilePath, String savePath) {
+        // Copy save file to the private application folder, it is not worth fixing when 2 load events overlap
+        new CopySaveFileTask(c, saveFilePath).execute();
         reset();
-        traceText(LOAD_EVENT + "," + filename + "," + (savePath != null ? savePath : ""));
+        traceText(LOAD_EVENT + (savePath != null ? savePath : ""));
     }
 
     public static void traceCrash() {
@@ -130,6 +133,37 @@ public class ONScripterTracer {
         }
     }
 
+    private static boolean copy(File src, File dst) {
+        OutputStream out = null;
+        InputStream in = null;
+        try {
+            in = new FileInputStream(src);
+                out = new FileOutputStream(dst);
+
+            // Transfer bytes from in to out
+            byte[] buf = new byte[1024];
+            int len;
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {}
+            }
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {}
+            }
+        }
+    }
+
     public static class Playback {
         private final File mTraceFile;
         private boolean mCanBeUsed = true;
@@ -160,16 +194,16 @@ public class ONScripterTracer {
                             if (line != null) {
                                 String[] parts = line.split(",");
                                 if (parts[1].charAt(0) == LOAD_EVENT) {
-                                    if (parts.length < 3) {
+                                    if (parts.length < 2) {
                                         toast("Playback cannot load because too little arguments");
                                         return;
                                     }
 
                                     // See if the save file is in the downloads folder
                                     File saveFile = new File(Environment.getExternalStoragePublicDirectory(
-                                            Environment.DIRECTORY_DOWNLOADS) + "/" + parts[2]);
+                                            Environment.DIRECTORY_DOWNLOADS) + "/save.dat");
                                     if (!saveFile.exists()) {
-                                        toast("Unable to playback without the save file in the downloads folder! (" + parts[2] + ")");
+                                        toast("Unable to playback without the save file in the downloads folder! (save.dat)");
                                         return;
                                     }
 
@@ -188,7 +222,7 @@ public class ONScripterTracer {
                                         e1.printStackTrace();
                                         return;
                                     }
-                                } else if (parts.length < 2) {
+                                } else if (parts.length < 1) {
                                     toast("First line does not have enough arguments");
                                 } else {
                                     commands.add(parts);
@@ -299,37 +333,6 @@ public class ONScripterTracer {
             threadWait(1000);
         }
 
-        private boolean copy(File src, File dst) {
-            OutputStream out = null;
-            InputStream in = null;
-            try {
-                in = new FileInputStream(src);
-                    out = new FileOutputStream(dst);
-
-                // Transfer bytes from in to out
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                return true;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {}
-                }
-                if (out != null) {
-                    try {
-                        out.close();
-                    } catch (IOException e) {}
-                }
-            }
-        }
-
         private void threadWait(long time) throws InterruptedException {
             synchronized (mThread) {
                 Thread.currentThread().wait(time);
@@ -343,6 +346,26 @@ public class ONScripterTracer {
                     Toast.makeText(mGame.getContext(), message, Toast.LENGTH_SHORT).show();
                 }
             });
+        }
+    }
+
+    static private class CopySaveFileTask extends AsyncTask<Void, Void, Void> {
+        Context mCtx;
+        String mFilePath;
+
+        public CopySaveFileTask(Context c, String f) {
+            mCtx = c;
+            mFilePath = f;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            File src = new File(mFilePath);
+            if (src.exists()) {
+                File dst = new File(mCtx.getApplicationContext().getFilesDir() + "/save.dat");
+                copy(src, dst);
+            }
+            return null;
         }
     }
 }
