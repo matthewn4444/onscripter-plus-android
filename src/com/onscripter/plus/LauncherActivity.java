@@ -72,8 +72,15 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         if (DEFAULT_FONT_PATH == null || DEFAULT_FONT_FILE == null) {
             FONTS_FOLDER = getString(R.string.assets_font_folder);
             try {
-                String[] file = getAssets().list(FONTS_FOLDER);
-                DEFAULT_FONT_FILE = file[0];
+                String[] files = getAssets().list(FONTS_FOLDER);
+                for (String file: files) {
+                    if (file.startsWith("default") && file.endsWith(".ttf")) {
+                        DEFAULT_FONT_FILE = file;
+                    }
+                }
+                if (DEFAULT_FONT_FILE == null) {
+                    Toast.makeText(this, R.string.message_asset_not_found, Toast.LENGTH_SHORT).show();
+                }
             } catch (IOException e1) {
                 e1.printStackTrace();
                 // Seriously something bad happened
