@@ -108,6 +108,9 @@ class TracedONScripterView extends DemoGLSurfaceView {
     }
 
     protected void onLoadFile(String filename, String savePath) {
-        ONScripterTracer.traceLoadEvent(filename, savePath);
+        if (mPlayback == null) {
+            String path = rootFolder + "/" + (savePath == null ? "" : (savePath + "/")) + filename;
+            ONScripterTracer.traceLoadEvent(getContext(), path, savePath);
+        }
     }
 }
