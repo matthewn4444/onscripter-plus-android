@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.1.18,2015년 1월 30일</item>
+        <item>비디오 고친　（Lovely Quest, Secret Game, Akatsuki no Goei）</item>
         <item>v버전 1.1.17,2014년 12월 24일</item>
         <item>많은 버그를 고쳤다</item>
         <item>v버전 1.1.16,2014년 12월 15일</item>
