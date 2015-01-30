@@ -13,6 +13,8 @@ import org.json.JSONObject;
 
 import android.util.Pair;
 
+import com.bugsense.trace.BugSenseHandler;
+
 public class ModifyServerRequest {
     static enum METHOD { PUT, POST };
 
@@ -57,6 +59,7 @@ public class ModifyServerRequest {
                 mFieldData = new ArrayList<String>();
                 mFileData = new ArrayList<Pair<String, byte[]>>();
             } catch (IOException e) {
+                BugSenseHandler.sendException(e);
                 mConnection = null;
                 throw e;
             }

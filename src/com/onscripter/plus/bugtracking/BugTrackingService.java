@@ -25,6 +25,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.bugtracking.ModifyServerRequest.METHOD;
 
@@ -71,6 +72,7 @@ public class BugTrackingService extends IntentService {
         try {
             sendData(exceptionMessage, gameName, stacktrace, logTime, extraData, date, hasSaveFile);
         } catch (IOException e) {
+            BugSenseHandler.sendException(e);
             e.printStackTrace();
         }
     }
@@ -207,6 +209,7 @@ public class BugTrackingService extends IntentService {
                                     + result.getString(RETURN_JSON_KEY_MESSAGE));
                         }
                     } catch (JSONException e) {
+                        BugSenseHandler.sendException(e);
                         Log.e(TAG, "Could not parse return data: " + e.getMessage());
                         e.printStackTrace();
                     }
@@ -259,8 +262,10 @@ public class BugTrackingService extends IntentService {
                             + result.getString(RETURN_JSON_KEY_MESSAGE));
                 }
             } catch (IOException e) {
+                BugSenseHandler.sendException(e);
                 e.printStackTrace();
             } catch (JSONException e) {
+                BugSenseHandler.sendException(e);
                 Log.e(TAG, "Could not parse return data: " + e.getMessage());
                 e.printStackTrace();
             }
@@ -287,8 +292,10 @@ public class BugTrackingService extends IntentService {
             is.read(buffer, 0, size);
             return buffer;
         } catch (FileNotFoundException e) {
+            BugSenseHandler.sendException(e);
             e.printStackTrace();
         } catch (IOException e) {
+            BugSenseHandler.sendException(e);
             e.printStackTrace();
         } finally {
             if (is != null) {
