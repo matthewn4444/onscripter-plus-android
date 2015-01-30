@@ -1,5 +1,8 @@
 package com.onscripter.plus;
 
+import java.io.File;
+import java.util.HashMap;
+
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
@@ -32,6 +35,7 @@ import com.onscripter.exception.NativeONSException;
 import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
+import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener, OnGameReadyListener
 {
@@ -188,7 +192,24 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     @Override
-    public void onNativeError(NativeONSException e, String line, String backtrace) {
+    public void onNativeError(NativeONSException e, final String line, final String backtrace) {
+        e.printStackTrace();
+        final HashMap<String, String> passArgs = new HashMap<String, String>(){
+            private static final long serialVersionUID = 1L;
+        {
+            put("Game Directory", mCurrentDirectory);
+            put("Save Directory", mSaveDirectory);
+            put("Is Ext SDCard Writable", ExtSDCardFix.isWritable() ? "true" : "false");
+            put("Resolution", mGame.getGameWidth() + " x " + mGame.getGameHeight());
+            put("Script line", line);
+            put("Needs fix", ExtSDCardFix.folderNeedsFix(
+                    new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
+        }};
+        String name = mVNPrefs.getString(getString(R.string.game_pref_name), null);
+        if (name == null) {
+            name = "*" + new File(mCurrentDirectory).getName();
+        }
+        BugTrackingService.createCrashReport(ONScripter.this, e.getMessage(), name, backtrace, passArgs);
     }
 
     @Override

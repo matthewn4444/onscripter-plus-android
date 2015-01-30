@@ -22,13 +22,18 @@ import android.widget.Toast;
 
 public class ONScripterTracer {
     public static String TRACE_FILE_NAME = "trace.log";
+    public static String SAVE_FILE_NAME = "save.dat";
 
     private static File sTraceFile;
     private static boolean sIsOpened = false;
     private static StringBuilder sBuffer;
     private static long sStartTime = 0;
     private static long sSkipTime = 0;
+    private static long sLastLoggedTime = 0;
+    private static boolean sHasLoadedSaveFile = false;
     private static boolean sAllowPlayback = false;
+    private static int sViewWidth = 0;
+    private static int sViewHeight = 0;
 
     private final static char KEY_EVENT = 'k';
     private final static char MOUSE_EVENT = 'm';
@@ -60,8 +65,14 @@ public class ONScripterTracer {
     public static void traceLoadEvent(Context c, String saveFilePath, String savePath) {
         // Copy save file to the private application folder, it is not worth fixing when 2 load events overlap
         new CopySaveFileTask(c, saveFilePath).execute();
-        reset();
+        restartTrace();
         traceText(LOAD_EVENT + (savePath != null ? savePath : ""));
+        sHasLoadedSaveFile = true;
+    }
+
+    public static void traceViewDimensions(int width, int height) {
+        sViewWidth = width;
+        sViewHeight = height;
     }
 
     public static void traceCrash() {
@@ -72,6 +83,10 @@ public class ONScripterTracer {
         return open(true);
     }
 
+    public static boolean hasLoadedSaveFile() {
+        return sHasLoadedSaveFile;
+    }
+
     public static void allowPlayback(boolean flag) {
         sAllowPlayback = flag;
     }
@@ -80,12 +95,16 @@ public class ONScripterTracer {
         return sAllowPlayback;
     }
 
+    public static long getCurrentLogTime() {
+        return sLastLoggedTime;
+    }
+
     public static synchronized boolean open(boolean append) {
         if (!sIsOpened) {
             sIsOpened = true;
             if (!append) {
                 sTraceFile.delete();
-                reset();
+                restartTrace();
             } else if (sStartTime > 0) {
                 // Reopened so we need to skip the time that was closed
                 sSkipTime += System.currentTimeMillis();
@@ -93,8 +112,10 @@ public class ONScripterTracer {
             if (sStartTime == 0) {
                 sStartTime = System.currentTimeMillis();
             }
+
+            // This runs once on the first open
             if (sBuffer == null) {
-                sBuffer = new StringBuilder();
+                reset();
             }
             return true;
         }
@@ -108,7 +129,9 @@ public class ONScripterTracer {
             PrintWriter writer = null;
             try {
                 writer = new PrintWriter(sTraceFile);
-                writer.println(sBuffer);
+                writer.print(sViewWidth);
+                writer.append(',').println(sViewHeight);
+                writer.print(sBuffer);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -119,14 +142,22 @@ public class ONScripterTracer {
         }
     }
 
+    private static void restartTrace() {
+        reset();
+        sStartTime = System.currentTimeMillis();
+    }
+
     private static void reset() {
         sBuffer = new StringBuilder();
-        sStartTime = System.currentTimeMillis();
+        sHasLoadedSaveFile = false;
+        sLastLoggedTime = 0;
+        sSkipTime = 0;
     }
 
     private static void traceText(String text) {
         if (sBuffer != null) {
-            sBuffer.append((System.currentTimeMillis() - sSkipTime - sStartTime));
+            sLastLoggedTime = System.currentTimeMillis() - sSkipTime - sStartTime;
+            sBuffer.append(sLastLoggedTime);
             sBuffer.append(',');
             sBuffer.append(text);
             sBuffer.append('\n');
@@ -186,46 +217,63 @@ public class ONScripterTracer {
                         // Read file
                         ArrayList<String[]> commands = new ArrayList<String[]>();
                         BufferedReader br = null;
+                        int width = 0, height = 0;
                         try {
                             br = new BufferedReader(new FileReader(mTraceFile));
 
-                            // Parse the first line and check if we are loading any files
+                            // Parse the first line for the game width and height from that trace
                             String line = br.readLine();
                             if (line != null) {
                                 String[] parts = line.split(",");
-                                if (parts[1].charAt(0) == LOAD_EVENT) {
-                                    if (parts.length < 2) {
-                                        toast("Playback cannot load because too little arguments");
-                                        return;
-                                    }
+                                if (parts.length < 2) {
+                                    toast("First line does not contain height and width of gameview!");
+                                    return;
+                                }
+                                width = Integer.parseInt(parts[0]);
+                                height = Integer.parseInt(parts[1]);
+                                if (width <= 1 || height <= 1) {
+                                    toast("Width or height is less than or equal to 1 and we cannot run playback");
+                                    return;
+                                }
 
-                                    // See if the save file is in the downloads folder
-                                    File saveFile = new File(Environment.getExternalStoragePublicDirectory(
-                                            Environment.DIRECTORY_DOWNLOADS) + "/save.dat");
-                                    if (!saveFile.exists()) {
-                                        toast("Unable to playback without the save file in the downloads folder! (save.dat)");
-                                        return;
-                                    }
+                                // Parse the second line and check if we are loading any files
+                                line = br.readLine();
+                                if (line != null) {
+                                    parts = line.split(",");
+                                    if (parts[1].charAt(0) == LOAD_EVENT) {
+                                        if (parts.length < 2) {
+                                            toast("Playback cannot load because too little arguments");
+                                            return;
+                                        }
 
-                                    // Copy the save file from Downloads folder to game save folder as save1.dat
-                                    File dst = new File(mGame.rootFolder + "/" + (parts.length >= 4 ? parts[3] : "") + "save1.dat");
-                                    if (!copy(saveFile, dst)) {
-                                        toast("Playback failed because could not copy save file");
-                                        return;
-                                    }
+                                        // See if the save file is in the downloads folder
+                                        File saveFile = new File(Environment.getExternalStoragePublicDirectory(
+                                                Environment.DIRECTORY_DOWNLOADS) + "/" + SAVE_FILE_NAME);
+                                        if (!saveFile.exists()) {
+                                            toast("Unable to playback without the save file in the downloads folder! (save.dat)");
+                                            return;
+                                        }
 
-                                    // Load the game
-                                    try {
-                                        threadWait(2000);
-                                        loadFirstGame();
-                                    } catch (InterruptedException e1) {
-                                        e1.printStackTrace();
-                                        return;
+                                        // Copy the save file from Downloads folder to game save folder as save1.dat
+                                        File dst = new File(mGame.rootFolder + "/" + (parts.length >= 4 ? parts[3] : "") + "save1.dat");
+                                        if (!copy(saveFile, dst)) {
+                                            toast("Playback failed because could not copy save file");
+                                            return;
+                                        }
+
+                                        // Load the game
+                                        try {
+                                            threadWait(2000);
+                                            loadFirstGame();
+                                        } catch (InterruptedException e1) {
+                                            e1.printStackTrace();
+                                            return;
+                                        }
+                                    } else if (parts.length < 1) {
+                                        toast("First line does not have enough arguments");
+                                    } else {
+                                        commands.add(parts);
                                     }
-                                } else if (parts.length < 1) {
-                                    toast("First line does not have enough arguments");
-                                } else {
-                                    commands.add(parts);
                                 }
                             }
 
@@ -285,11 +333,11 @@ public class ONScripterTracer {
                                     Log.v("ONScripter Playback", "Key Event [" + time + "]: " + command[2] + ", " + command[3]);
                                     break;
                                 case MOUSE_EVENT:
-                                    int x = Integer.parseInt(command[2]);
-                                    int y = Integer.parseInt(command[3]);
+                                    int x = (int)Math.round(Integer.parseInt(command[2]) * (sViewWidth * 1.0 / width));
+                                    int y = (int)Math.round(Integer.parseInt(command[3]) * (sViewHeight* 1.0 / height));
                                     int action = Integer.parseInt(command[4]);
                                     mGame.triggerMouseEvent(x, y, action);
-                                    Log.v("ONScripter Playback", "Mouse Event [" + time + "]: (" + command[2] + "," + command[3] + "), " + command[4]);
+                                    Log.v("ONScripter Playback", "Mouse Event [" + time + "]: (" + x + "," + y + "), " + command[4]);
                                     break;
                                 case CRASH_EVENT:
                                     Log.v("ONScripter Playback", "Playback was logged to crash now");
@@ -362,7 +410,7 @@ public class ONScripterTracer {
         protected Void doInBackground(Void... params) {
             File src = new File(mFilePath);
             if (src.exists()) {
-                File dst = new File(mCtx.getApplicationContext().getFilesDir() + "/save.dat");
+                File dst = new File(mCtx.getApplicationContext().getFilesDir() + "/" + SAVE_FILE_NAME);
                 copy(src, dst);
             }
             return null;
