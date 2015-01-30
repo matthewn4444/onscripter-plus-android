@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">Последние изменения</string>
     <string-array name="change_log">
+        <item>vVersion 1.1.18,1/30/2015</item>
+        <item>фиксированная видео (Lovely Quest, Secret Game, Akatsuki no Goei)</item>
         <item>vVersion 1.1.17,12/24/2014</item>
         <item>Исправлено множество ошибок</item>
         <item>vVersion 1.1.16,12/15/2014</item>
