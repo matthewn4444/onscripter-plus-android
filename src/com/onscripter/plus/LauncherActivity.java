@@ -50,6 +50,7 @@ import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 import com.onscripter.plus.ads.InterstitialAdHelper;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
+import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {
@@ -285,6 +286,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             mAdView.resume();
         }
         ONScripterTracer.close();
+        BugTrackingService.sendPendingReport(this);
     }
 
     @Override

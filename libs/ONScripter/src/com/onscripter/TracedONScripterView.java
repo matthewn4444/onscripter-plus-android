@@ -30,6 +30,15 @@ class TracedONScripterView extends DemoGLSurfaceView {
         }
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
+        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
+        ONScripterTracer.traceViewDimensions(parentWidth, parentHeight);
+        this.setMeasuredDimension(parentWidth, parentHeight);
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
     public void receiveException(String message, String currentLineBuffer, String backtrace) {
         if (mPlayback != null) {
             mPlayback.stop();
