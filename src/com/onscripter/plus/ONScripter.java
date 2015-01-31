@@ -205,7 +205,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             put("Needs fix", ExtSDCardFix.folderNeedsFix(
                     new File(mCurrentDirectory).getParentFile()) ? "true" : "false");
         }};
-        String name = mVNPrefs.getString(getString(R.string.game_pref_name), null);
+        String name = GameUtils.getGameName(mCurrentDirectory);
         if (name == null) {
             name = "*" + new File(mCurrentDirectory).getName();
         }
