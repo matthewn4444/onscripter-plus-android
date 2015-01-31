@@ -101,8 +101,8 @@ public class BugTrackingService extends IntentService {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
         String data = pref.getString(PREF_KEY_PENDING_REPORT, null);
         if (data != null) {
-            pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
             if (isNetworkAvailable(ctx)) {
+                pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
                 String[] params = data.toString().split("\\|");
                 if (params.length != 7) {
                     Log.w(TAG, "Unable to send data to server because we lack number of arguments.");
