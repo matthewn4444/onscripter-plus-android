@@ -26,6 +26,7 @@ public class ONScripterTracer {
 
     private static File sTraceFile;
     private static boolean sIsOpened = false;
+    private static boolean sVideoIsPlaying = false;
     private static StringBuilder sBuffer;
     private static long sStartTime = 0;
     private static long sSkipTime = 0;
@@ -54,18 +55,24 @@ public class ONScripterTracer {
         traceText(MOUSE_EVENT + "," + x + "," + y + "," + action);
     }
 
-    public static void traceVideoStartEvent() {
-        sSkipTime -= System.currentTimeMillis();
+    public synchronized static void traceVideoStartEvent() {
+        if (!sVideoIsPlaying) {
+            sVideoIsPlaying = true;
+            sSkipTime -= System.currentTimeMillis();
+        }
     }
 
-    public static void traceVideoEndEvent() {
-        sSkipTime += System.currentTimeMillis();
+    public synchronized static void traceVideoEndEvent() {
+        if (sVideoIsPlaying) {
+            sVideoIsPlaying = false;
+            sSkipTime += System.currentTimeMillis();
+        }
     }
 
     public static void traceLoadEvent(Context c, String saveFilePath, String savePath) {
         // Copy save file to the private application folder, it is not worth fixing when 2 load events overlap
         new CopySaveFileTask(c, saveFilePath).execute();
-        restartTrace();
+        reset();
         traceText(LOAD_EVENT + (savePath != null ? savePath : ""));
         sHasLoadedSaveFile = true;
     }
@@ -95,7 +102,7 @@ public class ONScripterTracer {
         return sAllowPlayback;
     }
 
-    public static long getCurrentLogTime() {
+    public synchronized static long getCurrentLogTime() {
         return sLastLoggedTime;
     }
 
@@ -104,13 +111,10 @@ public class ONScripterTracer {
             sIsOpened = true;
             if (!append) {
                 sTraceFile.delete();
-                restartTrace();
+                reset();
             } else if (sStartTime > 0) {
                 // Reopened so we need to skip the time that was closed
                 sSkipTime += System.currentTimeMillis();
-            }
-            if (sStartTime == 0) {
-                sStartTime = System.currentTimeMillis();
             }
 
             // This runs once on the first open
@@ -142,20 +146,17 @@ public class ONScripterTracer {
         }
     }
 
-    private static void restartTrace() {
-        reset();
-        sStartTime = System.currentTimeMillis();
-    }
-
     private static void reset() {
         sBuffer = new StringBuilder();
         sHasLoadedSaveFile = false;
+        sVideoIsPlaying = false;
         sLastLoggedTime = 0;
         sSkipTime = 0;
+        sStartTime = System.currentTimeMillis();
     }
 
-    private static void traceText(String text) {
-        if (sBuffer != null) {
+    private synchronized static void traceText(String text) {
+        if (sIsOpened && !sVideoIsPlaying && sBuffer != null) {
             sLastLoggedTime = System.currentTimeMillis() - sSkipTime - sStartTime;
             sBuffer.append(sLastLoggedTime);
             sBuffer.append(',');
