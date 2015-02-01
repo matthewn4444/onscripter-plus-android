@@ -466,7 +466,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
-            menu.add("Replay");
+            menu.add(ContextMenu.NONE, 0, ContextMenu.NONE, "Replay");
+            menu.add(ContextMenu.NONE, 1, ContextMenu.NONE, "Delete trace.log and save.dat from Downloads");
         }
     }
 
@@ -474,7 +475,18 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     public boolean onContextItemSelected(android.view.MenuItem item) {
         ONScripterTracer.allowPlayback(true);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        onItemClick(null, null, info.position, 0);
+        switch (item.getItemId()) {
+        case 0:
+            // Replay trace
+            onItemClick(null, null, info.position, 0);
+            break;
+        case 1:
+            // Delete trace.log and save.dat in Downloads folder
+            File downloadFolder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            new File(downloadFolder + "/trace.log").delete();
+            new File(downloadFolder + "/save.dat").delete();
+            break;
+        }
         return super.onContextItemSelected(item);
     }
 
