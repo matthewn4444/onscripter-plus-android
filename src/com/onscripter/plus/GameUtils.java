@@ -121,12 +121,14 @@ public class GameUtils {
      * @return the name of the game (by its caption)
      */
     public static String getGameName(String path) {
-        final String[] names = {"nscript.dat", "0.txt", "00.txt"};      // Too lazy to support "nscr_sec.dat & nscript.___" encryption
-        File filepath = null;
-        for (int i = 0; i < names.length; i++) {
-            filepath = new File(path + "/" + names[i]);
-            if (filepath.exists()) {
-                return getCaptionName(filepath);
+        if (path != null) {
+            final String[] names = {"nscript.dat", "0.txt", "00.txt"};      // Too lazy to support "nscr_sec.dat & nscript.___" encryption
+            File filepath = null;
+            for (int i = 0; i < names.length; i++) {
+                filepath = new File(path + "/" + names[i]);
+                if (filepath.exists()) {
+                    return getCaptionName(filepath);
+                }
             }
         }
         return null;
