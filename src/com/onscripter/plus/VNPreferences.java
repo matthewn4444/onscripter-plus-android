@@ -367,9 +367,16 @@ public class VNPreferences {
                 break;
             case SAVE_TASK:
                 // Check for space left
-                StatFs stat = new StatFs(mPath);
-                long bytesAvailable = (long)stat.getBlockSize() *(long)stat.getBlockCount();
-                final long kbAvailable = bytesAvailable / 1024;
+                long _kbAvailable = 0;
+                try {
+                    StatFs stat = new StatFs(mPath);
+                    long bytesAvailable = (long)stat.getBlockSize() *(long)stat.getBlockCount();
+                    _kbAvailable = bytesAvailable / 1024;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return OnLoadVNPrefListener.Result.NO_ISSUES;
+                }
+                final long kbAvailable = _kbAvailable;
 
                 // If at least 300kb is left over
                 if (kbAvailable <= MIN_FILE_SPACE_KB) {
