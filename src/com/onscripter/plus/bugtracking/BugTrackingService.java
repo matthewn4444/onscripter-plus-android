@@ -35,6 +35,7 @@ public class BugTrackingService extends IntentService {
 //    private static final String URL_SERVER_HOST = "http://10.0.0.5:1111/";            // For localhost
     private static final String URL_SERVER_HOST = "http://onscripter-plus-bug-server.herokuapp.com/";
     private static final String URL_PUT_QUERY_NEW_ERROR = URL_SERVER_HOST + "game/trace/";
+    private static final String URL_POST_QUERY_NEW_BUG = URL_SERVER_HOST + "game/bug/";
 
     private static final String RETURN_JSON_KEY_SUCCESS = "success";
     private static final String RETURN_JSON_KEY_MESSAGE = "message";
@@ -70,7 +71,11 @@ public class BugTrackingService extends IntentService {
         String date = intent.getStringExtra(INTENT_KEY_DATE);
         boolean hasSaveFile = intent.getBooleanExtra(INTENT_KEY_HAS_SAVE, false);
         try {
-            sendData(exceptionMessage, gameName, stacktrace, logTime, extraData, date, hasSaveFile);
+            if (logTime != null) {
+                sendTraceData(exceptionMessage, gameName, stacktrace, logTime, extraData, date, hasSaveFile);
+            } else {
+                sendBugData(exceptionMessage, gameName, stacktrace, extraData);
+            }
         } catch (IOException e) {
             BugSenseHandler.sendException(e);
             e.printStackTrace();
@@ -123,6 +128,27 @@ public class BugTrackingService extends IntentService {
     }
 
     /**
+     * Sends a generic bug report to the server, will fail if activity crashes after this.
+     *
+     * Will not send if user has no internet connection.
+     * @param ctx
+     * @param gameName
+     * @param exception
+     * @param extraData
+     */
+    public static void sendBugReport(Context ctx, String gameName, Exception exception,
+            Map<String, String> extraData) {
+        if (!ONScripterTracer.playbackEnabled() && isNetworkAvailable(ctx)) {
+            Intent in = new Intent(ctx, BugTrackingService.class);
+            in.putExtra(INTENT_KEY_EXCEPTION_MSG, exception.getMessage());
+            in.putExtra(INTENT_KEY_GAME_NAME, gameName);
+            in.putExtra(INTENT_KEY_STACKTRACE, Log.getStackTraceString(exception));
+            in.putExtra(INTENT_KEY_EXTRA, extrasMapToJSONString(extraData));
+            ctx.startService(in);
+        }
+    }
+
+    /**
      * Creates a crash report for individual games and uploads their traces.
      *
      * This does not send because most of the time this will run, it expects the activity to
@@ -152,7 +178,43 @@ public class BugTrackingService extends IntentService {
     }
 
     /**
-     * All the data to send the Internet for a trace to be recorded.
+     * All the data to send to the Internet for generic bug report.
+     *
+     * Make sure that if you run this explicitly that it is threaded and sendPendingReport() should
+     * have ran to init all the static variables.
+     * @param exceptionMessage
+     * @param gameName
+     * @param stacktrace
+     * @param extraData
+     * @throws IOException
+     */
+    private static void sendBugData(String exceptionMessage, String gameName, String stacktrace,
+            String extraData) throws IOException {
+        ModifyServerRequest request = null;
+        try {
+            request = new ModifyServerRequest(METHOD.POST);
+            request.openConnection(URL_POST_QUERY_NEW_BUG);
+            request.putField("stacktrace", stacktrace);
+            request.putField("phoneModel", Build.MODEL);
+            request.putField("androidVersion", Build.VERSION.RELEASE);
+            request.putField("locale", Resources.getSystem().getConfiguration().locale.getDisplayName());
+            request.putField("extra", extraData);
+            request.putField("number", APP_VERSION_CODE);
+            request.putField("versionString", APP_VERSION_NAME);
+            request.putField("message", exceptionMessage);
+            request.putField("name", gameName);
+            request.send();
+
+            handleGenericJSONResult(request);
+        } finally {
+            if (request != null) {
+                request.disconnect();
+            }
+        }
+    }
+
+    /**
+     * All the data to send to the Internet for a trace to be recorded.
      *
      * Make sure that if you run this explicitly that it is threaded and sendPendingReport() should
      * have ran to init all the static variables.
@@ -169,7 +231,7 @@ public class BugTrackingService extends IntentService {
      * @param hasSaveFile
      * @throws IOException
      */
-    private static void sendData(String exceptionMessage, String gameName, String stacktrace,
+    private static void sendTraceData(String exceptionMessage, String gameName, String stacktrace,
             String logTimeStr, String extraData, String dateStr, boolean hasSaveFile) throws IOException {
         CookieManager cookieManager = new CookieManager();
         CookieHandler.setDefault(cookieManager);
@@ -199,20 +261,7 @@ public class BugTrackingService extends IntentService {
                     }
                     request.send();
 
-                    JSONObject result;
-                    try {
-                        result = request.getResponseJSON();
-                        if (result.getBoolean(RETURN_JSON_KEY_SUCCESS)) {
-                            Log.i(TAG, "Bug report was send successfully.");
-                        } else {
-                            Log.w(TAG, "Bug report failed to send to server: "
-                                    + result.getString(RETURN_JSON_KEY_MESSAGE));
-                        }
-                    } catch (JSONException e) {
-                        BugSenseHandler.sendException(e);
-                        Log.e(TAG, "Could not parse return data: " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    handleGenericJSONResult(request);
                 } else {
                     Log.e(TAG, "Unable to open log file to send");
                 }
@@ -275,6 +324,34 @@ public class BugTrackingService extends IntentService {
             }
         }
         return null;
+    }
+
+    /**
+     * Handles a generic result from ModifyServerRequest.
+     *
+     * Returns true if request was success.
+     * @param request
+     * @return
+     * @throws IOException
+     */
+    private static boolean handleGenericJSONResult(ModifyServerRequest request) throws IOException {
+        JSONObject result;
+        try {
+            result = request.getResponseJSON();
+            if (result.has(RETURN_JSON_KEY_SUCCESS)) {
+                Log.i(TAG, "Bug report was send successfully. Return value: "
+                        + result.getBoolean(RETURN_JSON_KEY_SUCCESS));
+                return result.getBoolean(RETURN_JSON_KEY_SUCCESS);
+            } else {
+                Log.w(TAG, "Bug report failed to send to server: "
+                        + result.getString(RETURN_JSON_KEY_MESSAGE));
+            }
+        } catch (JSONException e) {
+            BugSenseHandler.sendException(e);
+            Log.e(TAG, "Could not parse return data: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**

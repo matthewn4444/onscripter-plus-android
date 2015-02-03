@@ -1,5 +1,8 @@
 package com.onscripter.plus;
 
+import java.io.File;
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -12,12 +15,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.ONScripterTracer;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.onscripter.ONScripterView.UserMessage;
 import com.onscripter.exception.NativeONSException;
+import com.onscripter.plus.bugtracking.BugTrackingService;
 import com.vplayer.MediaStreamInfo;
 import com.vplayer.VPlayerListener;
 import com.vplayer.VPlayerView;
@@ -54,7 +57,16 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
                 MediaStreamInfo[] streams) {
             super.onMediaSourceLoaded(err, streams);
             if (err != null) {
-                BugSenseHandler.sendExceptionMessage("Video", mVideoFilename, err);
+                // Send video path to bug tracking server
+                String currentDir = getArguments().getString(GameDirectoryKey);
+                String name = GameUtils.getGameName(currentDir);
+                if (name == null) name = "*" + new File(currentDir).getName();
+                BugTrackingService.sendBugReport(getActivity(), name, err,
+                        new HashMap<String, String>(){
+                    private static final long serialVersionUID = 1L; {
+                    put("Video Path", mVideoFilename);
+                }});
+
                 // Skip video if failed to open
                 Log.e("ONScripter", err.getMessage());
                 finishVideo();
