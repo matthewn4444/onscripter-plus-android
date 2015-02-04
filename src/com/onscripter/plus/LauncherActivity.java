@@ -64,6 +64,8 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private String mCurrentThemeResult;
     private ChangeLog mChangeLog;
 
+    private Bundle mStartONScripterBundle;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -324,7 +326,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             String theme = mPrefs.getString(SETTINGS_THEME_KEY, "");
             if (!theme.equals(mCurrentThemeResult)) {
                 finish();
-                goToActivity(this.getClass());
+                startActivity(new Intent(this, this.getClass()));
             }
             break;
         }
@@ -362,18 +364,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             }
         });
         return mDirectoryFiles != null && mDirectoryFiles.length > 0;
-    }
-
-    protected void goToActivity(Class<?> cls) {
-        goToActivity(cls, null);
-    }
-
-    protected void goToActivity(Class<?> cls, Bundle bundle) {
-        Intent i = new Intent(this, cls);
-        if (bundle != null) {
-            i.putExtras(bundle);
-        }
-        startActivity(i);
     }
 
     protected static void log(Object... txt) {
@@ -515,9 +505,28 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }
             b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
-            goToActivity(ONScripter.class, b);
+            mStartONScripterBundle = b;
+            goToONScripterActivity();
         } else {
             updateSaveFolderItemVisibility();
+        }
+    }
+
+    private void goToONScripterActivity() {
+        // TODO clean up after bug is understood
+        Intent i = new Intent(this, ONScripter.class);
+        try {
+            String directory = mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
+            String saveFolder = mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
+            boolean useDefaultFont = mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
+            mStartONScripterBundle = null;
+            if (directory == null) throw new NullPointerException("directory is null");
+            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
+            i.putExtra(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
+            i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
+            startActivity(i);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
         }
     }
 
