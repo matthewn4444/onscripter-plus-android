@@ -263,18 +263,13 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             @Override
             public void onAdDismiss() {
                 super.onAdDismiss();
-
-                // Closed before starting ONScripter, so we should launch ONScripter now
-                goToActivity(ONScripter.class, mStartONScripterBundle);
-                mStartONScripterBundle = null;
+                goToONScripterActivity();
             }
 
             @Override
             public void onAdLeftApplication() {
                 super.onAdLeftApplication();
-
-                goToActivity(ONScripter.class, mStartONScripterBundle);
-                mStartONScripterBundle = null;
+                goToONScripterActivity();
             }
         });
     }
@@ -472,7 +467,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             String theme = mPrefs.getString(SETTINGS_THEME_KEY, "");
             if (!theme.equals(mCurrentThemeResult)) {
                 finish();
-                goToActivity(this.getClass());
+                startActivity(new Intent(this, this.getClass()));
             }
             break;
         }
@@ -510,23 +505,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             }
         });
         return mDirectoryFiles != null && mDirectoryFiles.length > 0;
-    }
-
-    protected void goToActivity(Class<?> cls) {
-        goToActivity(cls, null);
-    }
-
-    protected void goToActivity(Class<?> cls, Bundle bundle) {
-        // Send all the events before we move on to ONScripter
-        if (cls.equals(ONScripter.class)) {
-            sendAnalyticsActivityEnd();
-        }
-
-        Intent i = new Intent(this, cls);
-        if (bundle != null) {
-            i.putExtras(bundle);
-        }
-        startActivity(i);
     }
 
     protected static void log(Object... txt) {
@@ -654,13 +632,34 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
                 b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }
             b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
+            mStartONScripterBundle = b;
             if (mInterHelper.show()) {
-                mStartONScripterBundle = b;
                 return;
             }
-            goToActivity(ONScripter.class, b);
+            goToONScripterActivity();
         } else {
             updateSaveFolderItemVisibility();
+        }
+    }
+
+    private void goToONScripterActivity() {
+        sendAnalyticsActivityEnd();
+
+        // TODO clean up after bug is understood
+        Intent i = new Intent(this, ONScripter.class);
+        try {
+            String directory = mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
+            String saveFolder = mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
+            boolean useDefaultFont = mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
+            mStartONScripterBundle = null;
+            if (directory == null) throw new NullPointerException("directory is null");
+            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
+            i.putExtra(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
+            i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
+            startActivity(i);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            BugSenseHandler.sendException(e);
         }
     }
 
