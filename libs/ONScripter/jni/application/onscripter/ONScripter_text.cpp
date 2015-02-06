@@ -24,14 +24,8 @@
 #include "utf8_decode.h"
 #include "ONScripter.h"
 
-#ifdef ENABLE_KOREAN
-extern unsigned short convKOR2UTF16(unsigned short code);
-#endif
-
-extern unsigned short convSJIS2UTF16( unsigned short in );
-
 #define IS_ROTATION_REQUIRED(x)	\
-    (!IS_TWO_BYTE(*(x)) ||                                              \
+    (ScriptDecoder::isOneByte(*x) ||                                    \
      (*(x) == (char)0x81 && *((x)+1) == (char)0x50) ||                  \
      (*(x) == (char)0x81 && *((x)+1) == (char)0x51) ||                  \
      (*(x) == (char)0x81 && *((x)+1) >= 0x5b && *((x)+1) <= 0x5d) ||    \
@@ -41,8 +35,6 @@ extern unsigned short convSJIS2UTF16( unsigned short in );
 
 #define IS_TRANSLATION_REQUIRED(x)	\
         ( *(x) == (char)0x81 && *((x)+1) >= 0x41 && *((x)+1) <= 0x44 )
-
-bool allowUTF8TextRender = false;
 
 void ONScripter::shiftHalfPixelX(SDL_Surface *surface)
 {
@@ -76,26 +68,11 @@ void ONScripter::shiftHalfPixelY(SDL_Surface *surface)
     SDL_UnlockSurface( surface );
 }
 
-void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], bool shadow_flag, AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect )
+void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color &color, char* text, int xy[2], bool shadow_flag, AnimationInfo *cache_info, SDL_Rect *clip, SDL_Rect &dst_rect, ScriptDecoder* decoder )
 {
-    unsigned short unicode;
     unsigned index = ((unsigned char*)text)[0];
     index = index << 8 | ((unsigned char*)text)[1];
-#ifdef ENABLE_KOREAN
-    if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
-		unicode = convKOR2UTF16( index );
-    } else
-#endif
-    if (IS_UTF8(text[0]) && allowUTF8TextRender){
-        unicode = decodeUTF8Character(text, NULL);
-    }
-    else if (IS_TWO_BYTE(text[0])){
-        unicode = convSJIS2UTF16( index );
-    }
-    else{
-        if ((text[0] & 0xe0) == 0xa0 || (text[0] & 0xe0) == 0xc0) unicode = ((unsigned char*)text)[0] - 0xa0 + 0xff60;
-        else unicode = text[0];
-    }
+    unsigned short unicode = decoder->convertNextChar(text);
 
     int minx, maxx, miny, maxy, advanced;
 #if 0
@@ -107,20 +84,12 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
                       &minx, &maxx, &miny, &maxy, &advanced );
     //printf("min %d %d %d %d %d %d\n", minx, maxx, miny, maxy, advanced,TTF_FontAscent((TTF_Font*)info->ttf_font[0])  );
 
-#ifdef ENABLE_ENGLISH
     // Use the glyth's advance for non-Japanese characters
-    if (IS_TWO_BYTE(text[0])) {
+    if (!ScriptDecoder::isOneByte(text[0]) && decoder->isMonospaced()) {
         info->addMonospacedCharacterAdvance();
-    }
-#ifdef ENABLE_KOREAN
-    else if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
-        info->addMonospacedCharacterAdvance();
-    }
-#endif
-    else {
+    } else {
         info->addProportionalCharacterAdvance(advanced);
     }
-#endif
 
     static SDL_Color fcol={0xff, 0xff, 0xff}, bcol={0, 0, 0};
     SDL_Surface *tmp_surface = TTF_RenderGlyph_Shaded((TTF_Font*)info->ttf_font[0], unicode, fcol, bcol);
@@ -198,10 +167,12 @@ void ONScripter::drawGlyph( SDL_Surface *dst_surface, FontInfo *info, SDL_Color 
         SDL_FreeSurface(tmp_surface);
 }
 
-void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip )
+void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool lookback_flag, SDL_Surface *surface, AnimationInfo *cache_info, SDL_Rect *clip, ScriptDecoder* decoder )
 {
     //printf("draw %x-%x[%s] %d, %d\n", text[0], text[1], text, info->xy[0], info->xy[1] );
     
+    if (!decoder) decoder = script_h.decoder;
+
     if ( info->ttf_font[0] == NULL ){
         if ( info->openFont( font_file, screen_ratio1, screen_ratio2 ) == NULL ){
             loge( stderr, "can't open font file: %s\n", font_file );
@@ -218,18 +189,8 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
-            #ifdef ENABLE_KOREAN
-                if (script_h.isKoreanMode() || force_korean_text) {
-                    current_page->add(((char*)"　")[0]);
-                    current_page->add(((char*)"　")[1]);
-                } else {
-                    current_page->add(0x81);
-                    current_page->add(0x40);
-                }
-            #else
                 current_page->add(0x81);
                 current_page->add(0x40);
-            #endif
             }
             info->advanceCharInHankaku(2);
         }
@@ -239,15 +200,13 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     info->old_xy[1] = info->y();
 
     char text2[3] = {text[0], 0, 0};
-    if (IS_UTF8(text[0]) && allowUTF8TextRender) {
+    int numBytes = decoder->getNumBytes(text[0]);
+    if (numBytes >= 2) {
         text2[1] = text[1];
-        text2[2] = text[2];
-    } else if (IS_TWO_BYTE(text[0])) text2[1] = text[1];
-
-#ifdef ENABLE_KOREAN
-    unsigned short index = (text[0] & 0xFF) << 8 ^ text[1] & 0xFF;
-    if (IS_KOR(index)) text2[1] = text[1];
-#endif
+        if (numBytes == 3) {
+            text2[2] = text[2];
+        }
+    }
 
     for (int i=0 ; i<2 ; i++){
         int xy[2];
@@ -256,7 +215,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     
         SDL_Color color = {info->color[0], info->color[1], info->color[2]};
         SDL_Rect dst_rect;
-        drawGlyph( surface, info, color, text2, xy, info->is_shadow, cache_info, clip, dst_rect );
+        drawGlyph( surface, info, color, text2, xy, info->is_shadow, cache_info, clip, dst_rect, decoder );
 
         if ( surface == accumulation_surface &&
              !flush_flag &&
@@ -273,11 +232,7 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
             flushDirect( dst_rect, REFRESH_NONE_MODE );
         }
 
-        if (IS_TWO_BYTE(text[0]) || IS_UTF8(text[0])
-#ifdef ENABLE_KOREAN
-            || IS_KOR(index)
-#endif
-        ){
+        if (decoder->getNumBytes(text[0]) >= 2) {
             info->advanceCharInHankaku(2);
             break;
         }
@@ -294,24 +249,17 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
 
 void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool single_line )
 {
-    int i;
-
-    // Scan string to allow UTF8 rendering or not; do not render it if there is Asian characters
-    allowUTF8TextRender = true;
-    i = 0;
-    while(i < strlen(str)) {
-        char c = str[i];
-        if (IS_UTF8(c)) {
-            i += UTF8ByteLength(c);
-        }
-        else if (IS_TWO_BYTE(c)) {
-            allowUTF8TextRender = false;
-            break;
-        }
-        else {
-            i++;
+    ScriptDecoder* decoder = NULL;
+    if (*str) {
+        ScriptDecoder* decoders[2] = { script_h.getSystemLanguageText()->decoder, script_h.decoder };
+        decoder = ScriptDecoder::chooseDecoderForTextFromList(str, decoders, 2);
+        if (!decoder) {
+            logw(stderr, "drawString: Cannot detect a decoder provided from system and script. Choosing script...");
+            decoder = script_h.decoder;
         }
     }
+
+    int i;
 
     int start_xy[2];
     start_xy[0] = info->xy[0];
@@ -374,58 +322,33 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
             }
         }
 #endif
-        unsigned short index = (*str & 0xFF) << 8 ^ *(str + 1) & 0xFF;
-        if ( IS_TWO_BYTE(*str)
-#ifdef ENABLE_KOREAN
-        || IS_KOR(index)
-#endif
-            ){
-            if ( checkLineBreak( str, info ) ){
-                if (single_line) break;
-                info->newLine();
-                for (int i=0 ; i<indent_offset ; i++)
-                    info->advanceCharInHankaku(2);
-            }
-
-            text[0] = *str++;
-            text[1] = *str++;
-#ifdef ENABLE_KOREAN
-            if (IS_UTF8(text[0]) && allowUTF8TextRender && !force_korean_text && !script_h.isKoreanMode()) {
-                text[2] = *str++;
-            }
-#endif
-            if (single_line && info->isEndOfLine()) break;
-            drawChar( text, info, false, false, surface, cache_info );
-        }
-        else if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
-            if (single_line) break;
-            info->newLine();
-            str++;
-        }
-        else if (IS_UTF8(*str) && allowUTF8TextRender) {
-            int numCharBytes = UTF8ByteLength(*str);
-            for (int i = 0; i < numCharBytes; i++) {
-                text[i] = *str++;
-            }
-            if (single_line && info->isEndOfLine()) break;
-            drawChar( text, info, false, false, surface, cache_info );
-        }
-        else if (*str){
-            text[0] = *str++;
-            // Add the next character if it is not the first byte of an Asian character and ignore ` characters
-            if (*str && !IS_TWO_BYTE(*str) && !IS_UTF8(*str) && *str != 0x0a && *str != '`') text[1] = *str++;
-            else                      text[1] = 0;
-#ifdef ENABLE_KOREAN
-            // If next character is Korean, then we block it from being added to the text
-            if (*str) {
-                index = *(str + 1) && *(str + 1) != 0x0a ? (*str & 0xFF) << 8 ^ *(str + 1) & 0xFF : 0;
-                if (IS_KOR(index)) {
-                    text[1] = 0;
+        if (*str) {
+            if (ScriptDecoder::isOneByte(*str)) {
+                if (*str == 0x0a || (*str == '\\' && info->is_newline_accepted)){
+                    if (single_line) break;
+                    info->newLine();
+                    str++;
                 }
+                else {
+                    text[0] = *str++;
+                    if (*str && *str != 0x0a && *str != '`' && ScriptDecoder::isOneByte(*str)) text[1] = *str++;
+                    else                                                        text[1] = 0;
+                    if (single_line && info->isEndOfLine()) break;
+                    drawChar( text, info, false, false, surface, cache_info, NULL, decoder );
+                }
+            } else {
+                if ( checkLineBreak( str, info ) ){
+                    if (single_line) break;
+                    info->newLine();
+                    for (int i=0 ; i<indent_offset ; i++)
+                        info->advanceCharInHankaku(2);
+                }
+
+                text[0] = *str++;
+                text[1] = *str++;
+                if (decoder->getNumBytes(text[0]) == 3) text[2] = *str++;
+                drawChar( text, info, false, false, surface, cache_info, NULL, decoder );
             }
-#endif
-            if (single_line && info->isEndOfLine()) break;
-            drawChar( text, info, false, false, surface, cache_info );
         }
     }
     for ( i=0 ; i<3 ; i++ ) info->color[i] = org_color[i];
@@ -460,23 +383,6 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
 #ifdef ANDROID
     reassureSentenceFontSize();
 #endif
-
-    // Scan string to allow UTF8 rendering or not; do not render it if there is Asian characters
-    allowUTF8TextRender = true;
-    int i = 0;
-    while (i < current_page->text_count) {
-        char c = current_page->text[i];
-        if (IS_UTF8(c)) {
-            i += UTF8ByteLength(c);
-        }
-        else if (IS_TWO_BYTE(c)) {
-            allowUTF8TextRender = false;
-            break;
-        }
-        else {
-            i++;
-        }
-    }
 
     char out_text[3] = { '\0','\0','\0' };
     FontInfo f_info = sentence_font;
@@ -517,23 +423,15 @@ void ONScripter::restoreTextBuffer(SDL_Surface *surface)
                 continue;
             }
 #endif
-            unsigned short index = (out_text[0] & 0xFF) << 8 ^ current_page->text[i+1] & 0xFF;
-            if (IS_TWO_BYTE(out_text[0])
-#ifdef ENABLE_KOREAN
-                    || IS_KOR(index)
-#endif
-            ){
+            if (!ScriptDecoder::isOneByte(out_text[0])) {
                 out_text[1] = current_page->text[i+1];
+                if (script_h.decoder->getNumBytes(out_text[0]) == 3) {
+                    out_text[2] = current_page->text[++i];
+                }
 
                 if ( checkLineBreak( current_page->text+i, &f_info ) )
                     f_info.newLine();
                 i++;
-            }
-            else if (IS_UTF8(out_text[0])) {
-                int numCharBytes = UTF8ByteLength(out_text[0]);
-                for (int j = 1; j < numCharBytes; j++, i++) {
-                    out_text[j] = current_page->text[i+1];
-                }
             }
             else{
                 out_text[1] = 0;
@@ -845,10 +743,8 @@ int ONScripter::textCommand()
             string_buffer_offset++;
             break;
         }
-        else if (IS_TWO_BYTE(buf[string_buffer_offset]))
-            string_buffer_offset += 2;
         else
-            string_buffer_offset++;
+            string_buffer_offset += script_h.decoder->getNumBytes(buf[string_buffer_offset]);
     }
 
     if (pretextgosub_label && 
@@ -878,7 +774,6 @@ int ONScripter::textCommand()
     line_enter_status = 2;
     if (pagetag_flag) page_enter_status = 1;
 
-    scanText();
     while(processText());
 
     return RET_CONTINUE;
@@ -894,7 +789,7 @@ bool ONScripter::checkLineBreak(const char *buf, FontInfo *fi)
         int i = 2;
         while (!fi->isEndOfLine(i)){
             if      ( buf2[i+2] == 0x0a || buf2[i+2] == 0 ) break;
-            else if ( !IS_TWO_BYTE( buf2[i+2] ) ) buf2++;
+            else if ( ScriptDecoder::isOneByte(buf2[i+2]) ) buf2++;
             else if ( isStartKinsoku( buf2+i+2 ) ) i += 2;
             else break;
         }
@@ -908,7 +803,7 @@ bool ONScripter::checkLineBreak(const char *buf, FontInfo *fi)
         int i = 2;
         while (!fi->isEndOfLine(i)){
             if      ( buf2[i+2] == 0x0a || buf2[i+2] == 0 ) break;
-            else if ( !IS_TWO_BYTE( buf2[i+2] ) ) buf2++;
+            else if ( ScriptDecoder::isOneByte(buf2[i+2]) ) buf2++;
             else if ( isEndKinsoku( buf2+i ) ) i += 2;
             else break;
         }
@@ -998,24 +893,14 @@ bool ONScripter::processText()
     
     char ch = script_h.getStringBuffer()[string_buffer_offset];
 
-    if ( IS_TWO_BYTE(ch) ){ // Shift jis
+    if ( !ScriptDecoder::isOneByte(ch) ){
         /* ---------------------------------------- */
         /* Kinsoku process */
         if ( checkLineBreak( script_h.getStringBuffer() + string_buffer_offset, &sentence_font ) ){
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
-            #ifdef ENABLE_KOREAN
-                if (script_h.isKoreanMode() || force_korean_text) {
-                    current_page->add(((char*)"　")[0]);
-                    current_page->add(((char*)"　")[1]);
-                } else {
-                    current_page->add(0x81);
-                    current_page->add(0x40);
-                }
-            #else
                 current_page->add(0x81);
                 current_page->add(0x40);
-            #endif
                 sentence_font.advanceCharInHankaku(2);
             }
         }
@@ -1023,7 +908,7 @@ bool ONScripter::processText()
         out_text[0] = script_h.getStringBuffer()[string_buffer_offset];
         out_text[1] = script_h.getStringBuffer()[string_buffer_offset+1];
 
-        if (IS_UTF8(ch) && allowUTF8TextRender) {
+        if (script_h.decoder->getNumBytes(ch) == 3) {
             out_text[2] = script_h.getStringBuffer()[string_buffer_offset + 2];
         }
 
@@ -1052,11 +937,7 @@ bool ONScripter::processText()
 
         num_chars_in_sentence++;
 
-        if (IS_UTF8(ch) && allowUTF8TextRender) {
-            string_buffer_offset += UTF8ByteLength(ch);
-        } else {
-            string_buffer_offset += 2;
-        }
+        string_buffer_offset += script_h.decoder->getNumBytes(ch);
 
         return true;
     }
@@ -1231,25 +1112,15 @@ bool ONScripter::processText()
             clickstr_state = CLICK_NONE;
         }
         
-        bool characterIs1Byte = (ch & 0x80) == 0;
         bool flush_flag = true;
         if ( skip_mode || ctrl_pressed_status )
             flush_flag = false;
-
         if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
              !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)){
-            if (!characterIs1Byte)  // Let 1 Byte characters play nice with 2 byte characters
-                out_text[1] = script_h.getStringBuffer()[ string_buffer_offset + 1 ];
             drawChar( out_text, &sentence_font, flush_flag, true, accumulation_surface, &text_info );
             num_chars_in_sentence++;
         }
         else if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
-            // Handle UTF8
-            if (IS_UTF8(ch) && allowUTF8TextRender) {
-                out_text[1] = script_h.getStringBuffer()[string_buffer_offset + 1];
-                string_buffer_offset += UTF8ByteLength(ch) - 1;
-            }
-
 #ifdef ENABLE_ENGLISH
             // Scan text for next whitespace to break on if at the end
             bool newLineEarly = false;
@@ -1300,175 +1171,30 @@ bool ONScripter::processText()
                 waitEvent( sentence_font.wait_time );
         }
 
-        if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
-             !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) && !characterIs1Byte)
-            string_buffer_offset++;
         string_buffer_offset++;
-
         return true;
     }
 
     return false;
 }
 
-bool ONScripter::scanText()
-{
-    // Read the type of byte, check that UTF8 is needed only when there is no Asian characters
-    allowUTF8TextRender = true;
-    int offset = string_buffer_offset;
-    while(1) {
-        char out_text[3]= {'\0', '\0', '\0'};
-
-        while( (!(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) &&
-                script_h.getStringBuffer()[ offset ] == ' ') ||
-               script_h.getStringBuffer()[ offset ] == '\t' ) offset ++;
-
-        if (script_h.getStringBuffer()[offset] == 0x00){
-            break;
-        }
-
-        char ch = script_h.getStringBuffer()[offset];
-
-        if ( IS_TWO_BYTE(ch) ){
-            if (IS_UTF8(ch)) {
-                offset += UTF8ByteLength(ch);
-            } else {
-                // Found asian character, do not render UTF8
-                allowUTF8TextRender = false;
-                return false;
-            }
-            continue;
-        }
-        else if ( ch == '@' || ch == '\\' ){ // wait for click
-            break;
-        }
-        else if ( ch == '_' ){ // Ignore an immediate click wait
-            offset++;
-
-            int matched_len = script_h.checkClickstr(script_h.getStringBuffer() + offset, true);
-            if (matched_len > 0){
-                offset += matched_len;
-            }
-            continue;
-        }
-        else if ( ch == '!' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
-            offset++;
-            if ( script_h.getStringBuffer()[ offset ] == 's' ){
-                offset++;
-                if ( script_h.getStringBuffer()[ offset ] == 'd' ){
-                    offset++;
-                }
-                else{
-                    while( script_h.getStringBuffer()[ offset ] >= '0' &&
-                           script_h.getStringBuffer()[ offset ] <= '9' ){
-                        offset++;
-                    }
-                    while (script_h.getStringBuffer()[ offset ] == ' ' ||
-                           script_h.getStringBuffer()[ offset ] == '\t') offset++;
-                }
-            }
-            else if ( script_h.getStringBuffer()[ offset ] == 'w' ||
-                      script_h.getStringBuffer()[ offset ] == 'd' ){
-                offset++;
-                while( script_h.getStringBuffer()[ offset ] >= '0' &&
-                       script_h.getStringBuffer()[ offset ] <= '9' ){
-                    offset++;
-                }
-                while (script_h.getStringBuffer()[ offset ] == ' ' ||
-                       script_h.getStringBuffer()[ offset ] == '\t') offset++;
-            }
-            continue;
-        }
-        else if ( ch == '#' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
-            offset += 7;
-            continue;
-        }
-        else if ( ch == '(' && script_h.getCurrent()[0] != '`' && (!english_mode ||
-                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
-            offset++;
-            continue;
-        }
-        else if ( ch == '<' && (!english_mode ||
-                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
-            offset++;
-            continue;
-        }
-        else if ( ch == '>' && in_textbtn_flag && (!english_mode ||
-                   !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)) ){
-            offset++;
-            continue;
-        }
-        else{
-            if (script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR){
-                // Handle UTF8
-                if (IS_UTF8(ch)) {
-                    offset += UTF8ByteLength(ch) - 1;
-                }
-            }
-
-            if ( script_h.getStringBuffer()[ offset + 1 ] &&
-                 !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR))
-                offset++;
-            offset++;
-        }
-        return true;
-    }
-}
-
 #ifdef ANDROID
-// TODO this is temporary till the encoder class is built
 // Converts a string (char*) to Unicode (jchar*) and returns the size
 //  Does not check if buffer is smaller than input text
 size_t ONScripter::basicStringToUnicode(jchar* out, const char* text)
 {
-    // Prescan for any characters that are not basic chars (like UTF8)
-    bool parseAsUTF8 = true;
-    int i = 0;
-    while(i < strlen(text)) {
-        char c = text[i];
-        if (IS_UTF8(c)) {
-            i += UTF8ByteLength(c);
-        }
-        else if (IS_TWO_BYTE(c)) {
-            parseAsUTF8 = false;
-            break;
-        }
-        else {
-            i++;
-        }
-    }
-
     // Convert bytes to unicode
     size_t size = strlen(text);
+    char* ptr = const_cast<char*>(text);
+
     int j = 0;
     for (int i=0; i<size ; i++) {
         jchar c = text[i];
 
-        if (i + 1 < size) {
-            unsigned char c2 = text[i + 1];
-            unsigned short index = c << 8 | c2;
-#ifdef ENABLE_KOREAN
-            if ((script_h.isKoreanMode() || force_korean_text) && IS_KOR(index)) {
-                c = convKOR2UTF16( index );
-                i++;
-            } else
-#endif
-            if (IS_UTF8(c) && parseAsUTF8){
-                char t[] = {c, c2};
-                c = decodeUTF8Character(t, NULL);
-                i += UTF8ByteLength(c) - 1;
-            }
-            else if (IS_TWO_BYTE(c)){
-                c = convSJIS2UTF16( index );
-                i++;
-            }
-            else{
-                if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
-                    c = c - 0xa0 + 0xff60;
-            }
-        } else {
-            if ((c & 0xe0) == 0xa0 || (c & 0xe0) == 0xc0)
-                    c = c - 0xa0 + 0xff60;
+        int n = script_h.decoder->getNumBytes(text[i]) - 1;
+        if (i + n < size) {
+            c = (jchar)script_h.decoder->convertNextChar(ptr + i);
+            i += n;
         }
         out[j++] = c;
     }

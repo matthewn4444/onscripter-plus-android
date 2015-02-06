@@ -812,7 +812,7 @@ void ScriptParser::setKinsoku(const char *start_chrs, const char *end_chrs, bool
     int num_start = 0;
     kchr = start_chrs;
     while (*kchr != '\0') {
-        if IS_TWO_BYTE(*kchr) kchr++;
+        if (!ScriptDecoder::isOneByte(*kchr)) kchr++;
         kchr++;
         num_start++;
     }
@@ -820,7 +820,7 @@ void ScriptParser::setKinsoku(const char *start_chrs, const char *end_chrs, bool
     int num_end = 0;
     kchr = end_chrs;
     while (*kchr != '\0') {
-        if IS_TWO_BYTE(*kchr) kchr++;
+        if (!ScriptDecoder::isOneByte(*kchr)) kchr++;
         kchr++;
         num_end++;
     }
@@ -845,7 +845,7 @@ void ScriptParser::setKinsoku(const char *start_chrs, const char *end_chrs, bool
             start_kinsoku[i].chr[0] = tmp[i].chr[0];
         else
             start_kinsoku[i].chr[0] = *kchr++;
-        if IS_TWO_BYTE(start_kinsoku[i].chr[0]) {
+        if (!ScriptDecoder::isOneByte(start_kinsoku[i].chr[0])) {
             if (i < num_start_kinsoku)
                 start_kinsoku[i].chr[1] = tmp[i].chr[1];
             else
@@ -877,7 +877,7 @@ void ScriptParser::setKinsoku(const char *start_chrs, const char *end_chrs, bool
             end_kinsoku[i].chr[0] = tmp[i].chr[0];
         else
             end_kinsoku[i].chr[0] = *kchr++;
-        if IS_TWO_BYTE(end_kinsoku[i].chr[0]) {
+        if (!ScriptDecoder::isOneByte(end_kinsoku[i].chr[0])) {
             if (i < num_end_kinsoku)
                 end_kinsoku[i].chr[1] = tmp[i].chr[1];
             else
