@@ -69,6 +69,11 @@ ScriptHandler::~ScriptHandler()
     delete[] saved_string_buffer;
     if (variable_data) delete[] variable_data;
 
+    if (decoder) {
+        delete decoder;
+        decoder = NULL;
+    }
+
 #ifdef ANDROID
     if (root_writable) {
         delete[] root_writable;
@@ -243,7 +248,7 @@ const char *ScriptHandler::readToken()
              (!english_mode && ch == '>') ||
              ch == '!' || ch == '#' || ch == ',' || ch == '"'){ // text
         while(1){
-            if ( IS_TWO_BYTE(ch) ){
+            if ( !ScriptDecoder::isOneByte(ch) ){
                 addStringBuffer( ch );
                 ch = *++buf;
                 if (ch == 0x0a || ch == '\0') break;
@@ -293,9 +298,10 @@ const char *ScriptHandler::readToken()
     else if (ch == '`'){
         ch = *++buf;
         while (ch != '`' && ch != 0x0a && ch !='\0'){
-            if ( IS_TWO_BYTE(ch) ){
+            if ( ScriptDecoder::isOneByte(ch) ){
                 addStringBuffer( ch );
-                ch = *++buf;
+                buf += decoder->getNumBytes(ch) - 1;
+                ch = *buf;
             }
             addStringBuffer( ch );
             ch = *++buf;
@@ -448,8 +454,9 @@ void ScriptHandler::skipToken()
         if ( *buf == 0x0a || *buf == 0 ||
              (!quat_flag && !text_flag && (*buf == ':' || *buf == ';') ) ) break;
         if ( *buf == '"' ) quat_flag = !quat_flag;
-        if ( IS_TWO_BYTE(*buf) ){
-            buf += 2;
+        int n = decoder->getNumBytes(*buf);
+        if ( n >= 2 ) {
+            buf += n;
             if ( !quat_flag ) text_flag = true;
         }
         else
@@ -621,10 +628,12 @@ void ScriptHandler::setSystemLanguage(const char* languageStr) {
         delete menuText;
         menuText = NULL;
     }
-    if (!strcmp( languageStr, "ko")) {
-        menuText = new KoreanMenu();
-    } else if (!strcmp( languageStr, "ja")) {
+    if (!strcmp( languageStr, "ja")) {
         menuText = new JapaneseMenu();
+#ifdef ENABLE_KOREAN
+    } else if (!strcmp( languageStr, "ko")) {
+        menuText = new KoreanMenu();
+#endif
     } else if (!strcmp( languageStr, "ru")) {
         menuText = new RussianMenu();
     } else {
@@ -1100,115 +1109,18 @@ int ScriptHandler::readScript( char *path )
     delete[] tmp_script_buf;
 
     script_buffer_length = p_script_buffer - script_buffer;
-#ifdef ENABLE_KOREAN
-    korean_mode = detectKoreanText(script_buffer, script_buffer_length);
-#endif
-    return 0;
-}
 
-#ifdef ENABLE_KOREAN
-// Korean mode depends if we can find only Korean text in the script, determines
-// whether or not to parse the script as Hangul text
-bool ScriptHandler::detectKoreanText(char* buffer, size_t size) {
-    // Must have 2000 Korean lines in the entire script
-    const unsigned int ValidateNumberOfKoreanLines = 2000;
-
-    // Each line will be considered Korean text if it has at least 5 characters
-    const unsigned int ValidateNumberOfCharPerLine = 5;
-
-    // If the script has less than 2000 dialog lines, at least 80% of them must be Korean
-    const double ShortScriptPercentKorLine = 0.8;
-
-    int possibleKorLines = 0;
-    int foundKorLines = 0;
-
-    // Read the script buffer and find out if script contains at least two lines of Korean text
-    char* ptr = buffer;
-    int found_valid_korean_lines = 0;
-    for (int i = 0; (ptr - buffer) < size; i++) {
-        SKIP_SPACE(ptr);
-        char c = *ptr & 0xFF;
-        // Found comment, parse next line
-        if (c == '*' || c == ';' || c == ':' || c == 0x0a) {
-            // Move to next line
-            while (*ptr != 0x0a) ptr++;
-            ptr++;
-            continue;
-        }
-#ifdef ENABLE_1BYTE_CHAR
-        // Guaranteed English characters
-        else if (c == '`') {
-            return false;
-        }
-#endif
-        // End of the script
-        else if (c == '\0') {
-            return false;
-        }
-        else if (c == '[') {
-            // Skip the text inside the brackets
-            while (*ptr != ']') ptr++;
-            ptr++;
-            continue;
-        }
-        else {
-            // Scan for Korean text only if next character is Korean, else next line
-            unsigned short index = (*ptr & 0xFF) << 8 ^ *(ptr + 1)& 0xFF;
-            if (IS_KOR(index)) {
-                int korean_text_count = 0;
-                while (*ptr != 0x0a) {
-                    unsigned short byte = (*ptr) & 0xFF;
-                    if (korean_text_count >= 0) {
-                        char nextC = *(ptr + 1);
-                        // Korean 2 Byte characters: the 2nd byte is not valid, skip
-                        if (nextC == '\0' || nextC == '\\') {
-                            korean_text_count = -1;
-                        }
-                        else if (byte >= 0 && byte < 0x80) {
-                            // Skip all 1-Byte characters
-                        }
-                        else {
-                            index = byte << 8 ^ nextC & 0xFF;
-
-                            // Found korean text
-                            if (IS_KOR(index)) {
-                                korean_text_count++;
-                                ptr++;
-                            }
-                            // Detected non-Korean character, move to next line
-                            else {
-                                korean_text_count = -1;
-                            }
-                        }
-                    }
-                    ptr++;
-                }
-                ptr++;
-
-                // See if we have gotten 2 lines of Korean text in the script
-                if (korean_text_count > 0) {
-                    foundKorLines++;
-                    if (korean_text_count > ValidateNumberOfCharPerLine) {
-                        found_valid_korean_lines++;
-                        if (found_valid_korean_lines > ValidateNumberOfKoreanLines) {
-                            return true;
-                        }
-                    }
-                }
-                possibleKorLines++;
-            }
-            // Line does not start with Korean characters, skip line
-            else {
-                while (*ptr != 0x0a) ptr++;
-                ptr++;
-            }
+    if (!decoder) {
+        decoder = ScriptDecoder::detectAndAllocateScriptDecoder(script_buffer, script_buffer_length);
+        if (decoder) {
+            logv("Decoder: %s", decoder->getName());
+        } else {
+            logw(stderr, "Could not detect script language, choosing Japanese by default...");
+            decoder = new JapaneseDecoder();
         }
     }
-
-    // In case the script has less than 2000 dialogs, 80% must be Korean
-    return foundKorLines > 1 && foundKorLines >= possibleKorLines * ShortScriptPercentKorLine;
+    return 0;
 }
-#endif
 
 int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
 {
@@ -1282,8 +1194,7 @@ void ScriptHandler::readConfiguration()
     char *buf = script_buffer;
     while ( buf < script_buffer + script_buffer_length ){
         if (*buf == ';') break;
-        if (IS_TWO_BYTE(*buf)) buf++;
-        buf++;
+        buf += decoder->getNumBytes(*buf);
     }
 
     while ( ++buf >= script_buffer + script_buffer_length ) return;

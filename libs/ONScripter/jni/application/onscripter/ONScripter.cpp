@@ -28,12 +28,10 @@
 #endif
 
 extern void initSJIS2UTF16();
-extern "C" void waveCallback( int channel );
-
-#ifdef ENABLE_KOREAN
-extern unsigned short convKOR2UTF16(unsigned short code);
+#ifdef ENABLE_CHINESE
+extern void initGBK2UTF16();
 #endif
-extern unsigned short convSJIS2UTF16( unsigned short in );
+extern "C" void waveCallback( int channel );
 
 #define DEFAULT_AUDIOBUF  4096
 
@@ -219,7 +217,10 @@ void ONScripter::initSDL()
     screen_rect.h = screen_height;
 
     initSJIS2UTF16();
-    
+#ifdef ENABLE_CHINESE
+    initGBK2UTF16();
+#endif
+
     wm_title_string = new char[ strlen(DEFAULT_WM_TITLE) + 1 ];
     memcpy( wm_title_string, DEFAULT_WM_TITLE, strlen(DEFAULT_WM_TITLE) + 1 );
     wm_icon_string = new char[ strlen(DEFAULT_WM_ICON) + 1 ];
@@ -288,9 +289,6 @@ ONScripter::ONScripter()
 #ifdef ANDROID
     audio_high_quality = false;
     setMenuLanguage("en");
-#endif
-#ifdef ENABLE_KOREAN
-    force_korean_text = false;
 #endif
 
     int i;

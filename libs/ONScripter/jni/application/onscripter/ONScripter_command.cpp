@@ -549,14 +549,7 @@ int ONScripter::splitCommand()
         while(save_buf[c] != delimiter && save_buf[c] != '\0'){
             unsigned short index = save_buf[c + 1] != '\0' && save_buf[c + 1] != '\\' ?
                 (save_buf[c] & 0xFF) << 8 ^ save_buf[c + 1] & 0xFF : 0;
-            if (IS_TWO_BYTE(save_buf[c])
-#ifdef ENABLE_KOREAN
-                || IS_KOR(index)
-#endif
-            )
-                c += 2;
-            else
-                c++;
+            c += script_h.decoder->getNumBytes(save_buf[c]);
         }
         memcpy( token, save_buf, c );
         token[c] = '\0';
@@ -2152,18 +2145,7 @@ int ONScripter::gettagCommand()
                 const char *buf_start = buf;
                 while(*buf != '/' && *buf != 0 && *buf != ']' && 
                       (!zenkakko_flag || buf[0] != "¡Û"[0] || buf[1] != "¡Û"[1])){
-#ifdef ENABLE_KOREAN
-                    unsigned short index = buf[1] != '\0' && buf[1] != '\\' ?
-                        (buf[0] & 0xFF) << 8 ^ buf[1] & 0xFF : 0;
-#endif
-                    if (IS_TWO_BYTE(*buf))
-                        buf += 2;
-#ifdef ENABLE_KOREAN
-                    else if (IS_KOR(index))
-                        buf += 2;
-#endif
-                    else
-                        buf++;
+                    buf += script_h.decoder->getNumBytes(*buf);
                 }
                 setStr( &script_h.getVariableData(script_h.pushed_variable.var_no).str, buf_start, buf-buf_start );
             }

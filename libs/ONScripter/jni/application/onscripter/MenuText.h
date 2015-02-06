@@ -2,6 +2,7 @@
 #define __MENUTEXT_H__
 
 #include "MenuText_UTF8.h"
+#include "ScriptDecoder.h"
 
 // English Menu Text
 #define ENGLISH_MSG_SAVE_EXIST "`%s%s    Date %s/%s    Time %s:%s"
@@ -17,6 +18,7 @@
 #define ENGLISH_SAVE_MENU_NAME "<Save>"
 #define ENGLISH_LOAD_MENU_NAME "<Load>"
 #define ENGLISH_SAVE_ITEM_NAME "Slot"
+#define ENGLISH_DECODER UTF8Decoder
 
 // Japanese Menu Text
 #define JAPANESE_MSG_SAVE_EXIST "%s%sÅ@%såé%sì˙%séû%sï™"
@@ -32,6 +34,7 @@
 #define JAPANESE_SAVE_MENU_NAME "ÅÉÉZÅ[ÉuÅÑ"
 #define JAPANESE_LOAD_MENU_NAME "ÅÉÉçÅ[ÉhÅÑ"
 #define JAPANESE_SAVE_ITEM_NAME "ÇµÇ®ÇË"
+#define JAPANESE_DECODER JapaneseDecoder
 
 // Korean Menu Text
 #define KOREAN_MSG_SAVE_EXIST "%s%s°°%sø˘%s¿œ%sΩ√%s∫–"
@@ -47,6 +50,7 @@
 #define KOREAN_SAVE_MENU_NAME "°¥ºº¿Ã∫Í°µ"
 #define KOREAN_LOAD_MENU_NAME "°¥∑ŒµÂ°µ"
 #define KOREAN_SAVE_ITEM_NAME "√•∞•««"
+#define KOREAN_DECODER KoreanDecoder
 
 class MenuTextBase
 {
@@ -56,7 +60,12 @@ public:
     MenuTextBase(const Language &lang) {
         language = lang;
     }
-    ~MenuTextBase() {}
+    ~MenuTextBase() {
+        if (decoder) {
+            delete decoder;
+            decoder = NULL;
+        }
+    }
 
     Language getLanguage() { return language; };
 
@@ -73,6 +82,8 @@ public:
     virtual const char* message_save_menu() = 0;
     virtual const char* message_load_menu() = 0;
     virtual const char* message_save_item() = 0;
+
+    ScriptDecoder* decoder;
 protected:
     Language language;
 };
@@ -82,7 +93,9 @@ protected:
     class cls : public MenuTextBase                                       \
     {                                                                      \
     public:                                                               \
-        cls():MenuTextBase(MenuTextBase::lang) {}                          \
+        cls():MenuTextBase(MenuTextBase::lang) {                           \
+            decoder = new lang##_DECODER();                                \
+        }                                                                  \
         ~cls() {}                                                          \
         const char* message_save_exist() {                                \
             static const char* save_exist = lang##_MSG_SAVE_EXIST;       \
@@ -140,7 +153,9 @@ protected:
 
 lazyMenuLangMake(EnglishMenu, ENGLISH)
 lazyMenuLangMake(JapaneseMenu, JAPANESE)
-lazyMenuLangMake(KoreanMenu, KOREAN)
 lazyMenuLangMake(RussianMenu, RUSSIAN)
+#ifdef ENABLE_KOREAN
+lazyMenuLangMake(KoreanMenu, KOREAN)
+#endif
 
 #endif // __MENUTEXT_H__

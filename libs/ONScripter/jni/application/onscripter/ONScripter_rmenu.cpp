@@ -833,15 +833,7 @@ void ONScripter::buildDialog(bool yesno_flag, const char *mes1, const char *mes2
             dialog_font.top_xy[1] = rect.y+(rect.h-dialog_font.font_size_xy[1])/2;
             dialog_font.setLineArea( strlen(mes[i])/2+1 );
             dialog_font.clear();
-#ifdef ENABLE_KOREAN
-            if (script_h.getSystemLanguageText()->getLanguage() == MenuTextBase::KOREAN) {
-                force_korean_text = true;
-            }
-#endif
             drawString( mes[i], col3, &dialog_font, false, bs2, NULL, NULL );
-#ifdef ENABLE_KOREAN
-            force_korean_text = false;
-#endif
         }
 
         ButtonLink *btn = new ButtonLink();

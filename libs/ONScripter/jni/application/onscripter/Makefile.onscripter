@@ -26,7 +26,9 @@ DECODER_OBJS = DirectReader$(OBJSUFFIX) \
 	NsaReader$(OBJSUFFIX) \
 	sjis2utf16$(OBJSUFFIX) \
 	kr2utf$(OBJSUFFIX) \
-	backtrace$(OBJSUFFIX)
+	gbk2utf$(OBJSUFFIX) \
+	backtrace$(OBJSUFFIX) \
+	ScriptDecoder$(OBJSUFFIX)
 
 SARDEC_OBJS  = sardec$(OBJSUFFIX) \
 	DirectReader$(OBJSUFFIX) \
