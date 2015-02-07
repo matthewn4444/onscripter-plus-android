@@ -60,7 +60,7 @@
 // Only used as a replacement for sprintf for failing on Android L
 // This only works with '%s' string arrays in the format. Corrects
 // the broken sprintf when format contains Asian character bytes.
-int makeSaveSystemList(char* buffer, const char* format, ...)
+int better_sprintf(char* buffer, const char* format, ...)
 {
     int i = 0, j = 0;
     char* str;
@@ -312,7 +312,6 @@ bool ONScripter::executeSystemLoad()
     menu_font.newLine();
         
     flush( refreshMode() );
-        
     bool nofile_flag;
     char *buffer = new char[ strlen( save_item_name ) + 256 ];
 
@@ -324,7 +323,7 @@ bool ONScripter::executeSystemLoad()
         if ( save_file_info.valid ){
 #ifdef ANDROID
             // Manual sprintf because broken on Android L with Asian characters
-            makeSaveSystemList( buffer, MESSAGE_SAVE_EXIST,
+            better_sprintf( buffer, MESSAGE_SAVE_EXIST,
 #else
             sprintf( buffer, MESSAGE_SAVE_EXIST,
 #endif
@@ -338,7 +337,7 @@ bool ONScripter::executeSystemLoad()
         }
         else{
 #ifdef ANDROID
-            makeSaveSystemList( buffer, MESSAGE_SAVE_EMPTY,
+            better_sprintf( buffer, MESSAGE_SAVE_EMPTY,
 #else
             sprintf( buffer, MESSAGE_SAVE_EMPTY,
 #endif
@@ -446,7 +445,7 @@ void ONScripter::executeSystemSave()
         if ( save_file_info.valid ){
 #ifdef ANDROID
             // Manual sprintf because broken on Android L with Asian characters
-            makeSaveSystemList( buffer, MESSAGE_SAVE_EXIST,
+            better_sprintf( buffer, MESSAGE_SAVE_EXIST,
 #else
             sprintf( buffer, MESSAGE_SAVE_EXIST,
 #endif
@@ -460,7 +459,7 @@ void ONScripter::executeSystemSave()
         }
         else{
 #ifdef ANDROID
-            makeSaveSystemList( buffer, MESSAGE_SAVE_EMPTY,
+            better_sprintf( buffer, MESSAGE_SAVE_EMPTY,
 #else
             sprintf( buffer, MESSAGE_SAVE_EMPTY,
 #endif
@@ -507,14 +506,22 @@ bool ONScripter::executeSystemYesNo( int caller, int file_no )
     if ( caller == SYSTEM_SAVE ){
         SaveFileInfo save_file_info;
         searchSaveFile( save_file_info, file_no );
+#ifdef ANDROID
+        better_sprintf( name, MESSAGE_SAVE_CONFIRM,
+#else
         sprintf( name, MESSAGE_SAVE_CONFIRM,
+#endif
                  save_item_name,
                  save_file_info.sjis_no );
     }
     else if ( caller == SYSTEM_LOAD ){
         SaveFileInfo save_file_info;
         searchSaveFile( save_file_info, file_no );
+#ifdef ANDROID
+        better_sprintf( name, MESSAGE_LOAD_CONFIRM,
+#else
         sprintf( name, MESSAGE_LOAD_CONFIRM,
+#endif
                  save_item_name,
                  save_file_info.sjis_no );
     }
