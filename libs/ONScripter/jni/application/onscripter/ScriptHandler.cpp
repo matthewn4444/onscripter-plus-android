@@ -870,20 +870,6 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
 #endif
 #endif
     int c = 0;
-#ifdef ENABLE_KOREAN
-    if (is_zero_inserted){
-        for (i=0 ; i<num_space ; i++){
-            buffer[c++] = ((char*)"£°")[0];
-            buffer[c++] = ((char*)"£°")[1];
-        }
-    }
-    else{
-        for (i=0 ; i<num_space ; i++){
-            buffer[c++] = ((char*)"¡¡")[0];
-            buffer[c++] = ((char*)"¡¡")[1];
-        }
-    }
-#else
     if (is_zero_inserted){
         for (i=0 ; i<num_space ; i++){
             buffer[c++] = ((char*)"‚O")[0];
@@ -896,15 +882,9 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
             buffer[c++] = ((char*)"@")[1];
         }
     }
-#endif
     if (num_minus == 1){
-    #ifdef ENABLE_KOREAN
-        buffer[c++] = "£­"[0];
-        buffer[c++] = "£­"[1];
-    #else
         buffer[c++] = "|"[0];
         buffer[c++] = "|"[1];
-    #endif
     }
     c = (num_column-1)*2;
     char num_str[] = "‚O‚P‚Q‚R‚S‚T‚U‚V‚W‚X";
