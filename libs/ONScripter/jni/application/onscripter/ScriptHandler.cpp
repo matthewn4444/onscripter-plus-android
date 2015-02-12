@@ -1322,6 +1322,13 @@ int ScriptHandler::findLabel( const char *label )
             return i;
     }
 
+#ifdef ENABLE_KOREAN
+    if (!strcmp(label, KOREAN_LABEL_END)) {
+        exit(-1);
+        return -1;
+    }
+#endif
+
     char *p = new char[ strlen(label) + 32 ];
     sprintf(p, "Label \"%s\" is not found.", label);
     errorAndExit( p );
