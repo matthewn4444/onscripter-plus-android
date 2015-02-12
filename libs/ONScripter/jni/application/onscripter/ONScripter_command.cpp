@@ -1678,7 +1678,7 @@ int ONScripter::lspCommand()
         ai->trans = -1;
 
     parseTaggedString( ai );
-    setupAnimationInfo( ai );
+    setupAnimationInfo( ai, NULL, false, script_h.decoder );
 
     if ( ai->visible ) dirty_rect.add( ai->pos );
 
