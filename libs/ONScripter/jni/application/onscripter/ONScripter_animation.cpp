@@ -145,7 +145,7 @@ void ONScripter::proceedAnimation()
     }
 }
 
-void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info, bool single_line )
+void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info, bool single_line, ScriptDecoder* decoder )
 {
     if (anim->trans_mode != AnimationInfo::TRANS_STRING &&
         anim->file_name && anim->surface_name &&
@@ -192,7 +192,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info, bool s
 
         SDL_Rect pos;
         if (anim->is_tight_region){
-            drawString( anim->file_name, anim->color_list[ anim->current_cell ], &f_info, false, NULL, &pos, NULL, single_line );
+            drawString( anim->file_name, anim->color_list[ anim->current_cell ], &f_info, false, NULL, &pos, NULL, single_line, decoder );
         }
         else{
             int xy_bak[2];
@@ -221,7 +221,7 @@ void ONScripter::setupAnimationInfo( AnimationInfo *anim, FontInfo *info, bool s
         f_info.top_xy[0] = f_info.top_xy[1] = 0;
         for ( int i=0 ; i<anim->num_of_cells ; i++ ){
             f_info.clear();
-            drawString( anim->file_name, anim->color_list[i], &f_info, false, NULL, NULL, anim, single_line );
+            drawString( anim->file_name, anim->color_list[i], &f_info, false, NULL, NULL, anim, single_line, decoder );
             f_info.top_xy[0] += anim->orig_pos.w;
         }
     }

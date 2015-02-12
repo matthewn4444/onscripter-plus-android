@@ -247,10 +247,9 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
     }
 }
 
-void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool single_line )
+void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool flush_flag, SDL_Surface *surface, SDL_Rect *rect, AnimationInfo *cache_info, bool single_line, ScriptDecoder* decoder )
 {
-    ScriptDecoder* decoder = NULL;
-    if (*str) {
+    if (!decoder && *str) {
         ScriptDecoder* decoders[2] = { script_h.getSystemLanguageText()->decoder, script_h.decoder };
         decoder = ScriptDecoder::chooseDecoderForTextFromList(str, decoders, 2);
         if (!decoder) {
