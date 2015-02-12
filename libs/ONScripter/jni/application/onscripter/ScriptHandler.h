@@ -39,6 +39,11 @@
 #define FORCE_1BYTE_CHAR
 #endif
 
+#ifdef ENABLE_KOREAN
+// To avoid crashing (Korean) games, this label is usually used to exit the game
+#define KOREAN_LABEL_END "l_offyo"
+#endif
+
 typedef unsigned char uchar3[3];
 
 #ifdef ANDROID
