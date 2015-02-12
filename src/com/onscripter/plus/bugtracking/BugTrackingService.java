@@ -17,6 +17,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Resources;
 import android.net.ConnectivityManager;
@@ -24,6 +25,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.bugtracking.ModifyServerRequest.METHOD;
@@ -104,9 +106,15 @@ public class BugTrackingService extends IntentService {
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(ctx);
         String data = pref.getString(PREF_KEY_PENDING_REPORT, null);
         if (data != null) {
-            if (isNetworkAvailable(ctx)) {
+            String[] params = data.toString().split("\\|");
+            // Debug mode should output the error and not send the data
+            if (isDebug(ctx)) {
                 pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
-                String[] params = data.toString().split("\\|");
+                if (params.length >= 1) {
+                    Toast.makeText(ctx, params[0], Toast.LENGTH_SHORT).show();
+                }
+            } else if (isNetworkAvailable(ctx)) {
+                pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
                 if (params.length != 7) {
                     Log.w(TAG, "Unable to send data to server because we lack number of arguments.");
                     return;
@@ -136,7 +144,7 @@ public class BugTrackingService extends IntentService {
      */
     public static void sendBugReport(Context ctx, String gameName, Exception exception,
             Map<String, String> extraData) {
-        if (!ONScripterTracer.playbackEnabled() && isNetworkAvailable(ctx)) {
+        if (!isDebug(ctx) && !ONScripterTracer.playbackEnabled() && isNetworkAvailable(ctx)) {
             Intent in = new Intent(ctx, BugTrackingService.class);
             in.putExtra(INTENT_KEY_EXCEPTION_MSG, exception.getMessage());
             in.putExtra(INTENT_KEY_GAME_NAME, gameName);
@@ -416,6 +424,10 @@ public class BugTrackingService extends IntentService {
         } catch (NameNotFoundException e) {
             return "?";
         }
+    }
+
+    private static boolean isDebug(Context ctx) {
+        return (ctx.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
     private static boolean isNetworkAvailable(Context ctx) {
