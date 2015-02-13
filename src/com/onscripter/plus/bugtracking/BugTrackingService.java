@@ -111,7 +111,7 @@ public class BugTrackingService extends IntentService {
             if (isDebug(ctx)) {
                 pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
                 if (params.length >= 1) {
-                    Toast.makeText(ctx, params[0], Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, params[0].trim(), Toast.LENGTH_SHORT).show();
                 }
             } else if (isNetworkAvailable(ctx)) {
                 pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
@@ -168,19 +168,17 @@ public class BugTrackingService extends IntentService {
      */
     public static void createCrashReport(final Context ctx, final String exceptionMessage,
             final String gameName, final String stacktrace, final Map<String, String> extraData) {
-        if (!ONScripterTracer.playbackEnabled()) {
-            StringBuilder params = new StringBuilder()
-                .append(exceptionMessage).append(PARAMS_DELIMITER)
-                .append(gameName).append(PARAMS_DELIMITER)
-                .append(stacktrace).append(PARAMS_DELIMITER)
-                .append(ONScripterTracer.getCurrentLogTime() + "").append(PARAMS_DELIMITER)
-                .append(extrasMapToJSONString(extraData)).append(PARAMS_DELIMITER)
-                .append(System.currentTimeMillis() + "").append(PARAMS_DELIMITER)
-                .append(ONScripterTracer.hasLoadedSaveFile());
+        StringBuilder params = new StringBuilder()
+            .append(exceptionMessage).append(PARAMS_DELIMITER)
+            .append(gameName).append(PARAMS_DELIMITER)
+            .append(stacktrace).append(PARAMS_DELIMITER)
+            .append(ONScripterTracer.getCurrentLogTime() + "").append(PARAMS_DELIMITER)
+            .append(extrasMapToJSONString(extraData)).append(PARAMS_DELIMITER)
+            .append(System.currentTimeMillis() + "").append(PARAMS_DELIMITER)
+            .append(ONScripterTracer.hasLoadedSaveFile());
 
-            PreferenceManager.getDefaultSharedPreferences(ctx).edit()
-                .putString(PREF_KEY_PENDING_REPORT, params.toString()).commit();
-        }
+        PreferenceManager.getDefaultSharedPreferences(ctx).edit()
+            .putString(PREF_KEY_PENDING_REPORT, params.toString()).commit();
     }
 
     /**
