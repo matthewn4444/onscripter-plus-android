@@ -257,6 +257,7 @@ protected:
     char *nsa_path;
 #ifdef ANDROID
     char *root_writable;
+    int glovalSaveAttempts;
 #endif
     unsigned int nsa_offset;
     bool globalon_flag;
