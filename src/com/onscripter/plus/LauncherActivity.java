@@ -232,6 +232,33 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(LAST_DIRECTORY, mAdapter.getCurrentDirectoryPath());
+
+        // TODO TEMP till later is understood
+        if (mStartONScripterBundle != null) {
+            outState.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA));
+            outState.putString(ONScripter.SAVE_DIRECTORY_EXTRA, mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA));
+            outState.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA));
+        }
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        String lastDirectory = savedInstanceState.getString(LAST_DIRECTORY);
+        if (lastDirectory != null) {
+            mAdapter.setCurrentDirectory(new File(lastDirectory));
+        }
+
+        // TODO TEMP till later is understood
+        String directory = savedInstanceState.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
+        if (directory != null) {
+            String saveFolder = savedInstanceState.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
+            boolean useDefaultFont = savedInstanceState.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
+            mStartONScripterBundle = new Bundle();
+            mStartONScripterBundle.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
+            mStartONScripterBundle.putString(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
+            mStartONScripterBundle.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
+        }
     }
 
     private void attachAds(ListView listView) {
