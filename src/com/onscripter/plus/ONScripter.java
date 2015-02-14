@@ -19,6 +19,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -53,6 +54,10 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     public static final String SAVE_DIRECTORY_EXTRA = "save_directory_extra";
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
     public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
+
+    private static final String[] mIgnoreGameExceptions = {
+        "getparam: not in a subroutine",
+    };
 
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
     private static int FULLSCREEN_TIMEOUT_SECONDS = App.getContext().getResources()
@@ -276,6 +281,15 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
     @Override
     public void onNativeError(NativeONSException e, final String line, final String backtrace) {
+        if (e == null) {
+            return;
+        }
+        for (String match: mIgnoreGameExceptions) {
+            if (e.getMessage().contains(match)) {
+                Log.w("ONScripter", "Ignored = " + e.getMessage());
+                return;
+            }
+        }
         e.printStackTrace();
         final HashMap<String, String> passArgs = new HashMap<String, String>(){
             private static final long serialVersionUID = 1L;
