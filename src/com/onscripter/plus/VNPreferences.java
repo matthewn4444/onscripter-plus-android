@@ -1,38 +1,37 @@
 package com.onscripter.plus;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.InvalidObjectException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map.Entry;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.StatFs;
 import android.util.Log;
-import android.util.Xml;
 
 public class VNPreferences {
     private static final String TAG = "VNPreferences";
-    private static final String XML_HEADER = "<?xml version='1.0' encoding='utf-8' standalone='yes' ?>";
-    public static final String PREF_FILE_NAME = "pref.xml";
+    public static final String PREF_FILE_NAME = "pref.json";
 
     private static final int MIN_FILE_SPACE_KB = 300;
+    private static final String UTF8_ENCODING = "UTF-8";
 
-    // XML parsing texts
-    private static final String XML_MAP_NODE = "map";
-    private static final String XML_FLOAT_NODE = "float";
-    private static final String XML_INT_NODE = "int";
-    private static final String XML_STRING_NODE = "string";
-    private static final String XML_BOOL_NODE = "boolean";
-    private static final String XML_VALUE_ATTR = "value";
-    private static final String XML_NAME_ATTR = "name";
+    private static final String JSON_NAME_TYPE = "type";
+    private static final String JSON_NAME_VALUE = "value";
+
+    private static final String TYPE_FLOAT = "float";
+    private static final String TYPE_INT = "int";
+    private static final String TYPE_STRING = "string";
+    private static final String TYPE_BOOL = "boolean";
 
     private final String mPath;
     private final Object mReadWriteLock = new Object();
@@ -60,81 +59,54 @@ public class VNPreferences {
     private boolean load() {
         File file = new File(mPath + "/" + PREF_FILE_NAME);
         if (file.exists()) {
+            StringBuilder sb = new StringBuilder();
             synchronized (mReadWriteLock) {
-                InputStream in = null;
+                BufferedReader br = null;
                 try {
-                    XmlPullParser parser = Xml.newPullParser();
-                    parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false);
-
-                    in = new FileInputStream(file);
-                    parser.setInput(in, null);
-                    parser.nextTag();
-                    parser.require(XmlPullParser.START_TAG, null, XML_MAP_NODE);
-                    while (parser.next() != XmlPullParser.END_TAG) {
-                        if (parser.getEventType() != XmlPullParser.START_TAG) {
-                            continue;
-                        }
-                        String itemName = parser.getName();
-
-                        // Start looking for the line by its type
-                        if (itemName.equals(XML_FLOAT_NODE)) {
-                            parser.require(XmlPullParser.START_TAG, null, XML_FLOAT_NODE);
-                            float value = Float.parseFloat(parser.getAttributeValue(null, XML_VALUE_ATTR));
-                            putFloat(parser.getAttributeValue(null, XML_NAME_ATTR), value);
-                            parser.nextTag();
-                        } else if (itemName.equals(XML_INT_NODE)) {
-                            parser.require(XmlPullParser.START_TAG, null, XML_INT_NODE);
-                            int value = Integer.parseInt(parser.getAttributeValue(null, XML_VALUE_ATTR));
-                            putInteger(parser.getAttributeValue(null, XML_NAME_ATTR), value);
-                            parser.nextTag();
-                        } else if (itemName.equals(XML_BOOL_NODE)) {
-                            parser.require(XmlPullParser.START_TAG, null, XML_BOOL_NODE);
-                            boolean value = parser.getAttributeValue(null, XML_VALUE_ATTR).equals("true");
-                            putBoolean(parser.getAttributeValue(null, XML_NAME_ATTR), value);
-                            parser.nextTag();
-                        } else if (itemName.equals(XML_STRING_NODE)) {
-                            parser.require(XmlPullParser.START_TAG, null, XML_STRING_NODE);
-                            String name = parser.getAttributeValue(null, XML_NAME_ATTR);
-                            if (parser.next() == XmlPullParser.TEXT) {
-                                putString(name, parser.getText());
-                                parser.nextTag();
-                            }
-                            parser.require(XmlPullParser.END_TAG, null, XML_STRING_NODE);
-                        } else {
-                            // Not a valid tag
-                            if (parser.getEventType() != XmlPullParser.START_TAG) {
-                                throw new IllegalStateException();
-                            }
-                            int depth = 1;
-                            while (depth != 0) {
-                                switch (parser.next()) {
-                                case XmlPullParser.END_TAG:
-                                    depth--;
-                                    break;
-                                case XmlPullParser.START_TAG:
-                                    depth++;
-                                    break;
-                                }
-                            }
-                        }
+                    // Read file
+                    String line;
+                    br = new BufferedReader(new InputStreamReader(
+                            new FileInputStream(file), UTF8_ENCODING));
+                    while((line = br.readLine()) != null) {
+                        sb.append(line);
                     }
-
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                    return false;
-                } catch (XmlPullParserException e) {
-                    e.printStackTrace();
-                    return false;
                 } catch (IOException e) {
                     e.printStackTrace();
                     return false;
                 } finally {
-                    if (in != null) {
+                    if (br != null) {
                         try {
-                            in.close();
+                            br.close();
                         } catch (IOException e) {}
                     }
                 }
+            }
+
+            // Parse the JSON data
+            JSONObject json;
+            try {
+                json = new JSONObject(sb.toString());
+                for(Iterator<String> iter = json.keys(); iter.hasNext();) {
+                    String key = iter.next();
+                    JSONObject field = json.getJSONObject(key);
+                    String type = field.getString(JSON_NAME_TYPE);
+                    Property prop;
+                    if (type.equals(TYPE_STRING)) {
+                        prop = new Property(field.getString(JSON_NAME_VALUE));
+                    } else if (type.equals(TYPE_FLOAT)) {
+                        prop = new Property((float)field.getDouble(JSON_NAME_VALUE));
+                    } else if (type.equals(TYPE_INT)) {
+                        prop = new Property(field.getInt(JSON_NAME_VALUE));
+                    } else if (type.equals(TYPE_BOOL)) {
+                        prop = new Property(field.getBoolean(JSON_NAME_VALUE));
+                    } else {
+                        continue;       // Ignored
+                    }
+                    mData.put(key, prop);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
             }
         }
         mLoaded = true;
@@ -150,19 +122,39 @@ public class VNPreferences {
     }
 
     public void putInteger(String name, int value) {
-        mData.put(name, new Property(name, value));
+        Property prop = mData.get(name);
+        if (prop != null) {
+            prop.mIntVal = value;
+        } else {
+            mData.put(name, new Property(value));
+        }
     }
 
     public void putBoolean(String name, boolean value) {
-        mData.put(name, new Property(name, value));
+        Property prop = mData.get(name);
+        if (prop != null) {
+            prop.mBoolval = value;
+        } else {
+            mData.put(name, new Property(value));
+        }
     }
 
     public void putString(String name, String value) {
-        mData.put(name, new Property(name, value));
+        Property prop = mData.get(name);
+        if (prop != null) {
+            prop.mStringVal = value;
+        } else {
+            mData.put(name, new Property(value));
+        }
     }
 
     public void putFloat(String name, Float value) {
-        mData.put(name, new Property(name, value));
+        Property prop = mData.get(name);
+        if (prop != null) {
+            prop.mFloatval = value;
+        } else {
+            mData.put(name, new Property(value));
+        }
     }
 
     public int getInteger(String name, int defaultValue) {
@@ -263,34 +255,29 @@ public class VNPreferences {
         public static final int FLOAT = 3;
 
         private int mIntVal;
-        private final String mName;
         private String mStringVal;
         private boolean mBoolval;
         private float mFloatval;
         private final int mType;
 
-        public Property(String name, int value) {
+        public Property(int value) {
             mIntVal = value;
             mType = INTEGER;
-            mName = name;
         }
 
-        public Property(String name, String value) {
+        public Property(String value) {
             mStringVal = value;
             mType = STRING;
-            mName = name;
         }
 
-        public Property(String name, boolean value) {
+        public Property(boolean value) {
             mBoolval = value;
             mType = BOOLEAN;
-            mName = name;
         }
 
-        public Property(String name, float value) {
+        public Property(float value) {
             mFloatval = value;
             mType = FLOAT;
-            mName = name;
         }
 
         public int getInteger() throws InvalidObjectException {
@@ -325,23 +312,29 @@ public class VNPreferences {
             return mFloatval;
         }
 
-        public String toXMLLine() {
+        public JSONObject toJSON() throws JSONException  {
+            JSONObject obj = new JSONObject();
             switch (mType) {
             case INTEGER:
-                return "<" + XML_INT_NODE + " " + XML_NAME_ATTR + "=\"" + mName + "\" " + XML_VALUE_ATTR + "=\"" + mIntVal
-                        + "\"/>";
+                obj.put(JSON_NAME_TYPE, TYPE_INT);
+                obj.put(JSON_NAME_VALUE, mIntVal);
+                break;
             case FLOAT:
-                return "<" + XML_FLOAT_NODE + " " + XML_NAME_ATTR + "=\"" + mName + "\" " + XML_VALUE_ATTR + "=\"" + mFloatval
-                        + "\"/>";
+                obj.put(JSON_NAME_TYPE, TYPE_FLOAT);
+                obj.put(JSON_NAME_VALUE, mFloatval);
+                break;
             case BOOLEAN:
-                return "<" + XML_BOOL_NODE + " " + XML_NAME_ATTR + "=\"" + mName + "\" " + XML_VALUE_ATTR + "=\""
-                        + (mBoolval ? "true" : "false") + "\"/>";
+                obj.put(JSON_NAME_TYPE, TYPE_BOOL);
+                obj.put(JSON_NAME_VALUE, mBoolval);
+                break;
             case STRING:
-                return "<" + XML_STRING_NODE + " " + XML_NAME_ATTR + "=\"" + mName + "\">" + mStringVal
-                        + "</string>";
+                obj.put(JSON_NAME_TYPE, TYPE_STRING);
+                obj.put(JSON_NAME_VALUE, mStringVal);
+                break;
             default:
-                return ""; // Not possible
+                return null;
             }
+            return obj;
         }
     }
 
@@ -382,45 +375,51 @@ public class VNPreferences {
                 if (kbAvailable <= MIN_FILE_SPACE_KB) {
                     return OnLoadVNPrefListener.Result.NO_MEMORY;
                 } else if (mData != null && !mData.isEmpty()) {
-                    synchronized (mReadWriteLock) {
-                        File file = new File(mPath + "/" + PREF_FILE_NAME);
-                        final byte[] newLine = System.getProperty("line.separator").getBytes();
-                        FileOutputStream os = null;
-                        try {
-                            if (!file.exists()) {
-                                file.createNewFile();
-                            }
-                            os = new FileOutputStream(file);
-                            os.write(XML_HEADER.getBytes());
-                            os.write(newLine);
-                            os.write(("<" + XML_MAP_NODE + ">").getBytes());
-                            os.write(newLine);
-
-                            for (Entry<String, Property> entry : mData.entrySet()) {
-                                if (isCancelled()) {
-                                    return OnLoadVNPrefListener.Result.CANCELLED;
-                                }
-                                os.write(entry.getValue().toXMLLine().getBytes());
-                                os.write(newLine);
-                            }
-
-                            os.write(("</" + XML_MAP_NODE + ">").getBytes());
-                            os.flush();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            if (os != null) {
-                                try {
-                                    os.close();
-                                } catch (IOException e) {
-                                }
-                            }
-                        }
-                    }
+                    return save();
                 }
                 break;
+            }
+            return OnLoadVNPrefListener.Result.NO_ISSUES;
+        }
+
+        private OnLoadVNPrefListener.Result save() {
+            // Build the json object to write to file
+            JSONObject data = new JSONObject();
+            for (Entry<String, Property> entry : mData.entrySet()) {
+                if (isCancelled()) {
+                    return OnLoadVNPrefListener.Result.CANCELLED;
+                }
+                JSONObject obj;
+                try {
+                    obj = entry.getValue().toJSON();
+                    if (obj != null) {
+                        data.put(entry.getKey(), obj);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (isCancelled()) {
+                return OnLoadVNPrefListener.Result.CANCELLED;
+            }
+            synchronized (mReadWriteLock) {
+                // Write to file system
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(mPath + "/" + PREF_FILE_NAME);
+                    byte[] out = UnicodeUtil.convert(data.toString()
+                            .getBytes("UTF-16"), UTF8_ENCODING);
+                    fos.write(out);
+                    fos.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException e) {}
+                    }
+                }
             }
             return OnLoadVNPrefListener.Result.NO_ISSUES;
         }
