@@ -300,8 +300,7 @@ const char *ScriptHandler::readToken()
         while (ch != '`' && ch != 0x0a && ch !='\0'){
             if ( !ScriptDecoder::isOneByte(ch) ){
                 addStringBuffer( ch );
-                buf += decoder->getNumBytes(ch) - 1;
-                ch = *buf;
+                ch = *++buf;
             }
             addStringBuffer( ch );
             ch = *++buf;
