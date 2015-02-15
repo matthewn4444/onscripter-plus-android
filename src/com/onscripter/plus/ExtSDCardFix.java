@@ -534,7 +534,7 @@ public final class ExtSDCardFix {
         @Override
         public boolean accept(File pathname) {
             final String[] acceptable = {
-                "pref.xml", "envdata", "gloval.sav", "kidoku.dat",
+                VNPreferences.PREF_FILE_NAME, "envdata", "gloval.sav", "kidoku.dat",
                 "stderr.txt", "stdout.txt"
             };
             String name = pathname.getName();
