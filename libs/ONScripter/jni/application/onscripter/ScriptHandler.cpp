@@ -867,7 +867,7 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
 
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
 #ifdef ANDROID
-    if (!decoder->isMonospaced()) {
+    if (!menuText->decoder->isMonospaced()) {
 #endif
     if (num_minus == 1) no = -no;
     char format[6];
