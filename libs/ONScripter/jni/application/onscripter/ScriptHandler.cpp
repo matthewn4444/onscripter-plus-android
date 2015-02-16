@@ -1291,12 +1291,20 @@ void ScriptHandler::readConfiguration()
     }
 }
 
+#include "backtrace.h"
+
 int ScriptHandler::labelScript()
 {
     int label_counter = -1;
     int current_line = 0;
     char *buf = script_buffer;
     label_info = new LabelInfo[ num_of_labels+1 ];
+
+    // Avoid the file byte order marks (utf8) and skip to first ';', '\n', or '*'
+    while ( buf < script_buffer + script_buffer_length ){
+        if (*buf == ';' || *buf == '*' || *buf == '\n') break;
+        buf++;
+    }
 
     while ( buf < script_buffer + script_buffer_length ){
         SKIP_SPACE( buf );
