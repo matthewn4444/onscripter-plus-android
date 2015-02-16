@@ -189,8 +189,13 @@ void ONScripter::drawChar( char* text, FontInfo *info, bool flush_flag, bool loo
         info->newLine();
         for (int i=0 ; i<indent_offset ; i++){
             if (lookback_flag){
+#ifdef ANDROID
+                current_page->add(script_h.getSystemLanguageText()->get_space_char()[0]);
+                current_page->add(script_h.getSystemLanguageText()->get_space_char()[1]);
+#else
                 current_page->add(0x81);
                 current_page->add(0x40);
+#endif
             }
             info->advanceCharInHankaku(2);
         }
@@ -898,8 +903,13 @@ bool ONScripter::processText()
         if ( checkLineBreak( script_h.getStringBuffer() + string_buffer_offset, &sentence_font ) ){
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
+#ifdef ANDROID
+                current_page->add(script_h.getSystemLanguageText()->get_space_char()[0]);
+                current_page->add(script_h.getSystemLanguageText()->get_space_char()[1]);
+#else
                 current_page->add(0x81);
                 current_page->add(0x40);
+#endif
                 sentence_font.advanceCharInHankaku(2);
             }
         }
@@ -1144,13 +1154,13 @@ bool ONScripter::processText()
                 if (newLineEarly) {
                     sentence_font.newLine();
                     for (int i=0 ; i<indent_offset ; i++){
-                    #ifdef ENABLE_KOREAN
-                        current_page->add(((char*)"¡¡")[0]);
-                        current_page->add(((char*)"¡¡")[1]);
-                    #else
+#ifdef ANDROID
+                        current_page->add(script_h.getSystemLanguageText()->get_space_char()[0]);
+                        current_page->add(script_h.getSystemLanguageText()->get_space_char()[1]);
+#else
                         current_page->add(0x81);
                         current_page->add(0x40);
-                    #endif
+#endif
                         sentence_font.advanceCharInHankaku(2);
                     }
                     current_page->add(' ');

@@ -18,6 +18,9 @@
 #define ENGLISH_SAVE_MENU_NAME "<Save>"
 #define ENGLISH_LOAD_MENU_NAME "<Load>"
 #define ENGLISH_SAVE_ITEM_NAME "Slot"
+#define ENGLISH_NUMBERS "0123456789"
+#define ENGLISH_SPACE " "
+#define ENGLISH_DASH "-"
 #define ENGLISH_DECODER UTF8Decoder
 
 // Japanese Menu Text
@@ -34,6 +37,9 @@
 #define JAPANESE_SAVE_MENU_NAME "亙僙乕僽亜"
 #define JAPANESE_LOAD_MENU_NAME "亙儘乕僪亜"
 #define JAPANESE_SAVE_ITEM_NAME "偟偍傝"
+#define JAPANESE_NUMBERS "侽侾俀俁係俆俇俈俉俋"
+#define JAPANESE_SPACE "丂"
+#define JAPANESE_DASH "亅"
 #define JAPANESE_DECODER JapaneseDecoder
 
 // Korean Menu Text
@@ -50,12 +56,34 @@
 #define KOREAN_SAVE_MENU_NAME "〈技捞宏〉"
 #define KOREAN_LOAD_MENU_NAME "〈肺靛〉"
 #define KOREAN_SAVE_ITEM_NAME "氓哎乔"
+#define KOREAN_NUMBERS "０１２３４５６７８９"
+#define KOREAN_SPACE "　"
+#define KOREAN_DASH "－"
 #define KOREAN_DECODER KoreanDecoder
+
+// Chinese Menu Text
+#define CHINESE_MSG_SAVE_EXIST "%s%s　%s月%s日%s时%s分"
+#define CHINESE_MSG_SAVE_EMPTY "%s%s　－－－－－－－－－－－－"
+#define CHINESE_MSG_SAVE_CONFIRM "存储存档?　%s%s?"
+#define CHINESE_MSG_LOAD_CONFIRM "读取存档?　%s%s?"
+#define CHINESE_MSG_RESET_CONFIRM "返回标题界面?"
+#define CHINESE_MSG_END_CONFIRM "退出?"
+#define CHINESE_MSG_YES "是"
+#define CHINESE_MSG_NO "否"
+#define CHINESE_MSG_OK "好的"
+#define CHINESE_MSG_CANCEL "取消"
+#define CHINESE_SAVE_MENU_NAME "<存档>"
+#define CHINESE_LOAD_MENU_NAME "<读取>"
+#define CHINESE_SAVE_ITEM_NAME "位"
+#define CHINESE_NUMBERS "０１２３４５６７８９"
+#define CHINESE_SPACE "　"
+#define CHINESE_DASH "－"
+#define CHINESE_DECODER ChineseDecoder
 
 class MenuTextBase
 {
 public:
-    enum Language { JAPANESE, ENGLISH, KOREAN, RUSSIAN };
+    enum Language { JAPANESE, ENGLISH, KOREAN, RUSSIAN, CHINESE };
 
     MenuTextBase(const Language &lang) {
         language = lang;
@@ -82,6 +110,9 @@ public:
     virtual const char* message_save_menu() = 0;
     virtual const char* message_load_menu() = 0;
     virtual const char* message_save_item() = 0;
+    virtual const char* get_numbers() = 0;
+    virtual const char* get_space_char() = 0;
+    virtual const char* get_dash_char() = 0;
 
     ScriptDecoder* decoder;
 protected:
@@ -149,6 +180,18 @@ protected:
             static const char* cancel = lang##_SAVE_ITEM_NAME;           \
             return cancel;                                                \
         }                                                                  \
+        const char* get_numbers() {                                       \
+            static const char* t = lang##_NUMBERS;                       \
+            return t;                                                     \
+        }                                                                  \
+        const char* get_space_char() {                                    \
+            static const char* t = lang##_SPACE;                         \
+            return t;                                                     \
+        }                                                                  \
+        const char* get_dash_char() {                                     \
+            static const char* t = lang##_DASH;                          \
+            return t;                                                     \
+        }                                                                  \
     };
 
 lazyMenuLangMake(EnglishMenu, ENGLISH)
@@ -156,6 +199,9 @@ lazyMenuLangMake(JapaneseMenu, JAPANESE)
 lazyMenuLangMake(RussianMenu, RUSSIAN)
 #ifdef ENABLE_KOREAN
 lazyMenuLangMake(KoreanMenu, KOREAN)
+#endif
+#ifdef ENABLE_CHINESE
+lazyMenuLangMake(ChineseMenu, CHINESE)
 #endif
 
 #endif // __MENUTEXT_H__

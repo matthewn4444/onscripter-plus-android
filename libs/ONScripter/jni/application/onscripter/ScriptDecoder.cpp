@@ -28,16 +28,6 @@ unsigned short ScriptDecoder::convertNextChar(char* buffer)
     }
 }
 
-bool ScriptDecoder::canConvertSJISNumber(int n)
-{   // 0x824f = '0' and 0x8258 = '9' in shift-jis
-    return n >= 0x824f && n <= 0x8258;
-}
-
-unsigned short ScriptDecoder::convertSJISNumber(int n)
-{
-    return canConvertSJISNumber(n) ? convSJIS2UTF16(n) : 0;
-}
-
 bool ScriptDecoder::isMonospaced()
 {
     return false;
@@ -194,8 +184,7 @@ unsigned short KoreanDecoder::convertNextChar(char* buffer)
         return ScriptDecoder::convertNextChar(buffer);
     }
     unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    unsigned short ret = convertSJISNumber(index);
-    return ret ? ret : convKOR2UTF16(index);
+    return convKOR2UTF16(index);
 }
 
 bool KoreanDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
@@ -203,7 +192,6 @@ bool KoreanDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
     if (ScriptDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
     int x = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    if (x == 0x8140 || canConvertSJISNumber(x)) return true;    // Hardcoded Space and Japanese numbers
     // http://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/KOREAN.TXT
     return  /* Hangul syllables */  ((x >= 0xB0A1 && x <= 0xC8FE) \
             /* Standard Korean */ || (x >= 0xA141 && x <= 0xA974) \
@@ -229,8 +217,7 @@ unsigned short ChineseDecoder::convertNextChar(char* buffer)
         return ScriptDecoder::convertNextChar(buffer);
     }
     unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    unsigned short ret = convertSJISNumber(index);
-    return ret ? ret : convGBK2UTF16(index);
+    return convGBK2UTF16(index);
 }
 
 bool ChineseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
@@ -238,7 +225,6 @@ bool ChineseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
     if (ScriptDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
     int n = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    if (n == 0x8140 || canConvertSJISNumber(n)) return true;    // Hardcoded Space and Japanese numbers
     return (n >= 0xA1A0 && n <= 0xfcfc) == true;
 }
 
