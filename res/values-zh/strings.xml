@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="directory_back">(返回)</string>
+    <string name="dialog_quit_button">退出</string>
+
+    <!-- Messages -->
+    <string name="message_cannot_find_internal_storage">找不到内部存储，出错!</string>
+    <string name="message_loading_fonts">加载字体中&#8230;</string>
+    <string name="message_asset_not_found">在assets中找不到默认字体文件!</string>
+    <string name="message_private_dir_not_found">找不到私人目录!</string>
+    <string name="message_internal_write_error">无法对内部存储读写字体文件!</string>
+    <string name="message_read_font_error">无法读取字体!</string>
+    <string name="message_cannot_write_pref">没有足够的空间存储设置.</string>
+    <string name="message_folder_exists">文件夹已存在，创建新文件夹.</string>
+    <string name="message_corrupt_save_file">存储文件已损坏无法加载. 请选择另一个.</string>
+
+    <!-- ActionBar -->
+    <string name="menu_action_settings">设置</string>
+    <string name="menu_action_change_folder">改变文件</string>
+
+    <!-- Settings -->
+    <string name="settings_general_header">普通设置</string>
+
+    <string name="settings_render_cate">渲染</string>
+    <string name="settings_render_font_outline_summary">为了方便阅读显示每个字母的轮廓.</string>
+    <string name="settings_render_font_outline_title">渲染字体的轮廓</string>
+
+    <string name="settings_controls_cate">控制</string>
+    <string name="settings_controls_display_summary">在用户划动呼出控制前隐藏控制.</string>
+    <string name="settings_controls_display_title">划动可见控制</string>
+    <string name="settings_controls_swipe_summary">呼出设置手势.</string>
+    <string name="settings_controls_swipe_title">划动手势</string>
+
+    <string name="settings_folder_cate">文件夹</string>
+    <string name="settings_folder_default_summary">选择一个读取可见小说文件的默认文件夹位置.</string>
+    <string name="settings_folder_default_title">选择默认文件夹</string>
+
+    <string name="settings_about_cate">关于</string>
+    <string name="settings_about_author_header">作者:</string>
+    <string name="settings_about_version_header">版本:</string>
+    <string name="settings_about_github_header">网页:</string>
+    <string name="settings_about_summary">此程序免费并开源. 如果你想用此程序的代码, 请提及 Studio O.G.A. Ogapee 和 Matthew Ng.</string>
+    <string name="settings_about_thanks_text">感谢 Studio O.G.A. Ogapee (原作者) 关于此程序的说明和源代码.。\n中文翻译：沈宇抗</string>
+
+    <string name="settings_about_change_log_title">看改动日志</string>
+
+    <string name="settings_appearance_cate">外观</string>
+    <string name="settings_theme_title">主题</string>
+    <string name="settings_theme_default_entry">白</string>
+    <string-array name="settings_theme_entries">
+        <item>@string/settings_theme_default_entry</item>
+        <item>黒</item>
+    </string-array>
+
+    <string name="settings_playback_cate">重放</string>
+    <string name="settings_external_video_title">使用外部播放器</string>
+    <string name="settings_use_hq_audio_title">使用高质量音频</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_choose_folder_title">选择文件夹</string>
+    <string name="dialog_select_button_text">选择</string>
+    <string name="dialog_back_button_text">返回</string>
+    <string name="dialog_next_button_text">下一步</string>
+    <string name="dialog_close_app">关闭程序</string>
+    <string name="dialog_reboot">重启</string>
+    <string name="dialog_ext_not_found">用英语发送SD卡的位置信息到 matthewn4444@gmail.com</string>
+    <string name="dialog_create_new_folder">创建新文件夹</string>
+    <string name="dialog_button_rate">请给个好评!</string>
+
+    <!-- Settings Control Display -->
+    <string name="dialog_settings_controls_title">控制</string>
+    <string name="dialog_settings_text_title">文本</string>
+
+    <string name="dialog_settings_controls_global">这些控制设置全球通用.</string>
+    <string-array name="settings_controls_swipe_entries">
+        <item>从底部上划</item>
+        <item>从左部划动</item>
+        <item>从右部划动</item>
+    </string-array>
+    <string name="dialog_settings_controls_display_title">划动打开设置</string>
+    <string name="dialog_settings_controls_swipe_title">划动手势</string>
+
+    <string name="dialog_settings_text_upscaling">设置放大字体大小.</string>
+    <string name="dialog_settings_text_upscaling_scale">大小比例:</string>
+    <string name="dialog_settings_text_upscaling_text">中国　日本語</string>
+
+    <!-- External SD Card Fix -->
+    <string name="message_copy_completed">复制完成. 默认文件夹已被设置为内部存储.</string>
+    <string name="message_copy_saves_completed">已完成复制存档文件.</string>
+    <string name="message_copy_failed">复制失败.</string>
+    <string name="message_copy_failed_no_space">内部存储已满, 无法复制游戏文件.</string>
+    <string name="message_copy_failed_no_files">找不到文件复制.</string>
+    <string name="message_kitkat_save_issue">因为在安卓 Kitkat 4.4.X, 一些手机限制了此程序的权限所以无法在外部SD卡存档，这就是为什么无法存档.\n请选择如何修复此问题.</string>
+    <string name="message_save_folder_missing">存档文件不存在.</string>
+    <string name="message_move_save_files_back">现在可以读写SD卡，你在内部存储还有存档文件, 你想要将他们移动到此文件夹吗?.</string>
+    <string name="message_user_handle_left_over_saves">现在已经可以读写. 你需要复制剩余的存档文件到原游戏文件夹. 此程序会读写游戏文件夹内部的存档文件而不是原存档文件夹.</string>
+    <string name="message_su_sdcard_fix_no_file">因为 plaform.xml 不存在，无法对外置SD卡进行修复读取权限.</string>
+    <string name="message_su_sdcard_fix_exists_no_write">无法对系统进行修复, 请尝试重启? 如果已经重启过仍未修复, 请把这个问题上报到 matthewn4444@gmail.com.</string>
+    <string name="message_su_sdcard_fix_issue">无法改动系统文件. 请把这个问题上报到 matthewn4444@gmail.com.</string>
+    <string name="message_restart_device">为应用改动请重启设备.</string>
+
+    <string name="menu_action_change_save_folder">改变存档文件夹</string>
+
+    <string name="dialog_choose_save_folder_title">选择一个存档文件</string>
+    <string name="dialog_fix_sd_card_write_title">选择如何修复</string>
+    <string name="dialog_scan_files_title">扫描文件</string>
+    <string name="dialog_copy_files_title">复制文件</string>
+    <string name="dialog_choose_copy_dst_title">选择目标文件夹</string>
+    <string name="dialog_copy_files_filename">文件:</string>
+    <string name="dialog_copy_files_filesize">大小:</string>
+    <string name="dialog_select_files_copy_title">选择要复制的文件</string>
+    <string name="dialog_bytes_remaining">剩余可用空间:</string>
+    <string name="dialog_override_files">(正在替换文件)</string>
+    <string name="dialog_su_sdcard_fix_desc">此操作会修复并可以读写外部SD卡存储. 并会用root权限修改系统文件.\n\n<b>此程序对于修改产生的任何问题没有任何责任. </b>\n\n这操作会写入 "media_rw" 到文件 /system/etc/permissions/platform.xml 在 WRITE_EXTERNAL_STORAGE 权限</string>
+    <string name="dialog_su_sdcard_fix_checkbox">你同意让这个程序用root权限修改系统文件.</string>
+    <string name="dialog_su_sdcard_fix_applying">正在修复&#8230;</string>
+
+    <string-array name="dialog_opt_fix_sd_card_write">
+        <item>将你的游戏移动到内部存储的文件夹</item>
+        <item>将你的游戏存档移动到内部存储的文件夹</item>
+        <item>对这个问题请使用SD卡修复\n(可能需要root)</item>
+    </string-array>
+</resources>
