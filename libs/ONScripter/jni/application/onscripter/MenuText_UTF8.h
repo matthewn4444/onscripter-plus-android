@@ -19,6 +19,9 @@
 #define RUSSIAN_SAVE_MENU_NAME "<Сохранение>"
 #define RUSSIAN_LOAD_MENU_NAME "<Загрузка>"
 #define RUSSIAN_SAVE_ITEM_NAME "слот"
+#define RUSSIAN_NUMBERS "0123456789"
+#define RUSSIAN_SPACE " "
+#define RUSSIAN_DASH "-"
 #define RUSSIAN_DECODER UTF8Decoder
 
 #endif // __MENUTEXT_UTF8_H__

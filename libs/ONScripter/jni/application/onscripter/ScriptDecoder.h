@@ -25,10 +25,6 @@ public:
         return name;
     }
 
-protected:
-    static bool canConvertSJISNumber(int twoByteChar);
-    static unsigned short convertSJISNumber(int twoByteChar);
-
 private:
     static const char* name;
 };

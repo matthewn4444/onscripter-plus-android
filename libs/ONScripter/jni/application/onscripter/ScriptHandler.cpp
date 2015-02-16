@@ -633,6 +633,10 @@ void ScriptHandler::setSystemLanguage(const char* languageStr) {
     } else if (!strcmp( languageStr, "ko")) {
         menuText = new KoreanMenu();
 #endif
+#ifdef ENABLE_CHINESE
+    } else if (!strcmp( languageStr, "zh")) {
+        menuText = new ChineseMenu();
+#endif
     } else if (!strcmp( languageStr, "ru")) {
         menuText = new RussianMenu();
     } else {
@@ -863,7 +867,7 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
 
 #if defined(ENABLE_1BYTE_CHAR) && defined(FORCE_1BYTE_CHAR)
 #ifdef ANDROID
-    if (menuText->getLanguage() != MenuTextBase::JAPANESE && menuText->getLanguage() != MenuTextBase::KOREAN) {
+    if (!decoder->isMonospaced()) {
 #endif
     if (num_minus == 1) no = -no;
     char format[6];
@@ -880,22 +884,41 @@ int ScriptHandler::getStringFromInteger( char *buffer, int no, int num_column, b
     int c = 0;
     if (is_zero_inserted){
         for (i=0 ; i<num_space ; i++){
+#ifdef ANDROID
+            buffer[c++] = menuText->get_numbers()[0];
+            buffer[c++] = menuText->get_numbers()[1];
+#else
             buffer[c++] = ((char*)"‚O")[0];
             buffer[c++] = ((char*)"‚O")[1];
+#endif
         }
     }
     else{
         for (i=0 ; i<num_space ; i++){
+#ifdef ANDROID
+            buffer[c++] = menuText->get_space_char()[0];
+            buffer[c++] = menuText->get_space_char()[1];
+#else
             buffer[c++] = ((char*)"@")[0];
             buffer[c++] = ((char*)"@")[1];
+#endif
         }
     }
     if (num_minus == 1){
+#ifdef ANDROID
+        buffer[c++] = menuText->get_dash_char()[0];
+        buffer[c++] = menuText->get_dash_char()[1];
+#else
         buffer[c++] = "|"[0];
         buffer[c++] = "|"[1];
+#endif
     }
     c = (num_column-1)*2;
+#ifdef ANDROID
+    const char* num_str = menuText->get_numbers();
+#else
     char num_str[] = "‚O‚P‚Q‚R‚S‚T‚U‚V‚W‚X";
+#endif
     for (i=0 ; i<num_digit ; i++){
         buffer[c]   = num_str[ no % 10 * 2];
         buffer[c+1] = num_str[ no % 10 * 2 + 1];
