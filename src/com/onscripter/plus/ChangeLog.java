@@ -93,7 +93,8 @@ public class ChangeLog {
 
             // If displaying English, then add the message to add translation
             String lang = Locale.getDefault().getLanguage();
-            if (!lang.equals(Locale.JAPANESE.toString()) && !lang.equals(Locale.KOREAN.toString())) {
+            if (!lang.equals(Locale.JAPANESE.toString()) && !lang.equals(Locale.KOREAN.toString())
+             && !lang.equals(Locale.CHINESE.toString())) {
                 layout.setPadding(padding, padding, padding, padding);
                 TextView emailText = new TextView(mCtx);
                 TextView translationText = new TextView(mCtx);
