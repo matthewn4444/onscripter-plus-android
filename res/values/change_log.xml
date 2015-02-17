@@ -5,6 +5,11 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.2.0,2/17/2015</item>
+        <item>Added Chinese language</item>
+        <item>Fixes menu decoding when using different script language</item>
+        <item>Changed preferences from xml to json</item>
+        <item>Fixes Tsukihime Russian Demo so it can play</item>
         <item>vVersion 1.1.18,1/30/2015</item>
         <item>Fixed videos (Akatsuki no Goei, Lovely Quest, Secret Game, etc)</item>
         <item>vVersion 1.1.17,12/24/2014</item>
