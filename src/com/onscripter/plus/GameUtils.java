@@ -147,6 +147,10 @@ public class GameUtils {
                 // Skip spaces/tabs
                 parser.skipWhiteText();
 
+                if (parser.eof()) {
+                    return null;
+                }
+
                 if (parser.nextMatchesAndSkip("caption")) {
                     parser.skipWhiteText();
 
