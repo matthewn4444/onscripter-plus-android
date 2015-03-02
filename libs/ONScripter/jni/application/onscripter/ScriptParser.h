@@ -29,6 +29,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
+#include <sys/stat.h>
 
 #include "ScriptHandler.h"
 #include "NsaReader.h"
