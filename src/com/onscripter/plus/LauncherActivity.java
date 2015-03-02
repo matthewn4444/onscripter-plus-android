@@ -48,8 +48,7 @@ import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
-import com.onscripter.plus.ads.InterstitialAdHelper;
-import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
+import com.onscripter.plus.ads.InterstitialActivityBeforeGame;
 import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
@@ -77,8 +76,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private ChangeLog mChangeLog;
 
     private AdView mAdView;
-    private InterstitialAdHelper mInterHelper;
-    private Bundle mStartONScripterBundle;
     private boolean mJustLaunched = true;
 
     @Override
@@ -232,13 +229,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(LAST_DIRECTORY, mAdapter.getCurrentDirectoryPath());
-
-        // TODO TEMP till later is understood
-        if (mStartONScripterBundle != null) {
-            outState.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA));
-            outState.putString(ONScripter.SAVE_DIRECTORY_EXTRA, mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA));
-            outState.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA));
-        }
     }
 
     @Override
@@ -247,17 +237,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         String lastDirectory = savedInstanceState.getString(LAST_DIRECTORY);
         if (lastDirectory != null) {
             mAdapter.setCurrentDirectory(new File(lastDirectory));
-        }
-
-        // TODO TEMP till later is understood
-        String directory = savedInstanceState.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
-        if (directory != null) {
-            String saveFolder = savedInstanceState.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
-            boolean useDefaultFont = savedInstanceState.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
-            mStartONScripterBundle = new Bundle();
-            mStartONScripterBundle.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
-            mStartONScripterBundle.putString(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
-            mStartONScripterBundle.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
         }
     }
 
@@ -283,22 +262,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         // Request the ads
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
-
-        // Initialize the Interstitial ads
-        mInterHelper = new InterstitialAdHelper(this);
-        mInterHelper.setAdListener(new AdListener() {
-            @Override
-            public void onAdDismiss() {
-                super.onAdDismiss();
-                goToONScripterActivity();
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                super.onAdLeftApplication();
-                goToONScripterActivity();
-            }
-        });
     }
 
     @Override
@@ -653,40 +616,16 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void startONScripter(String path, boolean useDefaultFont) {
-        Bundle b = new Bundle();
-        if (mFix.shouldLaunchGame(path, b)) {
+        Intent i = new Intent(this, InterstitialActivityBeforeGame.class);
+        if (mFix.shouldLaunchGame(path, i)) {
+            i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
             if (useDefaultFont) {
-                b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
+                i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }
-            b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
-            mStartONScripterBundle = b;
-            if (mInterHelper.show()) {
-                return;
-            }
-            goToONScripterActivity();
+            startActivity(i);
         } else {
             updateSaveFolderItemVisibility();
-        }
-    }
-
-    private void goToONScripterActivity() {
-        sendAnalyticsActivityEnd();
-
-        // TODO clean up after bug is understood
-        Intent i = new Intent(this, ONScripter.class);
-        try {
-            String directory = mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
-            String saveFolder = mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
-            boolean useDefaultFont = mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
-            mStartONScripterBundle = null;
-            if (directory == null) throw new NullPointerException("directory is null");
-            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
-            i.putExtra(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
-            i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
-            startActivity(i);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-            BugSenseHandler.sendException(e);
         }
     }
 

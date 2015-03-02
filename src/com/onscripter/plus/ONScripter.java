@@ -7,6 +7,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -501,6 +502,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 if (mAdView != null) {
                     mAdView.pause();
                 }
+                ProgressDialog progress = new ProgressDialog(this);
+                progress = new ProgressDialog(this);
+                progress.setMessage("Loading...");
+                progress.setCancelable(false);
+                progress.show();
                 return;
             }
             mGame.exitApp();
