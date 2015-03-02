@@ -60,7 +60,7 @@ public class InterstitialAdHelper {
     static final private int TIME_NOT_USED_24_HOURS_VALUE = 30;
     static final private String PREF_LAST_DATE_SEEN_AD = "InterstitialAdHelper.last.date.seen.ad";
 
-    static final private int TIMEOUT = 4000;
+    static final private int TIMEOUT = 7000;
 
     final UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
 
