@@ -64,8 +64,6 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     private String mCurrentThemeResult;
     private ChangeLog mChangeLog;
 
-    private Bundle mStartONScripterBundle;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -499,34 +497,15 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void startONScripter(String path, boolean useDefaultFont) {
-        Bundle b = new Bundle();
-        if (mFix.shouldLaunchGame(path, b)) {
+        Intent i = new Intent(this, ONScripter.class);
+        if (mFix.shouldLaunchGame(path, i)) {
+            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
             if (useDefaultFont) {
-                b.putBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
+                i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }
-            b.putString(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
-            mStartONScripterBundle = b;
-            goToONScripterActivity();
+            startActivity(i);
         } else {
             updateSaveFolderItemVisibility();
-        }
-    }
-
-    private void goToONScripterActivity() {
-        // TODO clean up after bug is understood
-        Intent i = new Intent(this, ONScripter.class);
-        try {
-            String directory = mStartONScripterBundle.getString(ONScripter.CURRENT_DIRECTORY_EXTRA);
-            String saveFolder = mStartONScripterBundle.getString(ONScripter.SAVE_DIRECTORY_EXTRA);
-            boolean useDefaultFont = mStartONScripterBundle.getBoolean(ONScripter.USE_DEFAULT_FONT_EXTRA);
-            mStartONScripterBundle = null;
-            if (directory == null) throw new NullPointerException("directory is null");
-            i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, directory);
-            i.putExtra(ONScripter.SAVE_DIRECTORY_EXTRA, saveFolder);
-            i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, useDefaultFont);
-            startActivity(i);
-        } catch (NullPointerException e) {
-            e.printStackTrace();
         }
     }
 
