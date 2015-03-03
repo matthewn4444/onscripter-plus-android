@@ -74,7 +74,6 @@ ScriptParser::ScriptParser()
     page_list = NULL;
 
 #ifdef ANDROID
-    glovalSaveAttempts = 0;
     setMenuLanguage("en");
 
     script_h.setOnErrorCallback(this);
@@ -346,42 +345,12 @@ void ScriptParser::saveGlovalData()
 
     int ret = saveFileIOBuf( "gloval.sav" );
     if (ret == -1){
-// ========================== TEMP FOR LOGGING ============================
-        glovalSaveAttempts++;
-
-        char filename[1024];
-        const char* path = "gloval.sav";
-        if (save_dir){
-#ifdef ANDROID
-            if (root_writable)
-                sprintf( filename, "%s%s%s", root_writable, save_dir, path );
-            else
-                sprintf( filename, "%s%s", save_dir, path );
-        }
-        else{
-            if (root_writable)
-                sprintf( filename, "%s%s%s", root_writable, archive_path, path );
-            else
-                sprintf( filename, "%s%s", archive_path, path );
-#else
-            sprintf( filename, "%s%s", save_dir, path );
-        else
-            sprintf( filename, "%s%s", archive_path, path );
-#endif
-        }
-        FILE* fp = ::fopen(filename, "wb");
-        bool ableToOpen = !!fp;
-        if (fp) fclose(fp);
-        char output[1024];
-        sprintf(output, "Filename: %s, Attempts: %d, Able to open: %s", filename, glovalSaveAttempts, ableToOpen ? "true" : "false");
-// ========================== TEMP FOR LOGGING ============================
-        logee( stderr, output, "can't open gloval.sav for writing\n");
-        // exit(-1);            // TEMP ignore the exit for now....
+        loge( stderr, "can't open gloval.sav for writing\n");
+        exit(-1);
     } else if (ret == -2) {
         loge( stderr, "unable to write gloval.sav correctly\n");
         exit(-1);
     }
-    glovalSaveAttempts = 0;
 }
 
 void ScriptParser::allocFileIOBuf()
