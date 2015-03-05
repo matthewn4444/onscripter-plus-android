@@ -42,7 +42,7 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
 
         if (mInterHelper.show()) {
             mProgress = new ProgressDialog(this);
-            mProgress.setMessage("Loading...");
+            mProgress.setMessage(getString(R.string.message_loading_ads));
             mProgress.setCancelable(false);
             mProgress.show();
         } else {

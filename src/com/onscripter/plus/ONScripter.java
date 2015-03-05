@@ -504,7 +504,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                 }
                 ProgressDialog progress = new ProgressDialog(this);
                 progress = new ProgressDialog(this);
-                progress.setMessage("Loading...");
+                progress.setMessage(getString(R.string.message_loading_ads));
                 progress.setCancelable(false);
                 progress.show();
                 return;

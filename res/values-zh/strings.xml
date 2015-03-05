@@ -98,6 +98,7 @@
     <string name="message_su_sdcard_fix_exists_no_write">无法对系统进行修复, 请尝试重启? 如果已经重启过仍未修复, 请把这个问题上报到 matthewn4444@gmail.com.</string>
     <string name="message_su_sdcard_fix_issue">无法改动系统文件. 请把这个问题上报到 matthewn4444@gmail.com.</string>
     <string name="message_restart_device">为应用改动请重启设备.</string>
+    <string name="message_loading_ads">加载广告&#8230;</string>
 
     <string name="menu_action_change_save_folder">改变存档文件夹</string>
 
