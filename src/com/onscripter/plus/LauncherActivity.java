@@ -421,6 +421,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             } catch (android.content.ActivityNotFoundException anfe) {
                 startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + packageName)));
             }
+            break;
         case R.id.action_change_save_folder:
             File saveFolder = ExtSDCardFix.getSaveFolder();
             if (saveFolder != null) {
