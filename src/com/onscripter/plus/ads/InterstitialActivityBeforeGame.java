@@ -29,20 +29,14 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
             @Override
             public void onAdDismiss() {
                 super.onAdDismiss();
-                if (mProgress != null && mProgress.isShowing()) {
-                    mProgress.dismiss();
-                    mProgress = null;
-                }
+                dismissDialog();
                 goToONScripter();
             }
 
             @Override
             public void onAdLeftApplication() {
                 super.onAdLeftApplication();
-                if (mProgress != null && mProgress.isShowing()) {
-                    mProgress.dismiss();
-                    mProgress = null;
-                }
+                dismissDialog();
             }
         });
 
@@ -53,6 +47,24 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
             mProgress.show();
         } else {
             goToONScripter();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        dismissDialog();
+        super.onDestroy();
+    }
+
+    private void dismissDialog() {
+        try {
+            if (mProgress != null && mProgress.isShowing()) {
+                mProgress.dismiss();
+                mProgress = null;
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            BugSenseHandler.sendException(e);
         }
     }
 
