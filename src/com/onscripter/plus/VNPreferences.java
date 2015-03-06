@@ -18,6 +18,8 @@ import android.os.AsyncTask;
 import android.os.StatFs;
 import android.util.Log;
 
+import com.onscripter.plus.bugtracking.BugTrackingService;
+
 public class VNPreferences {
     private static final String TAG = "VNPreferences";
     public static final String PREF_FILE_NAME = "pref.json";
@@ -106,6 +108,9 @@ public class VNPreferences {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                String name = "*" + (new File(mPath).getName());
+                BugTrackingService.sendBugReportWithFile(App.getContext(), name,
+                        e, null, file.getAbsolutePath());
                 return false;
             }
         }
