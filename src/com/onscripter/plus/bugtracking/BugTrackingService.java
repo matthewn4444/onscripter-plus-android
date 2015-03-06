@@ -50,6 +50,7 @@ public class BugTrackingService extends IntentService {
     private static final String INTENT_KEY_EXTRA = "in.key.extra";
     private static final String INTENT_KEY_DATE = "in.key.date";
     private static final String INTENT_KEY_HAS_SAVE = "in.key.has.save.file";
+    private static final String INTENT_KEY_EXTRA_FILE = "in.key.extra.file";
 
     private static final char PARAMS_DELIMITER = '|';
 
@@ -72,11 +73,12 @@ public class BugTrackingService extends IntentService {
         String extraData = intent.getStringExtra(INTENT_KEY_EXTRA);
         String date = intent.getStringExtra(INTENT_KEY_DATE);
         boolean hasSaveFile = intent.getBooleanExtra(INTENT_KEY_HAS_SAVE, false);
+        String uploadFile = intent.getStringExtra(INTENT_KEY_EXTRA_FILE);
         try {
             if (logTime != null) {
                 sendTraceData(exceptionMessage, gameName, stacktrace, logTime, extraData, date, hasSaveFile);
             } else {
-                sendBugData(exceptionMessage, gameName, stacktrace, extraData);
+                sendBugData(exceptionMessage, gameName, stacktrace, extraData, uploadFile);
             }
         } catch (IOException e) {
             BugSenseHandler.sendException(e);
@@ -156,6 +158,21 @@ public class BugTrackingService extends IntentService {
         }
     }
 
+    public static void sendBugReportWithFile(Context ctx, String gameName, Exception exception,
+            Map<String, String> extraData, String file) {
+        if (!isDebug(ctx) && !ONScripterTracer.playbackEnabled() && isNetworkAvailable(ctx)) {
+            Intent in = new Intent(ctx, BugTrackingService.class);
+            in.putExtra(INTENT_KEY_EXCEPTION_MSG, exception.getMessage());
+            in.putExtra(INTENT_KEY_GAME_NAME, gameName);
+            in.putExtra(INTENT_KEY_STACKTRACE, Log.getStackTraceString(exception));
+            in.putExtra(INTENT_KEY_EXTRA, extrasMapToJSONString(extraData));
+            if (new File(file).exists()) {
+                in.putExtra(INTENT_KEY_EXTRA_FILE, file);
+            }
+            ctx.startService(in);
+        }
+    }
+
     /**
      * Creates a crash report for individual games and uploads their traces.
      *
@@ -195,7 +212,7 @@ public class BugTrackingService extends IntentService {
      * @throws IOException
      */
     private static void sendBugData(String exceptionMessage, String gameName, String stacktrace,
-            String extraData) throws IOException {
+            String extraData, String uploadFile) throws IOException {
         ModifyServerRequest request = null;
         try {
             request = new ModifyServerRequest(METHOD.POST);
@@ -209,6 +226,12 @@ public class BugTrackingService extends IntentService {
             request.putField("versionString", APP_VERSION_NAME);
             request.putField("message", exceptionMessage);
             request.putField("name", gameName);
+            if (uploadFile != null) {
+                byte[] data = readBytesFromFile(uploadFile);
+                if (data != null) {
+                    request.putFile("extraFile", data);
+                }
+            }
             request.send();
 
             handleGenericJSONResult(request);

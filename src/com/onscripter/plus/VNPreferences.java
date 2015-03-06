@@ -19,6 +19,7 @@ import android.os.StatFs;
 import android.util.Log;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class VNPreferences {
     private static final String TAG = "VNPreferences";
@@ -109,7 +110,9 @@ public class VNPreferences {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
-                BugSenseHandler.sendException(e);
+                String name = "*" + (new File(mPath).getName());
+                BugTrackingService.sendBugReportWithFile(App.getContext(), name,
+                        e, null, file.getAbsolutePath());
                 return false;
             }
         }
