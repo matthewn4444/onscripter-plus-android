@@ -1353,7 +1353,8 @@ int ScriptHandler::findLabel( const char *label )
     }
 
 #ifdef ENABLE_KOREAN
-    if (!strcmp(label, KOREAN_LABEL_END)) {
+    if (!strcmp(label, KOREAN_LABEL_END)
+        || !strcmp(label, KOREAN_LABEL_END2)) {
         exit(-1);
         return -1;
     }
