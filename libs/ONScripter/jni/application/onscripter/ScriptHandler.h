@@ -42,6 +42,7 @@
 #ifdef ENABLE_KOREAN
 // To avoid crashing (Korean) games, this label is usually used to exit the game
 #define KOREAN_LABEL_END "l_offyo"
+#define KOREAN_LABEL_END2 "l_testnano"
 #endif
 
 typedef unsigned char uchar3[3];
