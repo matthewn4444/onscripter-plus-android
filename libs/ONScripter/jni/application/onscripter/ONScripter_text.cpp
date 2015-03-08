@@ -1015,7 +1015,8 @@ bool ONScripter::processText()
         }
         return true;
     }
-    else if ( ch == '#' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
+    else if ( ch == '#' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)
+            && script_h.getStringBuffer()[string_buffer_offset + 1] != ' ' ){
         readColor( &sentence_font.color, script_h.getStringBuffer() + string_buffer_offset );
         readColor( &ruby_font.color, script_h.getStringBuffer() + string_buffer_offset );
         string_buffer_offset += 7;
