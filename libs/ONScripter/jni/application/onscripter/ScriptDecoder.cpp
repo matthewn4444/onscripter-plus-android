@@ -74,15 +74,22 @@ ScriptDecoder* ScriptDecoder::detectAndAllocateScriptDecoder(char* buffer, size_
             // This says that the text is guarenteed to be English/UTF8
             foundDecoder = new UTF8Decoder();
             break;
-        } else if (!ScriptDecoder::isOneByte(c)) {
+        } else if (c != ';' && c != '*') {
             // We need to detect Asian language
             for (size_t j = 0; j < numDecoders && !foundDecoder; j++) {
                 // Get line length
                 char* start = buffer + i;
                 char* ptr = start;
-                while(*ptr != '\n' && *ptr != '\0') ptr++;
+                int numOneBytes = 0;
+                while(*ptr != '\n' && *ptr != '\0') {
+                    if (ScriptDecoder::isOneByte(*ptr)) numOneBytes++;
+                    ptr++;
+                }
                 size_t lineLength = ptr - start;
                 if (*ptr == '\0' || !lineLength) break;
+
+                // If more of the line is multibyte, then we should continue
+                if (numOneBytes * 1.0 / lineLength >= 0.5) break;
 
                 // Parse through each character on this line and see which decoders work
                 ScriptDecoder* decoder = decoders[j];
