@@ -974,7 +974,7 @@ bool ONScripter::processText()
         
         return true;
     }
-    else if ( ch == '!' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR) ){
+    else if ( ch == '!'){
         string_buffer_offset++;
         if ( script_h.getStringBuffer()[ string_buffer_offset ] == 's' ){
             string_buffer_offset++;
@@ -1012,6 +1012,9 @@ bool ONScripter::processText()
                 if (flag) event_mode |= WAIT_INPUT_MODE;
                 waitEvent(t);
             }
+        } else {
+            string_buffer_offset--;
+            goto parse_as_text;
         }
         return true;
     }
@@ -1086,6 +1089,7 @@ bool ONScripter::processText()
         return true;
     }
     else{
+        parse_as_text:          // Hack like ONScripter-EN to avoid making too many changes
         out_text[0] = ch;
         
         int matched_len = script_h.checkClickstr(script_h.getStringBuffer() + string_buffer_offset);
