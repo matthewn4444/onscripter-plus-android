@@ -203,7 +203,7 @@ public class ONScripterView extends TracedONScripterView {
             return;
         }
         if (mListener != null) {
-            File video = new File(mCurrentDirectory + "/" + new String(filename));
+            File video = new File(mCurrentDirectory + "/" + new String(filename).replace("\\", "/"));
             if (video.exists() && video.canRead()) {
                 ONScripterTracer.traceVideoStartEvent();
                 mListener.videoRequested(video.getAbsolutePath(), clickToSkip, shouldLoop);
