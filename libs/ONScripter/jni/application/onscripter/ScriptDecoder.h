@@ -29,7 +29,17 @@ private:
     static const char* name;
 };
 
-class JapaneseDecoder : public ScriptDecoder {
+class MultibyteDecoder : public ScriptDecoder {
+public:
+    virtual unsigned short convertNextChar(char* buffer);
+    virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
+    virtual int getNumBytes(char c);
+
+protected:
+    MultibyteDecoder() {}
+};
+
+class JapaneseDecoder : public MultibyteDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
@@ -48,7 +58,7 @@ private:
 };
 
 #ifdef ENABLE_KOREAN
-class KoreanDecoder : public ScriptDecoder {
+class KoreanDecoder : public MultibyteDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
@@ -68,7 +78,7 @@ private:
 #endif
 
 #ifdef ENABLE_CHINESE
-class ChineseDecoder : public ScriptDecoder {
+class ChineseDecoder : public MultibyteDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
@@ -87,7 +97,7 @@ private:
 };
 #endif
 
-class UTF8Decoder : public ScriptDecoder {
+class UTF8Decoder : public MultibyteDecoder {
 public:
     static int UTF8_ERROR;
 
@@ -95,6 +105,9 @@ public:
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
 
     virtual inline int getNumBytes(char c) {
+        int n = MultibyteDecoder::getNumBytes(c);
+        if (n)
+            return n;
         return getByteLength(c);
     }
 
