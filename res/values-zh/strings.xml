@@ -13,6 +13,7 @@
     <string name="message_cannot_write_pref">没有足够的空间存储设置.</string>
     <string name="message_folder_exists">文件夹已存在，创建新文件夹.</string>
     <string name="message_corrupt_save_file">存储文件已损坏无法加载. 请选择另一个.</string>
+    <string name="message_missing_label_define">此游戏在启动的时候崩溃，因为丢失或损坏的游戏文件。\n请确认您已经正确的复制所有游戏文件到指定文件夹</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">设置</string>

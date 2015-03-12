@@ -13,6 +13,7 @@
     <string name="message_cannot_write_pref">内蔵メモリがいっぱいになった。保存できません。</string>
     <string name="message_folder_exists">他のフォルダ名を選択してください</string>
     <string name="message_corrupt_save_file">壊れたファイルをロードすることができません。\n別のファイルをロードしてください。</string>
+    <string name="message_missing_label_define">ゲームを始めることができません。 現在、ゲームの必要なファイルが正しくない、又は不足します。\nゲームの必要なファイルを全てコピーしたのかしっかりチェックしてください。</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">設定</string>

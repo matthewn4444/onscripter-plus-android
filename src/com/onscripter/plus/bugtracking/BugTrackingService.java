@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.ONScripterTracer;
+import com.onscripter.plus.R;
 import com.onscripter.plus.bugtracking.ModifyServerRequest.METHOD;
 
 public class BugTrackingService extends IntentService {
@@ -111,6 +113,17 @@ public class BugTrackingService extends IntentService {
         String data = pref.getString(PREF_KEY_PENDING_REPORT, null);
         if (data != null) {
             String[] params = data.toString().split("\\|");
+
+            // Parse game specific bugs and decide whether to just show a message or send to server
+            try {
+                if (handleGameCrashesShowMessage(ctx, params[0], Long.parseLong(params[3]))) {
+                    pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
+                    return;
+                }
+            } catch(NumberFormatException e) {
+                e.printStackTrace();
+            }
+
             // Debug mode should output the error and not send the data
             if (isDebug(ctx)) {
                 pref.edit().remove(PREF_KEY_PENDING_REPORT).apply();
@@ -353,6 +366,30 @@ public class BugTrackingService extends IntentService {
             }
         }
         return null;
+    }
+
+    /**
+     * Handles sending messages to user if there is a crash but only some games
+     * hardcoded to the situation listed in the function.
+     *
+     * @param ctx
+     * @param exceptionMessage
+     * @param traceLength (ms)
+     * @return Whether to consume the crash or not
+     */
+    private static boolean handleGameCrashesShowMessage(Context ctx, String exceptionMessage, long traceLength) {
+        if (exceptionMessage != null) {
+            // 'Label "define" is not found' exception that is called under 2 sec
+            if (exceptionMessage.contains("Label \"define\" is not found.") && traceLength < 2 * 1000) {
+                new AlertDialog.Builder(ctx)
+                    .setTitle(R.string.app_name)
+                    .setMessage(R.string.message_missing_label_define)
+                    .setNeutralButton(android.R.string.ok, null)
+                    .show();
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

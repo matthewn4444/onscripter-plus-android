@@ -13,6 +13,7 @@
     <string name="message_cannot_write_pref">Внутренняя память заполнена и не может спасти.</string>
     <string name="message_folder_exists">Пожалуйста, выберите другое имя</string>
     <string name="message_corrupt_save_file">Не удается загрузить поврежденный файл.\nПожалуйста, загрузите другой файл.</string>
+    <string name="message_missing_label_define">Игра вылетает при запуске, возможно потому что отсутствуют некоторые файлы игры или они повреждены.\nПожалуйста, убедитесь, что вы скопировали все файлы игры должным образом.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>
