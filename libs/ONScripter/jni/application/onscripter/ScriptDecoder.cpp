@@ -11,15 +11,6 @@ extern unsigned short convGBK2UTF16(unsigned short code);
 
 extern unsigned short convSJIS2UTF16( unsigned short in );
 
-// This is a list of 2-byte Japanese characters that can be parsed by
-// all multibyte decoders without their respected decoders able to parse these bytes.
-// Used to hack for example Korean decoders if a Japanese space is used by accident.
-static const int multiAcceptedJpBytes[][2] = {
-    //  1st Byte    2nd Byte
-    {   0x81,       0x40 },     // Japanese Space
-    0                           // Terminating loop character
-};
-
 /*
  *  ScriptDecoder
  */
@@ -166,64 +157,21 @@ ScriptDecoder* ScriptDecoder::chooseDecoderForTextFromList(const char* buffer, S
 }
 
 /*
- *  MultibyteDecoder
- */
-unsigned short MultibyteDecoder::convertNextChar(char* buffer)
-{
-    if (isOneByte(*buffer)) {
-        return ScriptDecoder::convertNextChar(buffer);
-    }
-    int i = 0;
-    while(multiAcceptedJpBytes[i][0]) {
-        if (multiAcceptedJpBytes[i][0] == buffer[0] && multiAcceptedJpBytes[i][1] == buffer[1]) {
-            unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-            return convSJIS2UTF16(index);
-        }
-        i++;
-    }
-    return 0;
-}
-
-bool MultibyteDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
-{
-    if (ScriptDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
-    int i = 0;
-    while(multiAcceptedJpBytes[i][0]) {
-        if (multiAcceptedJpBytes[i][0] == buffer[0] && multiAcceptedJpBytes[i][1] == buffer[1]) {
-            *outNumBytes = 2;
-            return true;
-        }
-        i++;
-    }
-    return false;
-}
-
-int MultibyteDecoder::getNumBytes(char c)
-{
-    int i = 0;
-    while(multiAcceptedJpBytes[i][0])
-        if (c == multiAcceptedJpBytes[i++][0])
-            return 2;
-    return 0;
-}
-
-/*
  *  JapaneseDecoder
  */
 const char* JapaneseDecoder::name = "Japanese";
 
 unsigned short JapaneseDecoder::convertNextChar(char* buffer)
 {
-    int n = MultibyteDecoder::convertNextChar(buffer);
-    if (n)
-        return n;
+    if (isOneByte(*buffer))
+        return ScriptDecoder::convertNextChar(buffer);
     unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
     return convSJIS2UTF16(index);
 }
 
 bool JapaneseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (MultibyteDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
+    if (ScriptDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
     return ( ((*buffer) & 0xe0) == 0xe0 || ((*buffer) & 0xe0) == 0x80 );
 }
@@ -241,7 +189,7 @@ const char* KoreanDecoder::name = "Korean";
 
 unsigned short KoreanDecoder::convertNextChar(char* buffer)
 {
-    int n = MultibyteDecoder::convertNextChar(buffer);
+    int n = JapaneseDecoder::convertNextChar(buffer);
     if (n)
         return n;
     unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
@@ -250,7 +198,7 @@ unsigned short KoreanDecoder::convertNextChar(char* buffer)
 
 bool KoreanDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (MultibyteDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
+    if (JapaneseDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
     int x = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
     // http://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/KOREAN.TXT
@@ -258,11 +206,6 @@ bool KoreanDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
             /* Standard Korean */ || (x >= 0xA141 && x <= 0xA974) \
             /* Chinese Gylphs */  || (x >= 0xEFA1 && x <= 0xFDFE) \
                                     ) == true;
-}
-
-bool KoreanDecoder::isMonospaced()
-{
-    return true;
 }
 #endif
 
@@ -274,7 +217,7 @@ const char* ChineseDecoder::name = "Chinese";
 
 unsigned short ChineseDecoder::convertNextChar(char* buffer)
 {
-    int n = MultibyteDecoder::convertNextChar(buffer);
+    int n = JapaneseDecoder::convertNextChar(buffer);
     if (n)
         return n;
     unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
@@ -283,15 +226,10 @@ unsigned short ChineseDecoder::convertNextChar(char* buffer)
 
 bool ChineseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (MultibyteDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
+    if (JapaneseDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
     int n = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
     return (n >= 0xA1A0 && n <= 0xfcfc) == true;
-}
-
-bool ChineseDecoder::isMonospaced()
-{
-    return true;
 }
 #endif
 
@@ -324,16 +262,20 @@ int UTF8Decoder::getByteLength(char c)
 
 unsigned short UTF8Decoder::convertNextChar(char* buffer)
 {
-    int n = MultibyteDecoder::convertNextChar(buffer);
-    if (n)
-        return n;
-    return decodeUTF8Character(buffer, NULL);
+    if (getByteLength(*buffer) > 1)
+        return decodeUTF8Character(buffer, NULL);
+    return JapaneseDecoder::convertNextChar(buffer);
 }
 
 bool UTF8Decoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (MultibyteDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     int length = getByteLength(*buffer);
     *outNumBytes = length;
-    return (bool)(length > 1);
+    if (length > 1) return true;
+    if (JapaneseDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
+}
+
+bool UTF8Decoder::isMonospaced()
+{
+    return false;
 }
