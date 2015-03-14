@@ -131,7 +131,7 @@ ScriptDecoder* ScriptDecoder::detectAndAllocateScriptDecoder(char* buffer, size_
         if (++i >= size) break;
     }
 
-    delete langCounter;
+    delete[] langCounter;
 
     for (size_t i = 0; i < numDecoders; i++) {
         // Delete everything except found decoder
