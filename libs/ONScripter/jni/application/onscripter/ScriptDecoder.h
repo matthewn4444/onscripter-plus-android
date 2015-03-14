@@ -29,17 +29,7 @@ private:
     static const char* name;
 };
 
-class MultibyteDecoder : public ScriptDecoder {
-public:
-    virtual unsigned short convertNextChar(char* buffer);
-    virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
-    virtual int getNumBytes(char c);
-
-protected:
-    MultibyteDecoder() {}
-};
-
-class JapaneseDecoder : public MultibyteDecoder {
+class JapaneseDecoder : public ScriptDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
@@ -58,15 +48,10 @@ private:
 };
 
 #ifdef ENABLE_KOREAN
-class KoreanDecoder : public MultibyteDecoder {
+class KoreanDecoder : public JapaneseDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
-    virtual bool isMonospaced();
-
-    virtual inline int getNumBytes(char c) {
-        return isOneByte(c) ? 1 : 2;
-    }
 
     virtual inline const char* getName() {
         return name;
@@ -78,15 +63,10 @@ private:
 #endif
 
 #ifdef ENABLE_CHINESE
-class ChineseDecoder : public MultibyteDecoder {
+class ChineseDecoder : public JapaneseDecoder {
 public:
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
-    virtual bool isMonospaced();
-
-    virtual inline int getNumBytes(char c) {
-        return isOneByte(c) ? 1 : 2;
-    }
 
     virtual inline const char* getName() {
         return name;
@@ -97,18 +77,19 @@ private:
 };
 #endif
 
-class UTF8Decoder : public MultibyteDecoder {
+class UTF8Decoder : public JapaneseDecoder {
 public:
     static int UTF8_ERROR;
 
     virtual unsigned short convertNextChar(char* buffer);
     virtual bool canConvertNextChar(char* buffer, int* outNumBytes);
+    virtual bool isMonospaced();
 
     virtual inline int getNumBytes(char c) {
-        int n = MultibyteDecoder::getNumBytes(c);
-        if (n)
-            return n;
-        return getByteLength(c);
+        int n = getByteLength(c);
+        if (n == UTF8_ERROR)
+            return JapaneseDecoder::getNumBytes(c);
+        return n;
     }
 
     virtual inline const char* getName() {
