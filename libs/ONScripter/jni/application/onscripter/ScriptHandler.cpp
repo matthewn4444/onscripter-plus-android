@@ -283,6 +283,9 @@ const char *ScriptHandler::readToken()
                     SKIP_SPACE(buf);
                 }
                 else{
+#ifdef ENABLE_1BYTE_CHAR
+                    if (ch == '`') break;
+#endif
                     if (ch == 0x0a || ch == '\0') break;
                     addStringBuffer( ch );
                     buf++;
