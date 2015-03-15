@@ -553,7 +553,8 @@ bool ONScripter::clickWait( char *out_text )
             flush(refreshMode());
         }
         num_chars_in_sentence = 0;
-
+        if ( textgosub_label && (script_h.getNext()[0] != 0x0a))
+            new_line_skip_flag = true;
         event_mode = IDLE_EVENT_MODE;
         if ( waitEvent(0) ) return false;
     }
@@ -570,10 +571,14 @@ bool ONScripter::clickWait( char *out_text )
         if ( textgosub_label ){
             saveon_flag = false;
 
+            char *next = script_h.getNext();
             textgosub_clickstr_state = CLICK_WAIT;
-            if (script_h.getStringBuffer()[string_buffer_offset] == 0x0)
+            if (*next == 0x0a) {
                 textgosub_clickstr_state |= CLICK_EOL;
-            gosubReal( textgosub_label, script_h.getNext(), true );
+            } else {
+                new_line_skip_flag = true;
+            }
+            gosubReal( textgosub_label, next, true );
 
             event_mode = IDLE_EVENT_MODE;
             waitEvent(0);
@@ -847,6 +852,11 @@ bool ONScripter::processText()
 
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
 #ifdef ENABLE_ENGLISH
+        // Run end of text only if we are at the end of the line in the script
+        char* buf = script_h.getNext();
+        while(*buf != '\n' && *buf != '`' && *buf != 0x00) buf++;
+        if (*buf == '`') return false;
+
         // Check next line for English text and see if it is lowercase then skip new line
         char* next = script_h.getNext() + 1;
         if (next[0] == '`') {       // Using 1 Byte English text
