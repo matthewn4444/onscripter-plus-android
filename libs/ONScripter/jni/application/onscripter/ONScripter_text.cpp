@@ -555,6 +555,8 @@ bool ONScripter::clickWait( char *out_text )
         num_chars_in_sentence = 0;
         if ( textgosub_label && (script_h.getNext()[0] != 0x0a))
             new_line_skip_flag = true;
+        if (script_h.getStringBuffer()[ string_buffer_offset ] == '/'
+                && script_h.getStringBuffer()[ string_buffer_offset + 1 ] == 0x00 ) new_line_skip_flag = true;
         event_mode = IDLE_EVENT_MODE;
         if ( waitEvent(0) ) return false;
     }
@@ -578,6 +580,8 @@ bool ONScripter::clickWait( char *out_text )
             } else {
                 new_line_skip_flag = true;
             }
+            if (script_h.getStringBuffer()[ string_buffer_offset ] == '/'
+                && script_h.getStringBuffer()[ string_buffer_offset + 1 ] == 0x00 ) new_line_skip_flag = true;
             gosubReal( textgosub_label, next, true );
 
             event_mode = IDLE_EVENT_MODE;
@@ -853,9 +857,11 @@ bool ONScripter::processText()
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
 #ifdef ENABLE_ENGLISH
         // Run end of text only if we are at the end of the line in the script
+        // or hit a '/' symbol followed by new line or oef
         char* buf = script_h.getNext();
-        while(*buf != '\n' && *buf != '`' && *buf != 0x00) buf++;
-        if (*buf == '`') return false;
+        while(*buf != '\n' && *buf != '`' && *buf != 0x00
+            && !(*buf == '/' && (buf[1] == 0x00 || buf[1] == '\n'))) buf++;
+        if (*buf == '`' || *buf == '/') return false;
 
         // Check next line for English text and see if it is lowercase then skip new line
         char* next = script_h.getNext() + 1;
@@ -1043,8 +1049,7 @@ bool ONScripter::processText()
         string_buffer_offset++;
         return true;
     }
-    else if ( ch == '/' && !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)
-               && script_h.getStringBuffer()[string_buffer_offset + 1] == '\n'){    // Do not crash when scripts use '/'
+    else if ( ch == '/'){
         if ( ruby_struct.stage == RubyStruct::BODY ){
             current_page->add('/');
             sentence_font.addLineOffset(ruby_struct.margin);
@@ -1060,6 +1065,8 @@ bool ONScripter::processText()
 
             return true;
         }
+        else if (script_h.getStringBuffer()[string_buffer_offset+1] != 0x00)
+            goto parse_as_text;
         else{ // skip new line
             new_line_skip_flag = true;
             string_buffer_offset++;
