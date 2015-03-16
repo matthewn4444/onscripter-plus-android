@@ -857,11 +857,13 @@ bool ONScripter::processText()
     if (script_h.getStringBuffer()[string_buffer_offset] == 0x00){
 #ifdef ENABLE_ENGLISH
         // Run end of text only if we are at the end of the line in the script
-        // or hit a '/' symbol followed by new line or oef
+        // or hit with a '/', '@' or '\' symbol followed by new line or oef
         char* buf = script_h.getNext();
         while(*buf != '\n' && *buf != '`' && *buf != 0x00
-            && !(*buf == '/' && (buf[1] == 0x00 || buf[1] == '\n'))) buf++;
-        if (*buf == '`' || *buf == '/') return false;
+            && !(*buf == '/' && (buf[1] == '\n' || buf[1] == 0x00))
+            && !(*buf == '\\' && (buf[1] == '\n' || buf[1] == 0x00))
+            && !(*buf == '@' && (buf[1] == '\n' || buf[1] == 0x00))) buf++;
+        if (*buf == '`' || *buf == '/' || *buf == '\\' || *buf == '@') return false;
 
         // Check next line for English text and see if it is lowercase then skip new line
         char* next = script_h.getNext() + 1;
