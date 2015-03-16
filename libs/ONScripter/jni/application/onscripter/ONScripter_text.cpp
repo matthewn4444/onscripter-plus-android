@@ -1161,6 +1161,14 @@ bool ONScripter::processText()
 
                 // Scan the next characters till the next space and get the accumulated character advance (word width)
                 while(script[index] != '\0') {
+                    // Skip scanning color changes from the script
+                    if (script[index] == '#') {
+                        for (int i = 1; i <= 6; i++) {
+                            ch = script[index + i];
+                            if ( '0' > ch && ch > '9' && 'a' > ch && ch > 'f' && 'A' > ch && ch > 'F') break;
+                            if (i == 6) index += 6;
+                        }
+                    }
                     advanced = 0;
                     if (sentence_font.ttf_font[0]) {
                         TTF_GlyphMetrics( (TTF_Font*)sentence_font.ttf_font[0], script[index], NULL, NULL, NULL, NULL, &advanced );
