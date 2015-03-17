@@ -334,10 +334,29 @@ void ONScripter::drawString( const char *str, uchar3 color, FontInfo *info, bool
                     str++;
                 }
                 else {
+#ifdef ENABLE_1BYTE_CHAR
+                    // Scan text for space to figure out if next word can fit on the line
+                    if (*str == ' ') {
+                        int advanced, accum_advance = 0;
+                        i = 1;
+                        while(str[i]) {
+                            advanced = 0;
+                            if (info->ttf_font[0])
+                                TTF_GlyphMetrics( (TTF_Font*)info->ttf_font[0], str[i], NULL, NULL, NULL, NULL, &advanced );
+                            if (str[i] == '\n') break;
+                            accum_advance += advanced;
+                            if (str[i] == ' ') break;
+                            i++;
+                        }
+                        if (info->willBeEndOfLine(accum_advance)) {
+                            if (single_line) break;
+                            info->newLine();
+                            if (str[i] == ' ') str++;
+                        }
+                    }
+#endif
                     text[0] = *str++;
-                    if (*str && *str != 0x0a && *str != '`' && ScriptDecoder::isOneByte(*str)) text[1] = *str++;
-                    else                                                        text[1] = 0;
-                    if (single_line && info->isEndOfLine()) break;
+                    text[1] = 0;
                     drawChar( text, info, false, false, surface, cache_info, NULL, decoder );
                 }
             } else {
