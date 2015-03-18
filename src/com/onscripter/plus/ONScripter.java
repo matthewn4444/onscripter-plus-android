@@ -7,10 +7,10 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Point;
@@ -45,8 +45,7 @@ import com.onscripter.plus.Analytics.CHANGE;
 import com.onscripter.plus.ONScripterGame.OnGameReadyListener;
 import com.onscripter.plus.TwoStateLayout.OnSideMovedListener;
 import com.onscripter.plus.VNPreferences.OnLoadVNPrefListener;
-import com.onscripter.plus.ads.InterstitialAdHelper;
-import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
+import com.onscripter.plus.ads.InterstitialTransActivity;
 import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class ONScripter extends ActivityPlus implements OnClickListener, OnDismissListener, OnSideMovedListener, OnLoadVNPrefListener, ONScripterEventListener, OnGameReadyListener
@@ -100,7 +99,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private ONScripterGame mGame;
 
     private AdView mAdView;
-    private InterstitialAdHelper mInterstitialHelper;
     private long mSessionStart;
     static final private double LEAVE_GAME_INTERSTITIAL_AD_PERCENT = 60;
 
@@ -207,23 +205,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         if (getResources().getBoolean(R.bool.isTablet)) {
             mDisplayHeight -= attachAds();
         }
-        mInterstitialHelper = new InterstitialAdHelper(this, LEAVE_GAME_INTERSTITIAL_AD_PERCENT);
-        mInterstitialHelper.setAdListener(new AdListener() {
-            @Override
-            public void onAdDismiss() {
-                super.onAdDismiss();
-                findViewById(android.R.id.content).setVisibility(View.GONE);
-                mGame.exitApp();
-                finish();
-            }
-
-            @Override
-            public void onAdLeftApplication() {
-                super.onAdLeftApplication();
-                findViewById(android.R.id.content).setVisibility(View.GONE);
-                mGame.exitApp();
-            }
-        });
         mSessionStart = System.currentTimeMillis();
 
         runSDLApp();
@@ -494,23 +475,15 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         case R.id.controls_quit_button:
             Analytics.buttonEvent(BUTTON.BACK);
             removeHideControlsTimer();
-            if (mInterstitialHelper.show()) {
-                if( mGame != null ) {
-                    mGame.finishVideo();
-                    mGame.onStop();
-                }
-                if (mAdView != null) {
-                    mAdView.pause();
-                }
-                ProgressDialog progress = new ProgressDialog(this);
-                progress = new ProgressDialog(this);
-                progress.setMessage(getString(R.string.message_loading_ads));
-                progress.setCancelable(false);
-                progress.show();
-                return;
-            }
             mGame.exitApp();
             refreshTimer = false;
+
+            // Go to interstitial activity to see if ads will be shown to the user or not
+            Intent in = new Intent(this, InterstitialTransActivity.class);
+            in.setFlags(in.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
+            in.putExtra(InterstitialTransActivity.InterstitialRateExtra,
+                    LEAVE_GAME_INTERSTITIAL_AD_PERCENT);
+            startActivity(in);
             break;
         case R.id.controls_change_speed_button:
             Analytics.buttonEvent(BUTTON.CHANGE_SPEED);

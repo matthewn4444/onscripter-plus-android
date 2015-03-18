@@ -48,7 +48,7 @@ import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
-import com.onscripter.plus.ads.InterstitialActivityBeforeGame;
+import com.onscripter.plus.ads.InterstitialTransActivity;
 import com.onscripter.plus.bugtracking.BugTrackingService;
 
 public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
@@ -617,10 +617,11 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
     }
 
     private void startONScripter(String path, boolean useDefaultFont) {
-        Intent i = new Intent(this, InterstitialActivityBeforeGame.class);
+        Intent i = new Intent(this, InterstitialTransActivity.class);
         if (mFix.shouldLaunchGame(path, i)) {
             i.setFlags(i.getFlags() | Intent.FLAG_ACTIVITY_NO_HISTORY);
             i.putExtra(ONScripter.CURRENT_DIRECTORY_EXTRA, path);
+            i.putExtra(InterstitialTransActivity.NextClassExtra, ".ONScripter");
             if (useDefaultFont) {
                 i.putExtra(ONScripter.USE_DEFAULT_FONT_EXTRA, true);
             }

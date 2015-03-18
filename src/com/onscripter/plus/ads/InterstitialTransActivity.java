@@ -8,11 +8,13 @@ import android.os.Bundle;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.ActivityPlus;
-import com.onscripter.plus.ONScripter;
 import com.onscripter.plus.R;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 
-public class InterstitialActivityBeforeGame extends ActivityPlus {
+public class InterstitialTransActivity extends ActivityPlus {
+    public static final String NextClassExtra = "next.class.extra";
+    public static final String InterstitialRateExtra = "interstitial.rate.extra";
+
     private InterstitialAdHelper mInterHelper;
     private ProgressDialog mProgress;
 
@@ -24,13 +26,14 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
         }
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
-        mInterHelper = new InterstitialAdHelper(this);
+        int adRate = getIntent().getIntExtra(InterstitialRateExtra, 0);
+        mInterHelper = new InterstitialAdHelper(this, adRate);
         mInterHelper.setAdListener(new AdListener() {
             @Override
             public void onAdDismiss() {
                 super.onAdDismiss();
                 dismissDialog();
-                goToONScripter();
+                doNextAction();
             }
 
             @Override
@@ -46,7 +49,7 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
             mProgress.setCancelable(false);
             mProgress.show();
         } else {
-            goToONScripter();
+            doNextAction();
         }
     }
 
@@ -68,10 +71,21 @@ public class InterstitialActivityBeforeGame extends ActivityPlus {
         }
     }
 
-    private void goToONScripter() {
-        Intent in = new Intent(this, ONScripter.class);
-        in.putExtras(getIntent());
-        startActivity(in);
+    private void doNextAction() {
+        Intent prevIntent = getIntent();
+        String classPath = prevIntent.getStringExtra(NextClassExtra);
+        if (classPath != null) {
+            try {
+                Intent in = new Intent(this, Class.forName(getApplicationContext().getPackageName() + classPath));
+                in.putExtras(prevIntent);
+                startActivity(in);
+                return;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                BugSenseHandler.sendException(e);
+            }
+        }
+        finish();
     }
 
     private boolean isDebug() {
