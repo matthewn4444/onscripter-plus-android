@@ -1361,6 +1361,11 @@ int ScriptHandler::findLabel( const char *label )
         exit(-1);
         return -1;
     }
+    // Specific hack for broken Korean translated game 'Princess Frontier'
+    if (!strcmp(label, "l_badend")) {
+        logw(stderr, "Was not able to find l_badend, applying a hack by using 'l_bad_end' instead");
+        return findLabel("l_bad_end");
+    }
 #endif
 
     char *p = new char[ strlen(label) + 32 ];
