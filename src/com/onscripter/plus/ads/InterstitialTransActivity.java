@@ -1,10 +1,13 @@
 package com.onscripter.plus.ads;
 
+import java.util.Random;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.ActivityPlus;
@@ -14,6 +17,8 @@ import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 public class InterstitialTransActivity extends ActivityPlus {
     public static final String NextClassExtra = "next.class.extra";
     public static final String InterstitialRateExtra = "interstitial.rate.extra";
+
+    private static final int AdFailedTimeout = 2000;
 
     private InterstitialAdHelper mInterHelper;
     private ProgressDialog mProgress;
@@ -32,8 +37,24 @@ public class InterstitialTransActivity extends ActivityPlus {
             @Override
             public void onAdDismiss() {
                 super.onAdDismiss();
-                dismissDialog();
                 doNextAction();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                super.onAdFailedToLoad(errorCode);
+
+                // If failed to load (ad block or no Internet), 50% chance to wait 2 sec and forget showing the ad
+                if (new Random().nextBoolean()) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            doNextAction();
+                        }
+                    }, AdFailedTimeout);
+                } else {
+                    doNextAction();
+                }
             }
 
             @Override
@@ -59,7 +80,7 @@ public class InterstitialTransActivity extends ActivityPlus {
         super.onDestroy();
     }
 
-    private void dismissDialog() {
+    private synchronized void dismissDialog() {
         try {
             if (mProgress != null && mProgress.isShowing()) {
                 mProgress.dismiss();
@@ -72,6 +93,7 @@ public class InterstitialTransActivity extends ActivityPlus {
     }
 
     private void doNextAction() {
+        dismissDialog();
         Intent prevIntent = getIntent();
         String classPath = prevIntent.getStringExtra(NextClassExtra);
         if (classPath != null) {
