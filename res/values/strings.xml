@@ -49,6 +49,7 @@
     <string name="message_folder_exists">Folder already exists, create a new one.</string>
     <string name="message_corrupt_save_file">Cannot load save file because it is corrupted. Please choose another.</string>
     <string name="message_missing_label_define">The game crashed on game start up because it was missing game files or they were corrupted.\nPlease make sure you have copied all the game files properly.</string>
+    <string name="message_multiple_script_files">Found multiple scripts files for this game listed below. Only the script file in the immediate game folder will be used.\n\nUnused:</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
@@ -110,6 +111,8 @@
     <string name="settings_use_hq_audio_key">settings.use.hq.audio.key</string>
     <string name="settings_use_hq_audio_title">Use High Quality Audio</string>
 
+    <string name="settings_multiple_scripts_dont_show_again_key">settings.multiple.scripts.dont.show.again.key</string>
+
     <!-- Dialogs -->
     <string name="dialog_choose_folder_title">Choose a folder</string>
     <string name="dialog_select_button_text">Select</string>
@@ -121,6 +124,7 @@
     <string name="dialog_add_translation">Add a translation for your language by emailing me at</string>
     <string name="dialog_create_new_folder">Create new folder</string>
     <string name="dialog_button_rate">Rate this App!</string>
+    <string name="dialog_multiple_scripts_dont_show_again">OK, don\'t show again</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Controls</string>

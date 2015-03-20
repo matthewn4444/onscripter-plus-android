@@ -1,6 +1,7 @@
 package com.onscripter.plus;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.HashMap;
 
 import android.annotation.SuppressLint;
@@ -393,6 +394,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         mGame.setOnGameReadyListener(this);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        scanAndPromptForMultipleScripts();
     }
 
     public int getGameHeight() {
@@ -566,5 +568,58 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     private void refreshFullscreenTimer() {
         removeFullscreenTimer();
         mImmersiveHandler.postDelayed(mInvokeFullscreenRunnable, FULLSCREEN_TIMEOUT_SECONDS);
+    }
+
+    private void scanAndPromptForMultipleScripts() {
+        final String dontShowAgainKey = getString(R.string.settings_multiple_scripts_dont_show_again_key);
+        if (!mPrefs.getBoolean(dontShowAgainKey, false)) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // Scan the sub-directories one level for a script file name and
+                    // add to list when found, if found it skips to next sub-directory
+                    File[] files = new File(mCurrentDirectory).listFiles(new FileFilter() {
+                        @Override
+                        public boolean accept(File pathname) {
+                            return pathname.isDirectory() && pathname.canRead();
+                        }
+                    });
+                    if (files != null) {
+                        final StringBuilder sb = new StringBuilder();
+                        final String[] scriptNames = {"nscript.dat", "0.txt", "00.txt"};
+                        for (File subdir: files) {
+                            String subdirName = subdir.getName();
+                            for (String scriptName: scriptNames) {
+                                File scriptFile = new File(subdir + "/" + scriptName);
+                                if (scriptFile.exists() && scriptFile.canRead()) {
+                                    sb.append("\n\t- " + subdirName + "/" + scriptName);
+                                    break;
+                                }
+                            }
+                        }
+                        if (sb.length() > 0) {
+                            // Show dialog informing them that there are multiple script files
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    new Builder(ONScripter.this)
+                                    .setTitle(getString(R.string.app_name))
+                                    .setMessage(getString(R.string.message_multiple_script_files) + sb.toString())
+                                    .setNegativeButton(R.string.dialog_multiple_scripts_dont_show_again,
+                                            new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            mPrefs.edit().putBoolean(dontShowAgainKey, true).apply();
+                                        }
+                                    })
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .show();
+                                }
+                            });
+                        }
+                    }
+                }
+            }).start();
+        }
     }
 }

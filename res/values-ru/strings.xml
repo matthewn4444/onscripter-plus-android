@@ -14,6 +14,7 @@
     <string name="message_folder_exists">Пожалуйста, выберите другое имя</string>
     <string name="message_corrupt_save_file">Не удается загрузить поврежденный файл.\nПожалуйста, загрузите другой файл.</string>
     <string name="message_missing_label_define">Игра вылетает при запуске, возможно потому что отсутствуют некоторые файлы игры или они повреждены.\nПожалуйста, убедитесь, что вы скопировали все файлы игры должным образом.</string>
+    <string name="message_multiple_script_files">Найдено несколько скриптов для этой игры, перечисленных ниже. Будет использоваться только один скрипт, находящийся непосредственно в папке игры.\n\nНеиспользуемые:</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Настройки</string>
@@ -68,6 +69,7 @@
     <string name="dialog_add_translation">Что-бы добавить перевод для вашего языка напишите мне</string>
     <string name="dialog_create_new_folder">Создать новую папку</string>
     <string name="dialog_button_rate">Оцените приложение</string>
+    <string name="dialog_multiple_scripts_dont_show_again">ОК, больше не показывать</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">Управление</string>

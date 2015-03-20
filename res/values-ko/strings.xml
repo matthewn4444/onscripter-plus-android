@@ -16,6 +16,7 @@
     <string name="message_folder_exists">다른 폴더 이름을 선택하십시오</string>
     <string name="message_corrupt_save_file">망가진 파일을 로드할 수 없습니다.\n다른 파일을 로드하세요.</string>
     <string name="message_missing_label_define">게임을 시작할 수 없습니다. 현재 게임의 필요한 파일이 올바르지 않거나 부족합니다.\n게임의 필요한 파일을 전부 복사했는지 확실히 체크해 주세요.</string>
+    <string name="message_multiple_script_files">이 게임안에서 여러개의 스크립트 파일이 발견되었습니다. 그 중 가장 처음의 파일만 사용됩니다. \n\n사용되지 않는 파일 :</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">설정</string>
@@ -69,6 +70,7 @@
     <string name="dialog_ext_not_found"></string>
     <string name="dialog_create_new_folder">새로운 폴더</string>
     <string name="dialog_button_rate">이 앱을 평가!</string>
+    <string name="dialog_multiple_scripts_dont_show_again">네, 그만 보여주세요</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">@string/settings_controls_cate</string>
