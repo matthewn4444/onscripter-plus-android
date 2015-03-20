@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.2.2,2015년 3월 20일</item>
+        <item>게임 고정: 예익의 유스티아, 점점 더</item>
         <item>v버전 1.2.1,2015년 3월 3일</item>
         <item>고정된 게임을</item>
         <item>v버전 1.2.0,2015년 2월 17일</item>
