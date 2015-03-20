@@ -14,6 +14,7 @@
     <string name="message_folder_exists">文件夹已存在，创建新文件夹.</string>
     <string name="message_corrupt_save_file">存储文件已损坏无法加载. 请选择另一个.</string>
     <string name="message_missing_label_define">此游戏在启动的时候崩溃，因为丢失或损坏的游戏文件。\n请确认您已经正确的复制所有游戏文件到指定文件夹</string>
+    <string name="message_multiple_script_files">"在下列游戏里发现多个文本文档。只有在游戏文件夹下的文本文档会被使用。\n\n未使用:</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">设置</string>
@@ -67,6 +68,7 @@
     <string name="dialog_ext_not_found">用英语发送SD卡的位置信息到 matthewn4444@gmail.com</string>
     <string name="dialog_create_new_folder">创建新文件夹</string>
     <string name="dialog_button_rate">请给个好评!</string>
+    <string name="dialog_multiple_scripts_dont_show_again">好。不要在提示我了</string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">控制</string>

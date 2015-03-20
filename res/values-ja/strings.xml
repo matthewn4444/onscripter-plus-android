@@ -14,6 +14,7 @@
     <string name="message_folder_exists">他のフォルダ名を選択してください</string>
     <string name="message_corrupt_save_file">壊れたファイルをロードすることができません。\n別のファイルをロードしてください。</string>
     <string name="message_missing_label_define">ゲームを始めることができません。 現在、ゲームの必要なファイルが正しくない、又は不足します。\nゲームの必要なファイルを全てコピーしたのかしっかりチェックしてください。</string>
+    <string name="message_multiple_script_files">このゲームの中で複数のスクリプトファイルが発見されました。 そのうち最初のファイルだけが使用されます。\n\n使用されないファイル:</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">設定</string>
@@ -69,6 +70,7 @@
     <string name="dialog_please_wait">お待ちください&#8230;</string>
     <string name="dialog_create_new_folder">新しいフォルダー</string>
     <string name="dialog_button_rate">このアプリを評価！</string>
+    <string name="dialog_multiple_scripts_dont_show_again">OK、 このメッセージを再表示しない </string>
 
     <!-- Settings Control Display -->
     <string name="dialog_settings_controls_title">コントロール</string>
