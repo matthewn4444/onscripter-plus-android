@@ -376,7 +376,8 @@ public class BugTrackingService extends IntentService {
     private static boolean handleGameCrashesShowMessage(Context ctx, String exceptionMessage, long traceLength) {
         if (exceptionMessage != null) {
             // 'Label "define" is not found' exception that is called under 2 sec
-            if (exceptionMessage.contains("Label \"define\" is not found.") && traceLength < 2 * 1000) {
+            if (exceptionMessage.contains("Label \"define\" is not found.") && traceLength < 2 * 1000
+                || exceptionMessage.contains("Label \"l_op01\" is not found")) {
                 new AlertDialog.Builder(ctx)
                     .setTitle(R.string.app_name)
                     .setMessage(R.string.message_missing_label_define)
