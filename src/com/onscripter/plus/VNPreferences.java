@@ -87,24 +87,27 @@ public class VNPreferences {
             // Parse the JSON data
             JSONObject json;
             try {
-                json = new JSONObject(sb.toString());
-                for(Iterator<String> iter = json.keys(); iter.hasNext();) {
-                    String key = iter.next();
-                    JSONObject field = json.getJSONObject(key);
-                    String type = field.getString(JSON_NAME_TYPE);
-                    Property prop;
-                    if (type.equals(TYPE_STRING)) {
-                        prop = new Property(field.getString(JSON_NAME_VALUE));
-                    } else if (type.equals(TYPE_FLOAT)) {
-                        prop = new Property((float)field.getDouble(JSON_NAME_VALUE));
-                    } else if (type.equals(TYPE_INT)) {
-                        prop = new Property(field.getInt(JSON_NAME_VALUE));
-                    } else if (type.equals(TYPE_BOOL)) {
-                        prop = new Property(field.getBoolean(JSON_NAME_VALUE));
-                    } else {
-                        continue;       // Ignored
+                String text = sb.toString();
+                if (!text.isEmpty()) {
+                    json = new JSONObject(text.substring(text.indexOf("{"), text.lastIndexOf("}") + 1));
+                    for(Iterator<String> iter = json.keys(); iter.hasNext();) {
+                        String key = iter.next();
+                        JSONObject field = json.getJSONObject(key);
+                        String type = field.getString(JSON_NAME_TYPE);
+                        Property prop;
+                        if (type.equals(TYPE_STRING)) {
+                            prop = new Property(field.getString(JSON_NAME_VALUE));
+                        } else if (type.equals(TYPE_FLOAT)) {
+                            prop = new Property((float)field.getDouble(JSON_NAME_VALUE));
+                        } else if (type.equals(TYPE_INT)) {
+                            prop = new Property(field.getInt(JSON_NAME_VALUE));
+                        } else if (type.equals(TYPE_BOOL)) {
+                            prop = new Property(field.getBoolean(JSON_NAME_VALUE));
+                        } else {
+                            continue;       // Ignored
+                        }
+                        mData.put(key, prop);
                     }
-                    mData.put(key, prop);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
