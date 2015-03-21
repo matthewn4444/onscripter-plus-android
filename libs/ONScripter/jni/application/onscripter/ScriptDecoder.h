@@ -58,6 +58,7 @@ public:
     }
 
 private:
+    bool isKorean(char* buffer);
     static const char* name;
 };
 #endif
@@ -73,6 +74,7 @@ public:
     }
 
 private:
+    bool isChinese(char* buffer);
     static const char* name;
 };
 #endif

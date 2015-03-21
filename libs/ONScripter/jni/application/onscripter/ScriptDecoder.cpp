@@ -189,17 +189,21 @@ const char* KoreanDecoder::name = "Korean";
 
 unsigned short KoreanDecoder::convertNextChar(char* buffer)
 {
-    int n = JapaneseDecoder::convertNextChar(buffer);
-    if (n)
-        return n;
-    unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    return convKOR2UTF16(index);
+    if (isKorean(buffer)) {
+        unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
+        return convKOR2UTF16(index);
+    }
+    return JapaneseDecoder::convertNextChar(buffer);
 }
 
 bool KoreanDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (JapaneseDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
+    return isKorean(buffer) || JapaneseDecoder::canConvertNextChar(buffer, outNumBytes);
+}
+
+bool KoreanDecoder::isKorean(char* buffer)
+{
     int x = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
     // http://ftp.unicode.org/Public/MAPPINGS/VENDORS/APPLE/KOREAN.TXT
     return  /* Hangul syllables */  ((x >= 0xB0A1 && x <= 0xC8FE) \
@@ -217,17 +221,21 @@ const char* ChineseDecoder::name = "Chinese";
 
 unsigned short ChineseDecoder::convertNextChar(char* buffer)
 {
-    int n = JapaneseDecoder::convertNextChar(buffer);
-    if (n)
-        return n;
-    unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    return convGBK2UTF16(index);
+    if (isChinese(buffer)) {
+        unsigned short index = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
+        return convGBK2UTF16(index);
+    }
+    return JapaneseDecoder::convertNextChar(buffer);
 }
 
 bool ChineseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
 {
-    if (JapaneseDecoder::canConvertNextChar(buffer, outNumBytes)) return true;
     *outNumBytes = 2;
+    return isChinese(buffer) || JapaneseDecoder::canConvertNextChar(buffer, outNumBytes);
+}
+
+bool ChineseDecoder::isChinese(char* buffer)
+{
     int n = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
     return (n >= 0xA1A0 && n <= 0xfcfc) == true;
 }
