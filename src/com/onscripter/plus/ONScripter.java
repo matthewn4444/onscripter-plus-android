@@ -453,7 +453,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.add(R.id.game_wrapper, mGame);
-        transaction.commit();
+        transaction.commitAllowingStateLoss();
 
         mGame.setONScripterEventListener(this);
         mGame.setOnGameReadyListener(this);
