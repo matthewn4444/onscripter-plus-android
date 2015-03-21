@@ -1,13 +1,14 @@
 package com.onscripter.plus.ads;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 
 import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.ActivityPlus;
@@ -18,10 +19,13 @@ public class InterstitialTransActivity extends ActivityPlus {
     public static final String NextClassExtra = "next.class.extra";
     public static final String InterstitialRateExtra = "interstitial.rate.extra";
 
-    private static final int AdFailedTimeout = 2000;
+    private static final int AdFailedTimeout = 3000;
 
     private InterstitialAdHelper mInterHelper;
     private ProgressDialog mProgress;
+    private Timer mCancelTimer;
+    private boolean mNextRan = false;
+    private boolean mAdFailedToLoad = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +48,20 @@ public class InterstitialTransActivity extends ActivityPlus {
             public void onAdFailedToLoad(int errorCode) {
                 super.onAdFailedToLoad(errorCode);
 
-                // If failed to load (ad block or no Internet), 50% chance to wait 2 sec and forget showing the ad
-                if (new Random().nextBoolean()) {
-                    new Handler().postDelayed(new Runnable() {
+                synchronized (this) {
+                    if (mAdFailedToLoad) {
+                        return;
+                    }
+                    mAdFailedToLoad = true;
+                }
+
+                // If failed to load (ad block or no Internet), 50% chance to wait a few secs and forget showing the ad
+                if (mCancelTimer == null && new Random().nextBoolean()) {
+                    mCancelTimer = new Timer();
+                    mCancelTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
+                            // Cancel after timeout error
                             doNextAction();
                         }
                     }, AdFailedTimeout);
@@ -93,6 +106,15 @@ public class InterstitialTransActivity extends ActivityPlus {
     }
 
     private void doNextAction() {
+        synchronized (this) {
+            if (mNextRan) {
+                return;
+            }
+            mNextRan = true;
+            if (mCancelTimer != null) {
+                mCancelTimer.cancel();
+            }
+        }
         dismissDialog();
         Intent prevIntent = getIntent();
         String classPath = prevIntent.getStringExtra(NextClassExtra);
