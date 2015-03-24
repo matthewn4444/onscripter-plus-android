@@ -771,9 +771,6 @@ public final class ExtSDCardFix {
                         listener.onSuccess();
                     }
                     break;
-                case NO_FILE_SELECTED:      // This is pretty much impossible to happen
-                    alert(R.string.message_copy_failed_no_files);
-                    break;
                 case NO_SPACE_ERROR:
                     alert(R.string.message_copy_failed_no_space);
                     break;

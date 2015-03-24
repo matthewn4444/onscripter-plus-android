@@ -48,14 +48,13 @@ public final class CopyFilesDialogTask {
         public void onCopyCompleted(Result result);
     }
 
-    public static enum Result { SUCCESS, CANCELLED, COPY_ERROR, NO_SPACE_ERROR, NO_FILE_SELECTED };
+    public static enum Result { SUCCESS, CANCELLED, COPY_ERROR, NO_SPACE_ERROR };
 
     private final Context mCtx;
     private final CopyFilesDialogListener mListener;
     private CopyFileInfo[] mInfo;
     private final boolean mAllowUserChoice;
     private boolean mIsRunning;
-    private boolean mAtLeastSetCopy;
     private boolean mSrcFromInternalStorage;        // This limits all src to come from same storage and same for dst
     private int mStoragePathLength = 0;
     private final FileFilter mFileFilter;
@@ -113,11 +112,7 @@ public final class CopyFilesDialogTask {
     }
 
     private void scanFinished(long totalBytes) {
-        if (mAtLeastSetCopy) {
-            new InternalCopyDialogTask(totalBytes).execute();
-        } else {
-            scanFinishedUnsuccessfully(Result.NO_FILE_SELECTED);
-        }
+        new InternalCopyDialogTask(totalBytes).execute();
     }
 
     private void copyFinished(Result result) {
@@ -164,7 +159,6 @@ public final class CopyFilesDialogTask {
                     mCurrentSetHasOverwrite = true;
                 }
                 totalBytes += source.length();
-                mAtLeastSetCopy = true;
             } else {
                 if (mDirectoryFilter != null && !mDirectoryFilter.accept(source)) {
                     return 0;
@@ -203,7 +197,6 @@ public final class CopyFilesDialogTask {
         @Override
         protected Long doInBackground(Void... params) {
             long bytes = 0;
-            mAtLeastSetCopy = false;
 
             // Scan files
             for (int i = 0; i < mInfo.length; i++) {
