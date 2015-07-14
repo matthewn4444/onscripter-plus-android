@@ -1055,7 +1055,13 @@ bool ONScripter::processText()
         }
         return true;
     }
-    else if ( ch == '#' && script_h.getStringBuffer()[string_buffer_offset + 1] != ' ' ){
+    else if ( ch == '#'
+        && script_h.getStringBuffer()[string_buffer_offset + 1] != ' '
+        && script_h.getStringBuffer()[string_buffer_offset + 2] != ' '
+        && script_h.getStringBuffer()[string_buffer_offset + 3] != ' '
+        && script_h.getStringBuffer()[string_buffer_offset + 4] != ' '
+        && script_h.getStringBuffer()[string_buffer_offset + 5] != ' '
+        && script_h.getStringBuffer()[string_buffer_offset + 6] != ' ' ){
         readColor( &sentence_font.color, script_h.getStringBuffer() + string_buffer_offset );
         readColor( &ruby_font.color, script_h.getStringBuffer() + string_buffer_offset );
         string_buffer_offset += 7;
