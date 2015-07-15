@@ -615,7 +615,8 @@ void ScriptParser::readLog( ScriptHandler::LogInfo &info )
 void ScriptParser::errorAndExit( const char *str, const char *reason )
 {
     char location[1024];
-    sprintf(location, "%s:%d", current_label_info.name, current_line);
+    sprintf(location, "%s:%d -> Text line: '%s' (%d chars)", current_label_info.name, current_line,
+        script_h.getStringBuffer(), strlen(script_h.getStringBuffer()));
 
     if ( reason )
         logee( stderr, location, " *** Parse error: %s [%s] ***\n", str, reason );
