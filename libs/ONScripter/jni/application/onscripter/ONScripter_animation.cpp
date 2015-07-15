@@ -269,6 +269,32 @@ void ONScripter::parseTaggedString( AnimationInfo *anim )
     anim->num_of_cells = 1;
     anim->trans_mode = trans_mode;
 
+    // Scan text to remove spaces in color format
+    // For some reason some custom games have spaces in the color format
+    // for example: '#XXX XXX'. This causes the game to crash. The following
+    // checks and removes the space by copying to another buffer
+    char correctedBuffer[512];
+    char* ptr = correctedBuffer;
+    while (*buffer != '\0') {
+        *ptr++ = *buffer;
+        if (*buffer == '#') {
+            int i = 0;
+            buffer++;
+            while(*buffer != '\0' && i < 7) {
+                if (*buffer != ' ') {
+                    *ptr++ = *buffer;
+                    i++;
+                }
+                buffer++;
+            }
+        } else {
+            buffer++;
+        }
+    }
+    *ptr = '\0';
+    buffer = correctedBuffer;
+
+
     if ( buffer[0] == ':' ){
         while (*++buffer == ' ');
         
