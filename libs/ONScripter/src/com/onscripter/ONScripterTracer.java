@@ -242,10 +242,7 @@ public class ONScripterTracer {
                                 if (line != null) {
                                     parts = line.split(",");
                                     if (parts[1].charAt(0) == LOAD_EVENT) {
-                                        if (parts.length < 2) {
-                                            toast("Playback cannot load because too little arguments");
-                                            return;
-                                        }
+                                        String saveDirectoryName = parts[1].substring(1);
 
                                         // See if the save file is in the downloads folder
                                         File saveFile = new File(Environment.getExternalStoragePublicDirectory(
@@ -256,7 +253,7 @@ public class ONScripterTracer {
                                         }
 
                                         // Copy the save file from Downloads folder to game save folder as save1.dat
-                                        File dst = new File(mGame.rootFolder + "/" + (parts.length >= 4 ? parts[3] : "") + "save1.dat");
+                                        File dst = new File(mGame.rootFolder + "/" + (saveDirectoryName.length() > 0 ? saveDirectoryName : "") + "save1.dat");
                                         if (!copy(saveFile, dst)) {
                                             toast("Playback failed because could not copy save file");
                                             return;
