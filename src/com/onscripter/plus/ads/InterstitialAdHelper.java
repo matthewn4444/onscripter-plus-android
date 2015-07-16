@@ -36,6 +36,9 @@ public class InterstitialAdHelper {
     private Timer mCancelTimer;
     private boolean mCancel = false;
 
+    // Add an extra error for adblocking
+    static final public int ERROR_CODE_ADBLOCK_ERROR = AdRequest.ERROR_CODE_NETWORK_ERROR + 1;
+
     // Constants to decide whether to show the InterstitialAds now or later
     //      Notice how the first time and next time after seeing an ad, the
     //      percentage would be (close to) 0%
@@ -90,21 +93,6 @@ public class InterstitialAdHelper {
                 buildAd();
             }
         }
-
-        // Detect ads, just cancel showing the interstitial; need to be threaded
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if (Adblocker.check()) {
-                    mAct.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            handleAdLoadFail(AdRequest.ERROR_CODE_NETWORK_ERROR);
-                        }
-                    });
-                }
-            }
-        }).start();
     }
 
     /**
@@ -142,6 +130,7 @@ public class InterstitialAdHelper {
                             @Override
                             public void run() {
                                 if (mListener != null) {
+
                                     mListener.onAdFailedToLoad(AdRequest.ERROR_CODE_NETWORK_ERROR);
                                     mListener.onAdDismiss();
                                 }
@@ -266,15 +255,17 @@ public class InterstitialAdHelper {
 
     private void handleAdLoadFail(int errorCode) {
         removeOverlay();
-        mCancel = true;
-        if (!mCancel && mCancelTimer != null) {
-            mCancelTimer.cancel();
-        }
-        if (mListener != null) {
-            mListener.onAdFailedToLoad(errorCode);
-            if (mOverlay != null) {
-                // Show when overlay is shown
-                mListener.onAdDismiss();
+        if (!mCancel) {
+            mCancel = true;
+            if (mCancelTimer != null) {
+                mCancelTimer.cancel();
+            }
+            if (mListener != null) {
+                mListener.onAdFailedToLoad(errorCode);
+                if (mOverlay != null) {
+                    // Show when overlay is shown
+                    mListener.onAdDismiss();
+                }
             }
         }
     }
@@ -303,6 +294,21 @@ public class InterstitialAdHelper {
             }
         });
 
+        // Detect ads, just cancel showing the interstitial; need to be threaded
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (Adblocker.check()) {
+                    mAct.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            handleAdLoadFail(ERROR_CODE_ADBLOCK_ERROR);
+                        }
+                    });
+                }
+            }
+        }).start();
+
         mAd = new InterstitialAd(mAct);
         mAd.setAdUnitId(mAct.getString(R.string.admob_interstitial_key));
         final AdRequest adRequest = new AdRequest.Builder().build();
@@ -326,15 +332,17 @@ public class InterstitialAdHelper {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
-                if (!mCancel && mCancelTimer != null) {
-                    mCancelTimer.cancel();
-                }
-                if (mListener != null) {
-                    mListener.onAdLoaded();
-                }
-                // Waited for the ad to load
-                if (mOverlay != null) {
-                    internalShow();
+                if (!mCancel) {
+                    if (mCancelTimer != null) {
+                        mCancelTimer.cancel();
+                    }
+                    if (mListener != null) {
+                        mListener.onAdLoaded();
+                    }
+                    // Waited for the ad to load
+                    if (mOverlay != null) {
+                        internalShow();
+                    }
                 }
             }
             @Override
