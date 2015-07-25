@@ -3,6 +3,9 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.2.3,2015년 7월 25일</item>
+        <item>비디오 고친　（달에 다가서는 소녀의 작법2, 나츠이로레시피）</item>
+        <item>많은 버그를 고쳤다 (리틀버스터즈)</item>
         <item>v버전 1.2.2,2015년 3월 20일</item>
         <item>게임 고정: 예익의 유스티아, 점점 더</item>
         <item>v버전 1.2.1,2015년 3월 3일</item>

@@ -6,6 +6,9 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.2.3,7/25/2015</item>
+        <item>Fixed games crashing when \'#\' is used in the script</item>
+        <item>Fixed a lot of videos that didn\'t run before (Umineko, Tsuki ni yorisou otome no sahou 2, etc)</item>
         <item>vVersion 1.2.2,3/20/2015</item>
         <item>Added "ext_card" and "MicroSD" paths as external sdcard cards</item>
         <item>Fix several Korean translated games (Hotch Kiss, Auyoki no Eustia, Princess Frontier)</item>
