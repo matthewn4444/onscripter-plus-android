@@ -1181,15 +1181,15 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
         if ( cr_flag && ch != 0x0a ){
             *(*buf)++ = 0x0a;
             newline_flag = true;
+            newlabel_flag = false;
             cr_flag = false;
         }
     
-        if ( ch == '*' && newline_flag && !newlabel_flag){
+        // Accept multiple labels on the same line, even though the extra label is useless
+        if ( ch == '*' && ((newline_flag && !newlabel_flag) || newlabel_flag)) {
             num_of_labels++;
             newlabel_flag = true;
         }
-        else
-            newlabel_flag = false;
 
         if ( ch == 0x0d ){
             cr_flag = true;
@@ -1198,6 +1198,7 @@ int ScriptHandler::readScriptSub( FILE *fp, char **buf, int encrypt_mode )
         if ( ch == 0x0a ){
             *(*buf)++ = 0x0a;
             newline_flag = true;
+            newlabel_flag = false;
             cr_flag = false;
         }
         else{
