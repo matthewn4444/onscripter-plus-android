@@ -234,10 +234,36 @@ bool ChineseDecoder::canConvertNextChar(char* buffer, int* outNumBytes)
     return isChinese(buffer) || JapaneseDecoder::canConvertNextChar(buffer, outNumBytes);
 }
 
+/*
+ * Chinese is detected by multiple of regions
+ * The area from 0xa1a1->0xa954 are exceptions where
+ * non-Chinese looking characters are placed. All Chinese
+ * characters range from 0xaa40->0xafa0, 0xb040->0xf7fe and
+ * 0xf840->0xfca0. The first and last ranges are from 0xXX40->0xXXC0
+ * while the middle is from 0xXX40->0xXXfe
+ */
 bool ChineseDecoder::isChinese(char* buffer)
 {
     int n = (*buffer & 0xFF) << 8 | (buffer[1] & 0xFF);
-    return (n >= 0xA1A0 && n <= 0xfcfc) == true;
+
+    // Chinese characters
+    if (n >= 0xb040 && n <= 0xf7fe) {
+        return (buffer[1] >= 0x40 && buffer[1] <= 0xFE) == true;
+    }
+    else if ((n >= 0xaa40 && n <= 0xafa0) || (n >= 0xf840 && n <= 0xfca0)) {
+        return (buffer[1] >= 0x40 && buffer[1] <= 0xA0) == true;
+    }
+    else if (n < 0xaa40) {
+        // Non-Chinese characters
+        if (n >= 0xa1a1 && n <= 0xa6d8) {
+            return (buffer[1] >= 0xA1 && buffer[1] <= 0xFF) == true;
+        }
+        // Exceptions, non-Chinese characters
+        else if ((n >= 0xa840 && n <= 0xa8e9) || (n >= 0xa940 && n <= 0xa954)) {
+            return true;
+        }
+    }
+    return false;
 }
 #endif
 
