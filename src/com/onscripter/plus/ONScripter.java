@@ -58,6 +58,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
     private static final String[] mIgnoreGameExceptions = {
         "getparam: not in a subroutine",
+        "return: not in gosub",
+        "can't open gloval.sav for writing",
     };
 
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
