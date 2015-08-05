@@ -565,6 +565,10 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         }
 
         if (isDirectoryONScripterGame(currentDir)) {
+            if (!new File(currentDir + "/arc.nsa").exists()) {
+                alert("arc.nsa does not exist!");
+                return;
+            }
             // Prevent PONScripter games from running and crashing
             VNPreferences pref = ExtSDCardFix.getGameVNPreference(currentDir.getPath());
             if (pref != null) {
