@@ -135,6 +135,11 @@ public class BugTrackingService extends IntentService {
                     return;
                 }
 
+                // Only send if the log time is longer than 1 second
+                if (Long.parseLong(params[3], 10) < 1000) {
+                    return;
+                }
+
                 Intent in = new Intent(ctx, BugTrackingService.class);
                 in.putExtra(INTENT_KEY_EXCEPTION_MSG, params[0]);
                 in.putExtra(INTENT_KEY_GAME_NAME, params[1]);
