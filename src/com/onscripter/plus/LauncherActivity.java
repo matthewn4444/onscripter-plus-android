@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 
 import android.app.AlertDialog;
@@ -444,6 +445,15 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         }
 
         if (isDirectoryONScripterGame(currentDir)) {
+            // Prevent PONScripter games from running and crashing
+            VNPreferences pref = ExtSDCardFix.getGameVNPreference(currentDir.getPath());
+            if (pref != null) {
+                String name = pref.getString(GAME_PREF_NAME_KEY, null);
+                if (name.toLowerCase(Locale.getDefault()).contains("ponscripter")) {
+                    alert(getString(R.string.message_ponscripter_not_supported));
+                    return;
+                }
+            }
             startONScripterCheckFont(currentDir.getPath());
         } else {
             mAdapter.setChildAsCurrent(position);
