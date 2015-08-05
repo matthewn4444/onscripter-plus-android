@@ -51,6 +51,7 @@
     <string name="message_corrupt_save_file">Cannot load save file because it is corrupted. Please choose another.</string>
     <string name="message_missing_label_define">The game crashed on game start up because it was missing game files or they were corrupted.\nPlease make sure you have copied all the game files properly.</string>
     <string name="message_multiple_script_files">Found multiple scripts files for this game listed below. Only the script file in the immediate game folder will be used.\n\nUnused:</string>
+    <string name="message_ponscripter_not_supported">Cannot run this game because PONScripter games are not supported.</string>
 
     <!-- ActionBar -->
     <string name="menu_action_settings">Settings</string>
