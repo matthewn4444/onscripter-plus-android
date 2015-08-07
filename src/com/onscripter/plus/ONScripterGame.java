@@ -314,6 +314,14 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
         }
     }
 
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGame != null && mONScVideoThread == null) {
+            mGame.onStop();
+        }
+    }
+
     public void onUserLeaveHint()
     {
         if( mGame != null && mONScVideoThread == null) {

@@ -99,6 +99,8 @@ public class ONScripterView extends TracedONScripterView {
     private static UpdateHandler sHandler;
 
     private ONScripterEventListener mListener;
+    boolean mIsVideoPlaying = false;
+    boolean mHasUserLeaveHint = false;
 
     public interface ONScripterEventListener {
         public void autoStateChanged(boolean selected);
@@ -184,6 +186,13 @@ public class ONScripterView extends TracedONScripterView {
     public void onResume() {
         super.onResume();
         mAudioThread.onResume();
+        mHasUserLeaveHint = false;
+    }
+
+    public void onStop() {
+        if (mHasUserLeaveHint) {
+            super.onUserLeaveHint();
+        }
     }
 
     public int getGameWidth() {
@@ -198,6 +207,14 @@ public class ONScripterView extends TracedONScripterView {
         nativeSetSentenceFontScale(scaleFactor);
     }
 
+    @Override
+    public void onUserLeaveHint() {
+        mHasUserLeaveHint = true;
+        if (!mIsVideoPlaying) {
+            super.onUserLeaveHint();
+        }
+    }
+
     public void playVideo(char[] filename, boolean clickToSkip, boolean shouldLoop){
         if (!allowVideo()) {
             return;
@@ -205,8 +222,10 @@ public class ONScripterView extends TracedONScripterView {
         if (mListener != null) {
             File video = new File(mCurrentDirectory + "/" + new String(filename).replace("\\", "/"));
             if (video.exists() && video.canRead()) {
+                mIsVideoPlaying = true;
                 ONScripterTracer.traceVideoStartEvent();
                 mListener.videoRequested(video.getAbsolutePath(), clickToSkip, shouldLoop);
+                mIsVideoPlaying = false;
             } else {
                 Log.e("ONScripterView", "Cannot play video because it either does not exist or cannot be read. File: " + video.getPath());
             }
