@@ -62,6 +62,9 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         "can't open gloval.sav for writing",
         "Label \"l_000\" is not found.",
         "can't open font file: default.ttf",
+        "Label \"l_\" is not found",
+        "cannot load corrupt save file",
+        "text cannot be displayed in define section",
     };
 
     private static int HIDE_CONTROLS_TIMEOUT_SECONDS = 0;
