@@ -28,6 +28,7 @@
 #define CHECK_EOF() \
     if (file_io_buf_ptr >= file_io_buf_len) { \
         logw(stderr, "Save file is corrupted because file is too small."); \
+        sendUserMessage(ANDROID_MSG_CORRUPT_SAVE_FILE); \
         return -1; \
     }
 
@@ -106,6 +107,7 @@ int ONScripter::loadSaveFile2( int file_version )
             CHECK_EOF();
             if (!temp_int) {
                 logw(stderr, "Save file is corrupted because data is 0");
+                sendUserMessage(ANDROID_MSG_CORRUPT_SAVE_FILE);
                 return -1;
             }
             SCAN_MULTI(1, readInt);
@@ -170,6 +172,7 @@ int ONScripter::loadSaveFile2( int file_version )
         CHECK_EOF();
         if (!temp_int) {
             logw(stderr, "Save file is corrupted because current line cannot be negative");
+            sendUserMessage(ANDROID_MSG_CORRUPT_SAVE_FILE);
             return -1;
         }
     }
