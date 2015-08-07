@@ -5,6 +5,12 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.2.4,8/7/2015</item>
+        <item>Fixed freezing when not choosing an external video player</item>
+        <item>Added more error messages for corrupted save files</item>
+        <item>Fixed rendering text for all Korean games</item>
+        <item>Blocked PONScripter games</item>
+        <item>Fixed Moon of Darkness from crashing on startup (Chinese)</item>
         <item>vVersion 1.2.3,7/25/2015</item>
         <item>Fixed games crashing when \'#\' is used in the script</item>
         <item>Fixed a lot of videos that didn\'t run before (Umineko, Tsuki ni yorisou otome no sahou 2, etc)</item>
