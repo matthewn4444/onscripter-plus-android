@@ -1,7 +1,5 @@
 package com.onscripter.plus.settings;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -14,7 +12,6 @@ import com.onscripter.plus.R;
 import com.onscripter.plus.Settings;
 import com.onscripter.plus.settings.LayoutPreference.OnLayoutViewCreatedListener;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class AboutSettingsFragment extends PreferenceFragment implements OnPreferenceClickListener {
     private ChangeLog mChangeLog;
 

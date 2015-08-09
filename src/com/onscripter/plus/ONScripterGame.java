@@ -1,6 +1,7 @@
 package com.onscripter.plus;
 
 import android.app.Activity;
+import android.app.Fragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import com.actionbarsherlock.app.SherlockFragment;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.onscripter.ONScripterView.UserMessage;
@@ -23,7 +23,7 @@ import com.vplayer.VPlayerListener;
 import com.vplayer.VPlayerView;
 import com.vplayer.exception.VPlayerException;
 
-public class ONScripterGame extends SherlockFragment implements ONScripterEventListener {
+public class ONScripterGame extends Fragment implements ONScripterEventListener {
     private ONScripterView mGame;
     private VPlayerView mPlayer = null;
     private Thread mONScVideoThread = null;
