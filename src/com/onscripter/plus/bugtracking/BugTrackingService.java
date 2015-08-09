@@ -29,7 +29,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.bugsense.trace.BugSenseHandler;
-import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.R;
 import com.onscripter.plus.bugtracking.ModifyServerRequest.METHOD;
 

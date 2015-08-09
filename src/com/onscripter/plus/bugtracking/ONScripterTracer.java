@@ -1,4 +1,4 @@
-package com.onscripter;
+package com.onscripter.plus.bugtracking;
 
 import java.io.BufferedReader;
 import java.io.File;

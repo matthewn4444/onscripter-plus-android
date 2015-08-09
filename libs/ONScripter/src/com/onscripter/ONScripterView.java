@@ -24,7 +24,7 @@ import com.onscripter.exception.NativeONSException;
  * @author Matthew Ng
  *
  */
-public class ONScripterView extends TracedONScripterView {
+public class ONScripterView extends DemoGLSurfaceView {
 
     private static final int MSG_AUTO_MODE = 1;
     private static final int MSG_SKIP_MODE = 2;
@@ -216,14 +216,10 @@ public class ONScripterView extends TracedONScripterView {
     }
 
     public void playVideo(char[] filename, boolean clickToSkip, boolean shouldLoop){
-        if (!allowVideo()) {
-            return;
-        }
         if (mListener != null) {
             File video = new File(mCurrentDirectory + "/" + new String(filename).replace("\\", "/"));
             if (video.exists() && video.canRead()) {
                 mIsVideoPlaying = true;
-                ONScripterTracer.traceVideoStartEvent();
                 mListener.videoRequested(video.getAbsolutePath(), clickToSkip, shouldLoop);
                 mIsVideoPlaying = false;
             } else {
@@ -232,9 +228,7 @@ public class ONScripterView extends TracedONScripterView {
         }
     }
 
-    @Override
     public void receiveException(String message, String currentLineBuffer, String backtrace) {
-        super.receiveException(message, currentLineBuffer, backtrace);
         if (currentLineBuffer != null) {
             Log.e("ONScripter", message + "\nCurrent line: " + currentLineBuffer + "\n" + backtrace);
         } else {

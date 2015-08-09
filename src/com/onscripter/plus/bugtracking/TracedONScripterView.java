@@ -1,4 +1,4 @@
-package com.onscripter;
+package com.onscripter.plus.bugtracking;
 
 import java.io.File;
 
@@ -6,16 +6,20 @@ import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.os.Environment;
 
-class TracedONScripterView extends DemoGLSurfaceView {
+import com.onscripter.ONScripterView;
+
+public class TracedONScripterView extends ONScripterView {
 
     private ONScripterTracer.Playback mPlayback;
     final String rootFolder;
+    final String mCurrentDirectory;
 
     public TracedONScripterView(Activity context, String currentDirectory,
             String fontPath, String savePath, boolean useHQAudio,
             boolean shouldRenderOutline) {
         super(context, currentDirectory, fontPath, savePath, useHQAudio, shouldRenderOutline);
 
+        mCurrentDirectory = currentDirectory;
         rootFolder = savePath != null ? savePath : currentDirectory;
 
 //        String traceFile = getContext().getApplicationContext().getFilesDir() + "/" + ONScripterTracer.TRACE_FILE_NAME;
@@ -39,7 +43,9 @@ class TracedONScripterView extends DemoGLSurfaceView {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    @Override
     public void receiveException(String message, String currentLineBuffer, String backtrace) {
+        super.receiveException(message, currentLineBuffer, backtrace);
         if (mPlayback != null) {
             mPlayback.stop();
             mPlayback = null;
@@ -94,6 +100,17 @@ class TracedONScripterView extends DemoGLSurfaceView {
             ONScripterTracer.traceMouseEvent(x, y, action);
         }
         super.nativeMouse(x, y, action);
+    }
+
+    @Override
+    public void playVideo(char[] filename, boolean clickToSkip, boolean shouldLoop) {
+        if (allowVideo()) {
+            File video = new File(mCurrentDirectory + "/" + new String(filename).replace("\\", "/"));
+            if (video.exists() && video.canRead()) {
+                ONScripterTracer.traceVideoStartEvent();
+            }
+            super.playVideo(filename, clickToSkip, shouldLoop);
+        }
     }
 
     /**
