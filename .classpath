@@ -9,8 +9,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/google-play-services_lib"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/VPlayer_library"/>
 	<classpathentry exported="true" kind="lib" path="/google-play-services_lib/libs/google-play-services.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/onscripter-engine-android"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ONScripter"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

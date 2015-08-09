@@ -1,3 +1,6 @@
 [submodule "libs/VPlayer_lib"]
 	path = libs/VPlayer_lib
 	url = git@github.com:matthewn4444/VPlayer_lib.git
+[submodule "libs/onscripter-engine-android"]
+	path = libs/onscripter-engine-android
+	url = git@github.com:matthewn4444/onscripter-engine-android.git
