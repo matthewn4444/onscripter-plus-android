@@ -6,8 +6,8 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ONScripter"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/actionbarsherlock"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/VPlayer_library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/onscripter-engine-android"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
