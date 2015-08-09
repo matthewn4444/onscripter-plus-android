@@ -35,11 +35,11 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.ExtSDCardFix.OnSDCardFixListener;
 import com.onscripter.plus.FileSystemAdapter.CustomFileTypeParser;
 import com.onscripter.plus.FileSystemAdapter.LIST_ITEM_TYPE;
 import com.onscripter.plus.bugtracking.BugTrackingService;
+import com.onscripter.plus.bugtracking.ONScripterTracer;
 
 public class LauncherActivity extends ActivityPlus implements AdapterView.OnItemClickListener, CustomFileTypeParser
 {

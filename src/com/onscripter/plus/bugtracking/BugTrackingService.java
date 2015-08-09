@@ -28,7 +28,6 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.onscripter.ONScripterTracer;
 import com.onscripter.plus.R;
 import com.onscripter.plus.bugtracking.ModifyServerRequest.METHOD;
 

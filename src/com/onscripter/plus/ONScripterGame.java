@@ -12,11 +12,12 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.actionbarsherlock.app.SherlockFragment;
-import com.onscripter.ONScripterTracer;
 import com.onscripter.ONScripterView;
 import com.onscripter.ONScripterView.ONScripterEventListener;
 import com.onscripter.ONScripterView.UserMessage;
 import com.onscripter.exception.NativeONSException;
+import com.onscripter.plus.bugtracking.ONScripterTracer;
+import com.onscripter.plus.bugtracking.TracedONScripterView;
 import com.vplayer.MediaStreamInfo;
 import com.vplayer.VPlayerListener;
 import com.vplayer.VPlayerView;
@@ -95,7 +96,7 @@ public class ONScripterGame extends SherlockFragment implements ONScripterEventL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
         Bundle b = getArguments();
-        mGame = new ONScripterView(getActivity(), b.getString(GameDirectoryKey),
+        mGame = new TracedONScripterView(getActivity(), b.getString(GameDirectoryKey),
                 b.getString(FontPathKey), b.getString(SavePathKey), b.getBoolean(HQAudioKey),
                 b.getBoolean(RenderOutlineKey));
         mGame.setONScripterEventListener(this);
