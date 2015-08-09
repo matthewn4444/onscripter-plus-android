@@ -25,12 +25,7 @@ public class FolderBrowserDialogPreference extends DialogPreference {
 
         setPositiveButtonText(R.string.dialog_select_button_text);
         setNegativeButtonText(android.R.string.cancel);
-
-        // Apply the layout for ics and up
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion > context.getResources().getInteger(R.integer.gingerbread_version)) {
-            setLayoutResource(R.layout.dialog_preference);
-        }
+        setLayoutResource(R.layout.dialog_preference);
     }
 
     @Override

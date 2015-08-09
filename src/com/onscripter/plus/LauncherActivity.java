@@ -29,6 +29,9 @@ import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -38,9 +41,6 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -162,7 +162,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
         listView.setAdapter(mAdapter);
         listView.setOnItemClickListener(this);
         if (themeName.equals(defaultThemeName)) {
-            listView.setBackgroundColor(getResources().getColor(R.color.abs__background_holo_light));
+            listView.setBackgroundColor(getResources().getColor(android.R.color.background_light));
         }
         setContentView(listView);
 
@@ -397,7 +397,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-       MenuInflater inflater = getSupportMenuInflater();
+       MenuInflater inflater = getMenuInflater();
        inflater.inflate(R.menu.menu_launcher, menu);
        mMenu = menu;
        updateSaveFolderItemVisibility();

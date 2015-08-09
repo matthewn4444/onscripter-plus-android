@@ -6,7 +6,7 @@ import java.util.Calendar;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.InterstitialAd;
 import com.onscripter.plus.Adblocker;
@@ -169,14 +167,9 @@ public class InterstitialAdHelper {
                 mOverlay = new FrameLayout(mAct);
                 mOverlay.setBackgroundColor(Color.BLACK);
                 fl.addView(mOverlay);
-                boolean userHasActionbar = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB;
-                if (mAct instanceof SherlockActivity) {
-                    ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
-                    if (bar != null) {
-                        bar.hide();
-                    }
-                } else if (userHasActionbar) {
-                    showHideActionBarAPI11(mAct, false);
+                ActionBar bar = mAct.getActionBar();
+                if (bar != null) {
+                    bar.hide();
                 }
                 mAct.getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
             }
@@ -193,29 +186,12 @@ public class InterstitialAdHelper {
                     }
                     mOverlay = null;
                     mAct.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                    boolean userHasActionbar = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB;
-                    if (mAct instanceof SherlockActivity) {
-                        ActionBar bar = ((SherlockActivity)mAct).getSupportActionBar();
-                        if (bar != null) {
-                            bar.show();
-                        }
-                    } else if (userHasActionbar) {
-                        showHideActionBarAPI11(mAct, true);
+                    ActionBar bar = mAct.getActionBar();
+                    if (bar != null) {
+                        bar.hide();
                     }
                 }
             });
-        }
-    }
-
-    @TargetApi(11)
-    private void showHideActionBarAPI11(Activity act, boolean show) {
-        android.app.ActionBar bar = act.getActionBar();
-        if (bar != null) {
-            if (show) {
-                bar.show();
-            } else {
-                bar.hide();
-            }
         }
     }
 

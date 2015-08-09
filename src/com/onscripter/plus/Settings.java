@@ -2,30 +2,28 @@ package com.onscripter.plus;
 
 import java.util.List;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources.Theme;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockPreferenceActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.bugsense.trace.BugSenseHandler;
 import com.onscripter.plus.settings.AboutSettingsFragment;
 import com.onscripter.plus.settings.GeneralSettingsFragment;
 import com.onscripter.plus.settings.LayoutPreference;
 import com.onscripter.plus.settings.LayoutPreference.OnLayoutViewCreatedListener;
 
-public final class Settings extends SherlockPreferenceActivity implements OnPreferenceClickListener {
+public final class Settings extends PreferenceActivity implements OnPreferenceClickListener {
     private ChangeLog mChangeLog;
 
     // TODO when removing 2.X dependency, put the fragment classes back
@@ -55,7 +53,7 @@ public final class Settings extends SherlockPreferenceActivity implements OnPref
     @SuppressWarnings("deprecation")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB && ValidFragments == null) {
+        if (ValidFragments == null) {
             ValidFragments = new String[]{
                 GeneralSettingsFragment.class.getName(),
                 AboutSettingsFragment.class.getName()
@@ -66,8 +64,8 @@ public final class Settings extends SherlockPreferenceActivity implements OnPref
             BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
         }
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(R.string.menu_action_settings);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle(R.string.menu_action_settings);
 
         if (!isLargeTablet()) {
             // Old way of setting preferences for smaller devices
@@ -88,7 +86,6 @@ public final class Settings extends SherlockPreferenceActivity implements OnPref
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onBuildHeaders(List<Header> target) {
         if (isLargeTablet()) {
@@ -127,8 +124,7 @@ public final class Settings extends SherlockPreferenceActivity implements OnPref
 
     private boolean isLargeTablet() {
         return (getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-                >= Configuration.SCREENLAYOUT_SIZE_XLARGE
-                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+                >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     private boolean isDebug() {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Light" parent="@style/Theme.Sherlock.Light.DarkActionBar">
+    <style name="Theme.Light" parent="@android:style/Theme.DeviceDefault.Light.DarkActionBar">
         <item name="android:listViewStyle">@style/ListViewStyle.Light</item>
         <item name="folderUpImage">@drawable/ic_folder_up_light</item>
         <item name="fileImage">@drawable/ic_file_light</item>
@@ -9,7 +9,7 @@
         <item name="sdcardImage">@drawable/ic_action_sd_storage</item>
         <item name="plusImage">@drawable/ic_action_new</item>
     </style>
-    <style name="Theme.Dark" parent="@style/Theme.Sherlock">
+    <style name="Theme.Dark" parent="@android:style/Theme.DeviceDefault">
         <item name="android:listViewStyle">@style/ListViewStyle.Dark</item>
         <item name="folderUpImage">@drawable/ic_folder_up_dark</item>
         <item name="fileImage">@drawable/ic_file_dark</item>

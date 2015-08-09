@@ -4,10 +4,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.HashMap;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -19,8 +20,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
@@ -304,7 +303,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         fitGameOnScreen();
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void initImmersiveListeners() {
         mImmersiveHandler = new Handler();
         View v = getWindow().getDecorView();
@@ -338,8 +336,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     @SuppressWarnings("deprecation")
-    @SuppressLint("NewApi")
     private void getScreenDimensions(Point outDimensions) {
         Display disp = ((WindowManager)this.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
@@ -354,7 +352,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-    @SuppressLint("NewApi")
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void invokeFullscreen() {
         int version = android.os.Build.VERSION.SDK_INT;
         if (version >= android.os.Build.VERSION_CODES.KITKAT) {
@@ -365,24 +363,19 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
                   | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                   | View.SYSTEM_UI_FLAG_FULLSCREEN
                   | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        } else if (version >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+        } else {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private void showVNDialog() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
-            // Android 3.2+: a hack to not show the navigation bar when dialogs are shown
-            Window dialogWin = mDialog.getWindow();
-            dialogWin.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-            mDialog.show();
-            dialogWin.getDecorView().setSystemUiVisibility(
-                    getWindow().getDecorView().getSystemUiVisibility());
-            dialogWin.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
-        } else {
-            mDialog.show();
-        }
+        // Android 3.2+: a hack to not show the navigation bar when dialogs are shown
+        Window dialogWin = mDialog.getWindow();
+        dialogWin.setFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
+        mDialog.show();
+        dialogWin.getDecorView().setSystemUiVisibility(
+                getWindow().getDecorView().getSystemUiVisibility());
+        dialogWin.clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE);
     }
 
     private void updateControlPreferences() {
@@ -457,7 +450,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
 
         // Attach the game fragment
-        FragmentManager fm = getSupportFragmentManager();
+        FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.add(R.id.game_wrapper, mGame);
         transaction.commitAllowingStateLoss();
@@ -557,7 +550,6 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         }
     }
 
-    @SuppressLint("NewApi")
     @Override
     protected void onResume()
     {
@@ -565,8 +557,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
 
         // For Android 4-4.3, it will show low profile
         int version = android.os.Build.VERSION.SDK_INT;
-        if (version >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH
-                && version < android.os.Build.VERSION_CODES.KITKAT) {
+        if (version < android.os.Build.VERSION_CODES.KITKAT) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE);
         } else if (version >= android.os.Build.VERSION_CODES.KITKAT) {
             invokeFullscreen();

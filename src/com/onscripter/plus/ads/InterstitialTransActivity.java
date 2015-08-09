@@ -47,11 +47,9 @@ public class InterstitialTransActivity extends ActivityPlus {
         getWindow().getDecorView().setBackgroundColor(Color.BLACK);
 
         // Hide controls...
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            View decorView = getWindow().getDecorView();
-            int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            decorView.setSystemUiVisibility(uiOptions);
-        }
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        decorView.setSystemUiVisibility(uiOptions);
 
         int adRate = getIntent().getIntExtra(InterstitialRateExtra, 0);
         mInterHelper = new InterstitialAdHelper(this, adRate);

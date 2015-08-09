@@ -4,8 +4,8 @@
       android:versionCode="46"
       android:versionName="1.2.4">
 
-      <uses-sdk android:minSdkVersion="9"
-        android:targetSdkVersion="18"/>
+      <uses-sdk android:minSdkVersion="16"
+        android:targetSdkVersion="22"/>
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
     <uses-permission android:name="android.permission.WAKE_LOCK"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>    
@@ -31,7 +31,7 @@
 
         <activity android:name="com.onscripter.plus.ONScripter"
                   android:label="@string/app_name"
-                  android:theme="@style/Theme.Sherlock.NoActionBar"
+                  android:theme="@style/Theme.Light"
                   android:screenOrientation="landscape"
                   android:configChanges="orientation|keyboardHidden|screenSize">
         </activity>
@@ -51,7 +51,7 @@
 
        <activity android:name="com.onscripter.plus.ads.InterstitialTransActivity"
                   android:label="@string/app_name"
-                  android:theme="@style/Theme.Sherlock.NoActionBar"
+                  android:theme="@style/Theme.Light"
                   android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <!-- Google Analytics Version v4 needs this value for easy tracking -->
