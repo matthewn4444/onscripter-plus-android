@@ -1,0 +1,4 @@
+include ':app'
+include ':onscripter-engine-android'
+include ':VPlayer_library'
+project(':VPlayer_library').projectDir = new File(settingsDir, 'VPlayer_lib/VPlayer_library')
