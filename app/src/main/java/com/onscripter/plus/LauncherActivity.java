@@ -453,7 +453,7 @@ public class LauncherActivity extends ActivityPlus implements AdapterView.OnItem
             VNPreferences pref = ExtSDCardFix.getGameVNPreference(currentDir.getPath());
             if (pref != null) {
                 String name = pref.getString(GAME_PREF_NAME_KEY, null);
-                if (name.toLowerCase(Locale.getDefault()).contains("ponscripter")) {
+                if (name != null && name.toLowerCase(Locale.getDefault()).contains("ponscripter")) {
                     alert(getString(R.string.message_ponscripter_not_supported));
                     return;
                 }
