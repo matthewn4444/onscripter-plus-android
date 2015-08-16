@@ -234,6 +234,11 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     }
 
     @Override
+    public void onGameFinished() {
+        finish();
+    }
+
+    @Override
     public void onReady() {
         fitGameOnScreen();
     }
@@ -412,8 +417,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
         case R.id.controls_quit_button:
             removeHideControlsTimer();
             mGame.exitApp();
-            refreshTimer = false;
-            break;
+            return;
         case R.id.controls_change_speed_button:
             mGame.sendNativeKeyPress(KeyEvent.KEYCODE_O);
             break;

@@ -294,6 +294,13 @@ public class ONScripterGame extends Fragment implements ONScripterEventListener 
     }
 
     @Override
+    public void onGameFinished() {
+        if (mListener != null) {
+            mListener.onGameFinished();
+        }
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
         if (mPlayer != null && mONScVideoThread != null) {
