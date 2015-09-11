@@ -299,7 +299,7 @@ public class GameUtils {
         return
         /* Hangul syllables */  ((n >= 0xB0A1 && n <= 0xC8FE)
         /* Standard Korean */ || (n >= 0xA141 && n <= 0xA974)
-        /* Chinese Gylphs */  || (n >= 0xEFA1 && n <= 0xFDFE)
+        /* Chinese Gylphs */  || (n >= 0xD0A1 && n <= 0xFDFE)
                                     ) == true;
     }
 }
