@@ -26,6 +26,13 @@ public final class Environment2 {
         "/storage/MicroSD",
         "/sdcard2",
         "/storage/ext_sd",
+        "/sdcard0",
+        "/mnt/sdcard0",
+        "/storage/0000-0000",
+        "/mnt/sdcard/",
+        "/storage/0123-4567/",
+        "/storage/0390-D513/",
+        "/storage/589A-20AC",
     };
     private static boolean HasScanned = false;
 
