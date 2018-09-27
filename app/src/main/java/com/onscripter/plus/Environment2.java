@@ -1,6 +1,7 @@
 package com.onscripter.plus;
 
 import java.io.File;
+import java.io.FileFilter;
 
 import android.annotation.SuppressLint;
 import android.os.Environment;
@@ -28,11 +29,7 @@ public final class Environment2 {
         "/storage/ext_sd",
         "/sdcard0",
         "/mnt/sdcard0",
-        "/storage/0000-0000",
         "/mnt/sdcard/",
-        "/storage/0123-4567/",
-        "/storage/0390-D513/",
-        "/storage/589A-20AC",
     };
     private static boolean HasScanned = false;
 
@@ -83,18 +80,39 @@ public final class Environment2 {
     static public void reScan() {
         ExternalSDCardStorageFile = null;
         InternalStorageFile = Environment.getExternalStorageDirectory();
-        for (int i = 0; i < EXTERNAL_SD_DIR.length; i++) {
-            File file = new File(EXTERNAL_SD_DIR[i]);
-            if (file != null && file.exists() && !file.equals(InternalStorageFile)      // Directory must exist and not be internal memory
-                    && file.length() > 0) {
-                // Directory also must have space and files
-                String[] fileList = file.list();
-                if (fileList != null && fileList.length > 0) {
+
+        // Scan storage for XXXX-XXXX folder pattern that should represent the sdcard
+        File storage = new File("/storage");
+        if (ExternalSDCardStorageFile == null && storage.exists() && storage.canRead()) {
+            File[] files = storage.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return pathname.getName().matches("[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}");
+                }
+            });
+            for (File file: files) {
+                if (file.canRead()) {
                     ExternalSDCardStorageFile = file;
                     break;
                 }
             }
         }
+
+        if (ExternalSDCardStorageFile == null) {
+            for (int i = 0; i < EXTERNAL_SD_DIR.length; i++) {
+                File file = new File(EXTERNAL_SD_DIR[i]);
+                if (file != null && file.exists() && !file.equals(InternalStorageFile)      // Directory must exist and not be internal memory
+                        && file.length() > 0) {
+                    // Directory also must have space and files
+                    String[] fileList = file.list();
+                    if (fileList != null && fileList.length > 0) {
+                        ExternalSDCardStorageFile = file;
+                        break;
+                    }
+                }
+            }
+        }
+
         HasScanned = true;
     }
 }
