@@ -5,6 +5,7 @@
     <string name="empty"></string>
     <integer name="gingerbread_version">10</integer>
     <string name="website_thanks">http://onscripter.sourceforge.jp/android/android.html</string>
+    <string name="website_privay_policy">https://matthewn4444.github.io/public/onscripter-plus/privacy/</string>
     <string name="website_github">http://git.io/M5fI7g</string>
     <string name="author">Matthew Ng</string>
     <string name="email">matthewn4444@gmail.com</string>
@@ -93,6 +94,9 @@
 
     <string name="settings_about_change_log_title">View Change Log</string>
     <string name="settings_about_change_log_key">settings.about.change.log.key</string>
+
+    <string name="settings_about_privacy_policy_title">Privacy Policy</string>
+    <string name="settings_about_privacy_policy_key">settings.about.privacy.policy.key</string>
 
     <string name="settings_appearance_cate">Appearance</string>
     <string name="settings_theme_key">settings.theme.key</string>

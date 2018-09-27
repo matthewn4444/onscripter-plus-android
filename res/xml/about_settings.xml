@@ -4,6 +4,8 @@
         android:key="@string/settings_about_key">
         <Preference android:title="@string/settings_about_change_log_title"
             android:key="@string/settings_about_change_log_key"/>
+        <Preference android:title="@string/settings_about_privacy_policy_title"
+            android:key="@string/settings_about_privacy_policy_key"/>
         <com.onscripter.plus.settings.LayoutPreference
             android:key="@string/settings_about_app_key"
             android:layout="@layout/about_preference_layout"/>

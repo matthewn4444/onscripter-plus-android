@@ -48,6 +48,7 @@
     <string name="settings_about_thanks_text">Studio O.G.A. Ogapee (오리지널 제작자)에게 이 어플과 소스를 제공한 것에 대해 감사를 표합니다.\n이 어플을 한글로 번역해주신 MadZun에게 감사를 표합니다.\n(http://madzun.blog.me)</string>
 
     <string name="settings_about_change_log_title">변경사항</string>
+    <string name="settings_about_privacy_policy_title">개인정보처리방침</string>
 
     <string name="settings_appearance_cate">외관</string>
     <string name="settings_theme_title">테마</string>

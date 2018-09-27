@@ -3,11 +3,13 @@ package com.onscripter.plus;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.content.res.Resources.Theme;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
@@ -39,6 +41,16 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCl
             e.printStackTrace();
         }
     }
+
+    private final OnPreferenceClickListener mPrivacyPolicyListener = new OnPreferenceClickListener() {
+		@Override
+		public boolean onPreferenceClick(Preference preference) {
+			Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse(getString(R.string.website_privay_policy)));
+			startActivity(browserIntent);
+			return false;
+		}
+	};
 
     @Override
     protected void onApplyThemeResource(Theme theme, int resid, boolean first) {
@@ -74,6 +86,9 @@ public final class Settings extends PreferenceActivity implements OnPreferenceCl
 
             Preference preference = getPreferenceScreen().findPreference(getString(R.string.settings_about_change_log_key));
             preference.setOnPreferenceClickListener(this);
+
+            Preference privacyPref = getPreferenceScreen().findPreference(getString(R.string.settings_about_privacy_policy_key));
+            privacyPref.setOnPreferenceClickListener(mPrivacyPolicyListener);
 
             // Put the version number inside the app about preference screen
             LayoutPreference appAboutPref = (LayoutPreference)findPreference(getString(R.string.settings_about_app_key));

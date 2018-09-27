@@ -46,6 +46,7 @@
     <string name="settings_about_thanks_text">Studio O.G.A. Ogapee（オリジナル製作）には、アプリケーションのソースを提供したことに対して感謝の意を表します。</string>
 
     <string name="settings_about_change_log_title">変更</string>
+    <string name="settings_about_privacy_policy_title">プライバシー ポリシー</string>
 
     <string name="settings_appearance_cate">外観</string>
     <string name="settings_theme_title">テーマ</string>

@@ -45,6 +45,7 @@
     <string name="settings_about_thanks_text">感谢 Studio O.G.A. Ogapee (原作者) 关于此程序的说明和源代码.。\n中文翻译：沈宇抗</string>
 
     <string name="settings_about_change_log_title">看改动日志</string>
+    <string name="settings_about_privacy_policy_title">隱私權政策</string>
 
     <string name="settings_appearance_cate">外观</string>
     <string name="settings_theme_title">主题</string>

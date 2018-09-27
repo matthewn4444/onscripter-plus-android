@@ -46,6 +46,7 @@
     <string name="settings_about_thanks_text">Благодаря Studio O.G.A. Ogapee (первый автор) возможно запустить это приложение.</string>
 
     <string name="settings_about_change_log_title">Посмотреть журнал изменений</string>
+    <string name="settings_about_privacy_policy_title">Политика конфиденциальности</string>
 
     <string name="settings_appearance_cate">внешний вид</string>
     <string name="settings_theme_title">тема</string>
