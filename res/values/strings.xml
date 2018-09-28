@@ -174,7 +174,7 @@
     <string name="message_su_sdcard_fix_exists_no_write">Cannot apply fix to system, have you tried to reboot? If you already tried to reboot, please report this to matthewn4444@gmail.com.</string>
     <string name="message_su_sdcard_fix_issue">Unable to change system files. Please report this to matthewn4444@gmail.com.</string>
     <string name="message_restart_device">For the changes to apply, please reboot the device.</string>
-    <string name="message_loading_ads">Loading ads&#8230; (purchase the ad free version if you don\'t like ads.)</string>
+    <string name="message_loading_ads">Loading ads&#8230; (purchase the ad free version if you don\'t like ads.\nWait %d sec&#8230;</string>
 
     <string name="menu_action_change_save_folder">Change Save Folder</string>
 

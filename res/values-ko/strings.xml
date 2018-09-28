@@ -106,7 +106,7 @@
     <string name="message_su_sdcard_fix_exists_no_write">시스템을 수정할 수 없습니다. 핸드폰을 다시 시작 해보시겠습니까? 만약 이미 다시 시작을 해 보았다면, matthewn4444@gmail.com 메일에 영어로 연락을 주세요.</string>
     <string name="message_su_sdcard_fix_issue">시스템을 수정할 수 없습니다. matthewn4444@gmail.com 메일로 영어로 연락을 주세요.</string>
     <string name="message_restart_device">수정이 완료 되었습니다. 기기를 재부팅 하여 주십시오.</string>
-    <string name="message_loading_ads">광고를 로드하고 있습니다&#8230;</string>
+    <string name="message_loading_ads">광고를 로드하고 있습니다&#8230;\n%d초&#8230;</string>
 
     <string name="menu_action_change_save_folder">세이브 폴더 변경</string>
 

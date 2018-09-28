@@ -104,7 +104,7 @@
     <string name="message_su_sdcard_fix_exists_no_write">システムを修正できません。携帯電話をまた始めてみますか?もしすでに再開をして見れば、matthewn4444@gmail.comメールに英語で連絡をください。</string>
     <string name="message_su_sdcard_fix_issue">システムを修正できません。matthewn4444@gmail.comメールに英語で連絡をください。.</string>
     <string name="message_restart_device">修正が完了しました。機器を再起動させてください。</string>
-    <string name="message_loading_ads">広告をロードしています&#8230;</string>
+    <string name="message_loading_ads">広告をロードしています&#8230;\n%d秒&#8230;</string>
 
     <string name="menu_action_change_save_folder">セーブフォルダ変更</string>
 

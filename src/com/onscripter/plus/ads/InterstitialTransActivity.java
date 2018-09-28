@@ -8,12 +8,14 @@ import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.bugsense.trace.BugSenseHandler;
@@ -24,12 +26,16 @@ import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
 public class InterstitialTransActivity extends ActivityPlus {
     public static final String NextClassExtra = "next.class.extra";
     public static final String InterstitialRateExtra = "interstitial.rate.extra";
+    static final private String PREF_LEFT_AD_BEFORE_BLOCKED = "InterstitialTransActivity.blocked.ad.missed.last.time";
 
-    private static final int AdFailedTimeout = 3000;
+    private static final int AdBlockFailedTimeout = 15000;
+    private static final int AdFailedTimeout = 12000;
 
     private InterstitialAdHelper mInterHelper;
     private ProgressDialog mProgress;
     private Timer mCancelTimer;
+    private SharedPreferences mPrefs;
+    private long mCountdown;
     private boolean mNextRan = false;
     private boolean mAdFailedToLoad = false;
 
@@ -41,6 +47,7 @@ public class InterstitialTransActivity extends ActivityPlus {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!isDebug()) {
             BugSenseHandler.initAndStartSession(this, getString(R.string.bugsense_key));
         }
@@ -50,6 +57,12 @@ public class InterstitialTransActivity extends ActivityPlus {
         View decorView = getWindow().getDecorView();
         int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
         decorView.setSystemUiVisibility(uiOptions);
+
+        // If last time skipped without finishing ad timeout, show it again
+        if (lastTimeSkippedBlockedAd()) {
+            showMissingDialog(0);
+            return;
+        }
 
         int adRate = getIntent().getIntExtra(InterstitialRateExtra, 0);
         mInterHelper = new InterstitialAdHelper(this, adRate);
@@ -63,7 +76,6 @@ public class InterstitialTransActivity extends ActivityPlus {
             @Override
             public void onAdFailedToLoad(int errorCode) {
                 super.onAdFailedToLoad(errorCode);
-
                 synchronized (this) {
                     if (mAdFailedToLoad) {
                         return;
@@ -71,21 +83,10 @@ public class InterstitialTransActivity extends ActivityPlus {
                     mAdFailedToLoad = true;
                 }
 
-                // If failed to load (ad block or no Internet), 50% chance to wait a few secs and forget showing the ad
-                if (mCancelTimer == null && new Random().nextBoolean()) {
-                    if (errorCode == InterstitialAdHelper.ERROR_CODE_ADBLOCK_ERROR) {
-                        showDialog();
-                    }
-
-                    mCancelTimer = new Timer();
-                    mCancelTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            // Cancel after timeout error
-                            doNextAction();
-                        }
-                    }, AdFailedTimeout);
-                } else {
+                // If failed to load (ad block or no Internet), 40% chance to wait a few secs and forget showing the ad
+                if (mCancelTimer == null && new Random().nextInt(10) >= 6) {
+                    showMissingDialog(errorCode);
+                } else if (mProgress == null) {
                     doNextAction();
                 }
             }
@@ -97,10 +98,6 @@ public class InterstitialTransActivity extends ActivityPlus {
             }
         });
 
-        // If the internet is off
-        if (!isNetworkAvailable(this)) {
-            showDialog();
-        }
         if (!mInterHelper.show()) {
             doNextAction();
         }
@@ -112,13 +109,60 @@ public class InterstitialTransActivity extends ActivityPlus {
         super.onDestroy();
     }
 
-    private void showDialog() {
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (mCountdown > 0) {
+            // If user left app before passed, force the next time to play an ad
+            mPrefs.edit().putBoolean(PREF_LEFT_AD_BEFORE_BLOCKED, true).apply();
+        }
+    }
+
+    private void updateDialogTimeout() {
+        if (mProgress != null) {
+            mProgress.setMessage(String.format(getString(R.string.message_loading_ads), mCountdown));
+        }
+    }
+
+    private void showMissingDialog(int errorCode) {
         if (mProgress == null) {
+            mPrefs.edit().remove(PREF_LEFT_AD_BEFORE_BLOCKED).apply();
+            long timeout = errorCode == InterstitialAdHelper.ERROR_CODE_ADBLOCK_ERROR
+                    ? AdBlockFailedTimeout : AdFailedTimeout;
+            mCountdown = timeout / 1000;
             mProgress = new ProgressDialog(this);
-            mProgress.setMessage(getString(R.string.message_loading_ads));
+            updateDialogTimeout();
             mProgress.setCancelable(false);
             mProgress.show();
+
+            if (mCancelTimer == null) {
+                mCancelTimer = new Timer();
+                mCancelTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        // Cancel after timeout error
+                        doNextAction();
+                    }
+                }, timeout);
+
+                mCancelTimer.scheduleAtFixedRate(new TimerTask() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updateDialogTimeout();
+                                mCountdown--;
+                            }
+                        });
+                    }
+                }, 0, 1000);
+            }
         }
+    }
+
+    private boolean lastTimeSkippedBlockedAd() {
+        return mPrefs.getBoolean(PREF_LEFT_AD_BEFORE_BLOCKED, false);
     }
 
     private synchronized void dismissDialog() {

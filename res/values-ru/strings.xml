@@ -105,7 +105,7 @@
     <string name="message_su_sdcard_fix_exists_no_write">Нельзя применить исправления к системе, вы пробовали перезагрузить? Если вы уже пробовали перезагрузиться, просьба сообщить об этом в matthewn4444@gmail.com.</string>
     <string name="message_su_sdcard_fix_issue">Не удается изменить системные файлы. Пожалуйста сообщите об этом matthewn4444@gmail.com.</string>
     <string name="message_restart_device">Чтобы применить изменения перезагрузите устройство.</string>
-    <string name="message_loading_ads">Загрузка реклама&#8230;</string>
+    <string name="message_loading_ads">Загрузка реклама&#8230;\n%dсекунд&#8230;</string>
 
     <string name="menu_action_change_save_folder">Изменить папку сохранений</string>
 
