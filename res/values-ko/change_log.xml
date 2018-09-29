@@ -3,6 +3,8 @@
     <string name="change_log_no_ads">광고 삭제</string>
     <string name="change_log_dialog_title">변경사항</string>
     <string-array name="change_log">
+        <item>v버전 1.2.5,2018년 9월 29일</item>
+        <item>버그를 고쳤다</item>
         <item>v버전 1.2.4,2015년 8월 7일</item>
         <item>고정 된 한국어 텍스트　（쓰르라미 울적에）</item>
         <item>v버전 1.2.3,2015년 7월 25일</item>

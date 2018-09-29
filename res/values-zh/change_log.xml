@@ -2,6 +2,8 @@
 <resources>
     <string name="change_log_dialog_title">改动日志</string>
     <string-array name="change_log">
+        <item>v版本 1.2.5,2018年9月29日</item>
+        <item>修正错误</item>
         <item>v版本 1.2.4,2015年8月7日</item>
         <item>崩溃固定的游戏 (Moon of Darkness)</item>
         <item>v版本 1.2.3,2015年7月25日</item>
