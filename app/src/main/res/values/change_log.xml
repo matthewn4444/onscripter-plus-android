@@ -5,6 +5,8 @@
     <string name="change_log_dialog_title">Recent Changes</string>
     <string name="bullet_point">&#8226;</string>
     <string-array name="change_log">
+        <item>vVersion 1.2.5,9/29/2018</item>
+        <item>Added a way to view sdcards, should work with most devices/versions, but may not work on some</item>
         <item>vVersion 1.2.4,8/7/2015</item>
         <item>Fixed freezing when not choosing an external video player</item>
         <item>Added more error messages for corrupted save files</item>
