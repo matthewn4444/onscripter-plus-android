@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.view.View;
 
 import com.bugsense.trace.BugSenseHandler;
+import com.google.android.gms.ads.AdRequest;
 import com.onscripter.plus.ActivityPlus;
 import com.onscripter.plus.R;
 import com.onscripter.plus.ads.InterstitialAdHelper.AdListener;
@@ -127,8 +128,20 @@ public class InterstitialTransActivity extends ActivityPlus {
     private void showMissingDialog(int errorCode) {
         if (mProgress == null) {
             mPrefs.edit().remove(PREF_LEFT_AD_BEFORE_BLOCKED).apply();
-            long timeout = errorCode == InterstitialAdHelper.ERROR_CODE_ADBLOCK_ERROR
-                    ? AdBlockFailedTimeout : AdFailedTimeout;
+
+            long timeout = 0;
+            switch (errorCode) {
+            case InterstitialAdHelper.ERROR_CODE_ADBLOCK_ERROR:
+                timeout = AdBlockFailedTimeout;
+                break;
+            case AdRequest.ERROR_CODE_NETWORK_ERROR:
+                timeout = AdFailedTimeout;
+                break;
+            default:
+                // Internet was not the reason, so skip the ad
+                doNextAction();
+                return;
+            }
             mCountdown = timeout / 1000;
             mProgress = new ProgressDialog(this);
             updateDialogTimeout();
