@@ -55,6 +55,8 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
     public static final String USE_DEFAULT_FONT_EXTRA = "use_default_font_extra";
     public static final String DIALOG_FONT_SCALE_KEY = "dialog_font_scale_key";
 
+    private static final String PREF_AD_SHOWN_ALREADY = "ad.shown.already";
+
     private static final String[] mIgnoreGameExceptions = {
         "getparam: not in a subroutine",
         "return: not in gosub",
@@ -213,6 +215,7 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             mDisplayHeight -= attachAds();
         }
         mSessionStart = System.currentTimeMillis();
+        mPrefs.edit().putBoolean(PREF_AD_SHOWN_ALREADY, false).apply();
 
         runSDLApp();
     }
@@ -478,6 +481,14 @@ public class ONScripter extends ActivityPlus implements OnClickListener, OnDismi
             Analytics.buttonEvent(BUTTON.BACK);
             removeHideControlsTimer();
             mGame.exitApp();
+
+            if (mPrefs.getBoolean(PREF_AD_SHOWN_ALREADY, false)) {
+                // Probably will finish the original activity, better than nothing
+                finish();
+                return;
+            }
+            mPrefs.edit().putBoolean(PREF_AD_SHOWN_ALREADY, true).apply();
+
             refreshTimer = false;
 
             // Go to interstitial activity to see if ads will be shown to the user or not
