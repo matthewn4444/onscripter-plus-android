@@ -1,3 +1,5 @@
+This repository is not active anymore.
+
 ===========================
 Onscripter Plus For Android
 ===========================
