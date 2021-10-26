@@ -1,4 +1,4 @@
-This repository is not active anymore.
+This repository is not active anymore. (Oct 18, 2021)
 
 ===========================
 Onscripter Plus For Android
